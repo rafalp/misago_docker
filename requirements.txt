@@ -1,0 +1,2 @@
+misago<0.18
+uwsgi<2.1
