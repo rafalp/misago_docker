@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
+from distutils.util import strtobool
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -27,16 +28,16 @@ _ = lambda s: s
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '9pxz%pdyu+yk&(x1(m13)r_h^#nvs43mvtnf@!+5o51*+w!b*r'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = strtobool(os.environ.get('DEBUG', 'no'))
 
 
 # A list of strings representing the host/domain names that this Django site can serve.
 # If you are unsure, just enter here your domain name, eg. ['mysite.com', 'www.mysite.com']
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [hostname.strip() for hostname in os.environ.get('VIRTUAL_HOST', '').split(',')]
 
 
 # Database
@@ -46,10 +47,10 @@ DATABASES = {
     'default': {
         # Misago requires PostgreSQL to run
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': '',
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': 'localhost',
+        'NAME': os.environ.get('POSTGRES_DB') or os.environ.get('POSTGRES_USER'),
+        'USER': os.environ.get('POSTGRES_USER'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+        'HOST': 'postgres',
         'PORT': 5432,
     }
 }
@@ -94,9 +95,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = os.environ.get('LANGUAGE_CODE', 'en-us')
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = os.environ.get('TIME_ZONE', 'UTC')
 
 USE_I18N = True
 
@@ -337,7 +338,7 @@ REST_FRAMEWORK = {
 # spanish, swedish and turkish
 # Example on adding custom language can be found here: https://github.com/lemonskyjwt/plpstgrssearch
 
-MISAGO_SEARCH_CONFIG = 'simple'
+MISAGO_SEARCH_CONFIG = os.environ.get('SEARCH_CONFIG', 'simple')
 
 
 # Path to directory containing avatar galleries
@@ -374,3 +375,13 @@ MISAGO_PROFILE_FIELDS = [
         ],
     },
 ]
+
+
+# Misago-Docker settings override
+# If you want to override any of the above settings or create new ones without editing this file,
+# you may do so by creating custom overrides.py file next to settings.py and placing them in it.
+
+try:
+    from .overrides import *
+except ImportError:
+    pass
