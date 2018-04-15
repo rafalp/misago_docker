@@ -11,7 +11,11 @@
 # than single maintenance task is running at single time)
 #
 # You are free to edit this file to add custom `manage.py` calls for your site.
- 
+
+# Make sure database is available
+./wait_for_postgres.sh
+
+# Run maintenance commands
 python manage.py prunecategories
 python manage.py buildactivepostersranking
 python manage.py clearattachments
