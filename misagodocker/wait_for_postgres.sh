@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
-# This utility script pauses docker's execution until we are sure that PostgreSQL has started
+# Sometimes Misago may attempt to run before PostgreSQL service, crashing
+# in result.This script delays that moment until we are sure that database
+# is available.
+
 export PGPASSWORD=$POSTGRES_PASSWORD
 RETRIES=10
 

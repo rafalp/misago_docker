@@ -16,12 +16,16 @@ RUN apt-get update && \
       gettext && \
     apt-get clean
 
+# Install requirements file
 ADD requirements.txt /
 RUN pip install -r requirements.txt
 
+# Make current directory available as "Misago" within docker
 ADD . /misago
 WORKDIR /misago
 
+# Expose port 80 from Docker
 EXPOSE 80
 
-CMD ./entrypoint.sh
+# Call entrypoint script to setup 
+CMD ["uwsgi" "--ini uwsgi.ini"]
