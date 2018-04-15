@@ -60,9 +60,12 @@ DATABASES = {
 # https://docs.djangoproject.com/en/1.11/topics/cache/#setting-up-the-cache
 
 CACHES = {
-    'default': {
-        # Misago doesn't run well with LocMemCache in production environments
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://redis/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
     }
 }
 
@@ -157,12 +160,6 @@ EMAIL_HOST_PASSWORD = ''
 DEFAULT_FROM_EMAIL = 'Forums <%s>' % EMAIL_HOST_USER
 
 
-# Allow users to delete their own accounts?
-# Providing such feature is required by EU law from entities that process europeans personal data.
-
-MISAGO_ENABLE_DELETE_OWN_ACCOUNT = True
-
-
 # Application definition
 
 AUTH_USER_MODEL = 'misago_users.User'
@@ -241,6 +238,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'misagodocker.urls'
+
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 
 TEMPLATES = [
     {
@@ -375,6 +374,12 @@ MISAGO_PROFILE_FIELDS = [
         ],
     },
 ]
+
+
+# Allow users to delete their own accounts?
+# Providing such feature is required by EU law from entities that process europeans personal data.
+
+MISAGO_ENABLE_DELETE_OWN_ACCOUNT = True
 
 
 # Misago-Docker settings override
