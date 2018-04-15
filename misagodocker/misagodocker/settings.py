@@ -141,6 +141,10 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'theme', 'static'),
 ]
 
+# Fingerprint static files
+
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
+
 
 # Email configuration
 # https://docs.djangoproject.com/en/1.11/ref/settings/#email-backend
@@ -149,18 +153,18 @@ STATICFILES_DIRS = [
 if os.environ.get('MAILGUN_API_KEY'):
     EMAIL_BACKEND = 'anymail.backends.mailgun.EmailBackend'
     ANYMAIL = {
-        'MAILGUN_API_KEY': os.environ.['MAILGUN_API_KEY'],
+        'MAILGUN_API_KEY': os.environ['MAILGUN_API_KEY'],
     }
 elif os.environ.get('MAILJET_API_KEY_PUBLIC') and os.environ.get('MAILJET_API_KEY_PRIVATE'):
     EMAIL_BACKEND = 'anymail.backends.mailjet.EmailBackend'
     ANYMAIL = {
-        'MAILJET_API_KEY': os.environ.['MAILJET_API_KEY_PUBLIC'],
-        'MAILJET_SECRET_KEY': os.environ.['MAILJET_API_KEY_PRIVATE'],
+        'MAILJET_API_KEY': os.environ['MAILJET_API_KEY_PUBLIC'],
+        'MAILJET_SECRET_KEY': os.environ['MAILJET_API_KEY_PRIVATE'],
     }
 elif os.environ.get('SENDINBLUE_API_KEY'):
     EMAIL_BACKEND = 'anymail.backends.sendinblue.EmailBackend'
     ANYMAIL = {
-        'SENDINBLUE_API_KEY': os.environ.['SENDINBLUE_API_KEY'],
+        'SENDINBLUE_API_KEY': os.environ['SENDINBLUE_API_KEY'],
     }
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -200,6 +204,7 @@ INSTALLED_APPS = [
     'crispy_forms',
     'debug_toolbar',
     'mptt',
+    'raven.contrib.django.raven_compat',
     'rest_framework',
 
     # Misago apps
@@ -336,6 +341,80 @@ REST_FRAMEWORK = {
     'UNAUTHENTICATED_USER': 'misago.users.models.AnonymousUser',
     'URL_FORMAT_OVERRIDE': None,
 }
+
+
+# Setup custom logging if SENTRY_DSN is specified
+
+if os.environ.get('SENTRY_DSN'):
+    RAVEN_CONFIG = {
+        'dsn': os.environ['SENTRY_DSN'],
+        'include_versions': False,
+    }
+
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': True,
+        'root': {
+            'level': 'INFO',
+            'handlers': ['sentry', 'file'],
+        },
+        'formatters': {
+            'verbose': {
+                'format': '%(levelname)s %(asctime)s %(module)s '
+                        '%(process)d %(thread)d %(message)s'
+            },
+            'simple': {
+                'format': '[%(asctime)s] %(levelname)s %(message)s'
+            },
+        },
+        'formatters': {
+            'verbose': {
+                'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+            },
+        },
+        'handlers': {
+            'sentry': {
+                'level': 'INFO', # Change to ERROR, WARNING, INFO, etc.
+                'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
+            },
+            'file': {
+                'level': 'INFO',
+                'class': 'logging.FileHandler',
+                'formatter': 'simple',
+                'filename': os.path.join(BASE_DIR, 'misago.log'),
+            },
+            'console': {
+                'level': 'DEBUG',
+                'class': 'logging.StreamHandler',
+                'formatter': 'verbose'
+            },
+            'null': {
+                'level': 'DEBUG',
+                'class': 'logging.NullHandler',
+            },
+        },
+        'loggers': {
+            'django.db.backends': {
+                'level': 'ERROR',
+                'handlers': ['console'],
+                'propagate': False,
+            },
+            'django.security.DisallowedHost': {
+                'handlers': ['null'],
+                'propagate': False,
+            },
+            'raven': {
+                'level': 'DEBUG',
+                'handlers': ['console'],
+                'propagate': False,
+            },
+            'sentry.errors': {
+                'level': 'DEBUG',
+                'handlers': ['console'],
+                'propagate': False,
+            },
+        },
+    }
 
 
 # Misago specific settings
