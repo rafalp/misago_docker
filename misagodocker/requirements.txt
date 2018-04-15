@@ -1,3 +1,5 @@
 misago<0.18
-django_redis<5
+django-anymail<3
+django-redis<5
+raven
 uwsgi<2.1

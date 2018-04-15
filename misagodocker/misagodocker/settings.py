@@ -145,19 +145,29 @@ STATICFILES_DIRS = [
 # Email configuration
 # https://docs.djangoproject.com/en/1.11/ref/settings/#email-backend
 
-EMAIL_HOST = 'localhost'
-EMAIL_PORT = 25
+# Misago Docker performs some magic based on whichever setting we are using
+if os.environ.get('MAILGUN_API_KEY'):
+    EMAIL_BACKEND = 'anymail.backends.mailgun.EmailBackend'
+    ANYMAIL = {
+        'MAILGUN_API_KEY': os.environ.['MAILGUN_API_KEY'],
+    }
+elif os.environ.get('MAILJET_API_KEY_PUBLIC') and os.environ.get('MAILJET_API_KEY_PRIVATE'):
+    EMAIL_BACKEND = 'anymail.backends.mailjet.EmailBackend'
+    ANYMAIL = {
+        'MAILJET_API_KEY': os.environ.['MAILJET_API_KEY_PUBLIC'],
+        'MAILJET_SECRET_KEY': os.environ.['MAILJET_API_KEY_PRIVATE'],
+    }
+elif os.environ.get('SENDINBLUE_API_KEY'):
+    EMAIL_BACKEND = 'anymail.backends.sendinblue.EmailBackend'
+    ANYMAIL = {
+        'SENDINBLUE_API_KEY': os.environ.['SENDINBLUE_API_KEY'],
+    }
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
+# Default email address set as sender for outgoing e-mails
 
-# If either of these settings is empty, Django won't attempt authentication.
-
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
-
-
-# Default email address to use for various automated correspondence from the site manager(s).
-
-DEFAULT_FROM_EMAIL = 'Forums <%s>' % EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', '')
 
 
 # Application definition
@@ -186,8 +196,9 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # 3rd party apps used by Misago
-    'debug_toolbar',
+    'anymail',
     'crispy_forms',
+    'debug_toolbar',
     'mptt',
     'rest_framework',
 
@@ -380,13 +391,3 @@ MISAGO_PROFILE_FIELDS = [
 # Providing such feature is required by EU law from entities that process europeans personal data.
 
 MISAGO_ENABLE_DELETE_OWN_ACCOUNT = True
-
-
-# Misago-Docker settings override
-# If you want to override any of the above settings or create new ones without editing this file,
-# you may do so by creating custom overrides.py file next to settings.py and placing them in it.
-
-try:
-    from .overrides import *
-except ImportError:
-    pass
