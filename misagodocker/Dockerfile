@@ -1,18 +1,27 @@
-FROM python:3.6
+FROM python:3.6-slim
 ENV PYTHONUNBUFFERED 1
 
-RUN \
-  apt-get -y update && \
-  apt-get install -y gettext && \
-  apt-get clean
+# Install dependencies in one single command/layer
+RUN apt-get update && \
+    apt-get install -y \
+      vim \
+      libffi-dev \
+      libssl-dev \
+      sqlite3 \
+      libjpeg-dev \
+      libopenjpeg-dev \
+      locales \
+      cron \
+      postgresql-client
+      gettext && \
+    apt-get clean
 
-ADD requirements.txt /app/
-RUN pip install -r /app/requirements.txt
+ADD requirements.txt /
+RUN pip install -r requirements.txt
 
-ADD . /app
-WORKDIR /app
+ADD . /misago
+WORKDIR /misago
 
-EXPOSE 8000
-ENV PORT 8000
+EXPOSE 80
 
-CMD ["uwsgi", "/app/misagodocker/wsgi/uwsgi.ini"]
+CMD ./entrypoint.sh

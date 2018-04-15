@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+
 # This utility script pauses docker's execution until we are sure that PostgreSQL has started
 export PGPASSWORD=$POSTGRES_PASSWORD
 RETRIES=10
