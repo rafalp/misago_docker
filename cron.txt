@@ -1,0 +1,13 @@
+# This is the crontab file (https://en.wikipedia.org/wiki/Cron) for Misago-Docker
+# You are free to customize it by adding additional entries or changing the schedule
+# at which the "docker-compose run" is executed, but please keep it in this file.
+#
+# After updating this file, make sure you load it into cron so its used by your system.
+# To do that, simply run this command in directory containing this file:
+#
+#  crontab cron.txt
+#
+# Note: if you want to run additional Django management commands, edit `maintenance.sh`
+# file located in the misagodocker directory instead!
+
+30 0 * * * docker-compose run --rm misago maintenance.sh
