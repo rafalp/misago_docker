@@ -3,6 +3,9 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# Development files
+.vscode
+
 # OS files
 .DS_Store
 thumbs.db
