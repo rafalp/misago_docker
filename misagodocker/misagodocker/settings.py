@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
-from . import env
+from .utils import strtobool, strtolist
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -31,13 +31,13 @@ _ = lambda s: s
 SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env.get_bool('DEBUG', False)
+DEBUG = strtobool(os.environ.get('DEBUG'))
 
 
 # A list of strings representing the host/domain names that this Django site can serve.
 # If you are unsure, just enter here your domain name, eg. ['mysite.com', 'www.mysite.com']
 
-ALLOWED_HOSTS = env.get_list('VIRTUAL_HOST')
+ALLOWED_HOSTS = strtolist(os.environ.get('VIRTUAL_HOST'))
 
 
 # Database
@@ -479,7 +479,7 @@ MISAGO_SEARCH_CONFIG = os.environ.get('SEARCH_CONFIG', 'simple')
 # Enables users to learn what data about them is being held by the site without having to contact
 # site's administrators.
 
-MISAGO_ENABLE_DOWNLOAD_OWN_DATA = env.get_bool('ENABLE_DOWNLOAD_OWN_DATA')
+MISAGO_ENABLE_DOWNLOAD_OWN_DATA = strtobool(os.environ.get('ENABLE_DOWNLOAD_OWN_DATA'))
 
 # Path to the directory that Misago should use to prepare user data downloads.
 # Should not be accessible from internet.
@@ -492,7 +492,7 @@ MISAGO_USER_DATA_DOWNLOADS_WORKING_DIR = os.path.join(BASE_DIR, 'userdata')
 # This mechanism doesn't delete user posts, polls or attachments, but attempts to anonymize any
 # data about user left behind after user is deleted.
 
-MISAGO_ENABLE_DELETE_OWN_ACCOUNT = env.get_bool('ENABLE_DELETE_OWN_ACCOUNT')
+MISAGO_ENABLE_DELETE_OWN_ACCOUNT = strtobool(os.environ.get('ENABLE_DELETE_OWN_ACCOUNT'))
 
 
 # Automatically delete new user accounts that weren't activated in specified time
