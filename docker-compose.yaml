@@ -20,7 +20,7 @@ services:
       - misago-redis:/data
 
   misago:
-    build: misagodocker
+    build: misago
     restart: unless-stopped
     volumes:
       - misago-media:/misago/media
