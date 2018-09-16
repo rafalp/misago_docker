@@ -15,4 +15,4 @@ def strtobool(value):
 def strtolist(value):
     if value is None:
         return []
-    return [item.strip() for item in os.environ.get(name).split(',')]
+    return [item.strip() for item in value.split(',')]
