@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
+from . import env
 
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -27,16 +28,16 @@ _ = lambda s: s
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'o0fx@+6xmgq94@rawu$*jl&yy0(q&rikl3t10u3yq-4454x^w1'
+SECRET_KEY = os.environ.get('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.get_bool('DEBUG', False)
 
 
 # A list of strings representing the host/domain names that this Django site can serve.
 # If you are unsure, just enter here your domain name, eg. ['mysite.com', 'www.mysite.com']
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = env.get_list('VIRTUAL_HOST')
 
 
 # Database
@@ -46,10 +47,10 @@ DATABASES = {
     'default': {
         # Misago requires PostgreSQL to run
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': '',
-        'USER': '',
-        'PASSWORD': '',
-        'HOST': 'localhost',
+        'NAME': os.environ.get('POSTGRES_DB') or os.environ.get('POSTGRES_USER'),
+        'USER': os.environ.get('POSTGRES_USER'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+        'HOST': 'postgres',
         'PORT': 5432,
     }
 }
@@ -59,9 +60,12 @@ DATABASES = {
 # https://docs.djangoproject.com/en/1.11/topics/cache/#setting-up-the-cache
 
 CACHES = {
-    'default': {
-        # Misago doesn't run well with LocMemCache in production environments
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://redis/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
     }
 }
 
@@ -94,9 +98,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = os.environ.get('LANGUAGE_CODE', 'en-us')
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = os.environ.get('TIME_ZONE', 'UTC')
 
 USE_I18N = True
 
@@ -138,22 +142,40 @@ STATICFILES_DIRS = [
 ]
 
 
+# Fingerprint static files
+# Includes small version checksum at end of every static file,
+# forcing browser to download new version when file contents change.
+
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
+
+
 # Email configuration
 # https://docs.djangoproject.com/en/1.11/ref/settings/#email-backend
 
-EMAIL_HOST = 'localhost'
-EMAIL_PORT = 25
-
-
-# If either of these settings is empty, Django won't attempt authentication.
-
-EMAIL_HOST_USER = ''
-EMAIL_HOST_PASSWORD = ''
+# Misago Docker performs some magic based on whichever setting we are using
+if os.environ.get('MAILGUN_API_KEY'):
+    EMAIL_BACKEND = 'anymail.backends.mailgun.EmailBackend'
+    ANYMAIL = {
+        'MAILGUN_API_KEY': os.environ['MAILGUN_API_KEY'],
+    }
+elif os.environ.get('MAILJET_API_KEY_PUBLIC') and os.environ.get('MAILJET_API_KEY_PRIVATE'):
+    EMAIL_BACKEND = 'anymail.backends.mailjet.EmailBackend'
+    ANYMAIL = {
+        'MAILJET_API_KEY': os.environ['MAILJET_API_KEY_PUBLIC'],
+        'MAILJET_SECRET_KEY': os.environ['MAILJET_API_KEY_PRIVATE'],
+    }
+elif os.environ.get('SENDINBLUE_API_KEY'):
+    EMAIL_BACKEND = 'anymail.backends.sendinblue.EmailBackend'
+    ANYMAIL = {
+        'SENDINBLUE_API_KEY': os.environ['SENDINBLUE_API_KEY'],
+    }
+else:
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 
 # Default email address to use for various automated correspondence from the site manager(s).
 
-DEFAULT_FROM_EMAIL = 'Forums <%s>' % EMAIL_HOST_USER
+DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', '')
 
 
 # Application definition
@@ -235,6 +257,8 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'misagodocker.urls'
+
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 
 SOCIAL_AUTH_PIPELINE = (
     # Steps required by social pipeline to work - don't delete those!
@@ -356,6 +380,80 @@ REST_FRAMEWORK = {
 }
 
 
+# Setup custom logging if SENTRY_DSN is specified
+
+if os.environ.get('SENTRY_DSN'):
+    RAVEN_CONFIG = {
+        'dsn': os.environ['SENTRY_DSN'],
+        'include_versions': False,
+    }
+
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': True,
+        'root': {
+            'level': 'INFO',
+            'handlers': ['sentry', 'file'],
+        },
+        'formatters': {
+            'verbose': {
+                'format': '%(levelname)s %(asctime)s %(module)s '
+                        '%(process)d %(thread)d %(message)s'
+            },
+            'simple': {
+                'format': '[%(asctime)s] %(levelname)s %(message)s'
+            },
+        },
+        'formatters': {
+            'verbose': {
+                'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+            },
+        },
+        'handlers': {
+            'sentry': {
+                'level': 'INFO', # Change to ERROR, WARNING, INFO, etc.
+                'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
+            },
+            'file': {
+                'level': 'INFO',
+                'class': 'logging.FileHandler',
+                'formatter': 'simple',
+                'filename': os.path.join(BASE_DIR, 'misago.log'),
+            },
+            'console': {
+                'level': 'DEBUG',
+                'class': 'logging.StreamHandler',
+                'formatter': 'verbose'
+            },
+            'null': {
+                'level': 'DEBUG',
+                'class': 'logging.NullHandler',
+            },
+        },
+        'loggers': {
+            'django.db.backends': {
+                'level': 'ERROR',
+                'handlers': ['console'],
+                'propagate': False,
+            },
+            'django.security.DisallowedHost': {
+                'handlers': ['null'],
+                'propagate': False,
+            },
+            'raven': {
+                'level': 'DEBUG',
+                'handlers': ['console'],
+                'propagate': False,
+            },
+            'sentry.errors': {
+                'level': 'DEBUG',
+                'handlers': ['console'],
+                'propagate': False,
+            },
+        },
+    }
+
+
 # Misago specific settings
 # https://misago.readthedocs.io/en/latest/developers/settings.html
 
@@ -364,7 +462,7 @@ REST_FRAMEWORK = {
 # On Misago admin panel home page you will find a message telling you if you have entered the
 # correct value, or what value is correct in case you've didn't.
 
-MISAGO_ADDRESS = 'http://my-misago-site.com/'
+MISAGO_ADDRESS = os.environ.get('ADDRESS')
 
 
 # PostgreSQL text search configuration to use in searches
@@ -374,14 +472,14 @@ MISAGO_ADDRESS = 'http://my-misago-site.com/'
 # spanish, swedish and turkish
 # Example on adding custom language can be found here: https://github.com/lemonskyjwt/plpstgrssearch
 
-MISAGO_SEARCH_CONFIG = 'simple'
+MISAGO_SEARCH_CONFIG = os.environ.get('SEARCH_CONFIG', 'simple')
 
 
 # Allow users to download their personal data
 # Enables users to learn what data about them is being held by the site without having to contact
 # site's administrators.
 
-MISAGO_ENABLE_DOWNLOAD_OWN_DATA = True
+MISAGO_ENABLE_DOWNLOAD_OWN_DATA = env.get_bool('ENABLE_DOWNLOAD_OWN_DATA')
 
 # Path to the directory that Misago should use to prepare user data downloads.
 # Should not be accessible from internet.
@@ -394,7 +492,7 @@ MISAGO_USER_DATA_DOWNLOADS_WORKING_DIR = os.path.join(BASE_DIR, 'userdata')
 # This mechanism doesn't delete user posts, polls or attachments, but attempts to anonymize any
 # data about user left behind after user is deleted.
 
-MISAGO_ENABLE_DELETE_OWN_ACCOUNT = True
+MISAGO_ENABLE_DELETE_OWN_ACCOUNT = env.get_bool('ENABLE_DELETE_OWN_ACCOUNT')
 
 
 # Automatically delete new user accounts that weren't activated in specified time
@@ -402,7 +500,9 @@ MISAGO_ENABLE_DELETE_OWN_ACCOUNT = True
 # the "deleteinactiveusers" management command, or change this value to zero. Otherwise
 # keep it short to give users a chance to retry on their own after few days pass.
 
-MISAGO_DELETE_NEW_INACTIVE_USERS_OLDER_THAN_DAYS = 2
+MISAGO_DELETE_NEW_INACTIVE_USERS_OLDER_THAN_DAYS = int(
+    os.environ.get('DELETE_NEW_INACTIVE_USERS_OLDER_THAN_DAYS', 2)
+)
 
 
 # Path to directory containing avatar galleries
@@ -414,7 +514,9 @@ MISAGO_AVATAR_GALLERY = os.path.join(BASE_DIR, 'avatargallery')
 # Specifies the number of days that IP addresses are stored in the database before removing.
 # Change this setting to None to never remove old IP addresses.
 
-MISAGO_IP_STORE_TIME = 50
+MISAGO_IP_STORE_TIME = int(
+    os.environ.get('IP_STORE_TIME', 50)
+)
 
 
 # Profile fields
