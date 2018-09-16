@@ -1,0 +1,69 @@
+#!/bin/bash
+# appctl is an utility script for controlling your Misago deployment.
+# To find out what options are available, run it without any arguments.
+
+# Text styles
+RED='\033[0;31m'
+BOLD=$(tput bold)
+NORMAL=$(tput sgr0)
+
+# Utility functions used by action commands
+error() {
+    echo -e "${RED}Error:${NORMAL} $1"
+}
+
+require_in_docker() {
+    if [[ ! $IN_MISAGO_DOCKER = 1 ]]; then
+        error "This command can only be ran inside the running Misago docker container."
+        exit 1
+    fi
+}
+
+wait_for_db() {
+    require_in_docker
+
+    export PGPASSWORD=$POSTGRES_PASSWORD
+    RETRIES=10
+
+    until psql -h $POSTGRES_HOST -U $POSTGRES_USER -d $POSTGRES_DB -c "select 1" > /dev/null 2>&1 || [ $RETRIES -eq 0 ]; do
+        echo "Waiting for PostgreSQL to start, $((RETRIES--)) remaining attempts..."
+        sleep 2
+    done
+}
+
+# Check if user has docker-compose
+if [[ ! $IN_MISAGO_DOCKER = 1 ]]; then
+    if ! command -v docker-compose >/dev/null 2>&1; then
+        error "You need to have Docker installed to use this tool."
+        echo
+        echo "Docker release for your system can be downloaded for free from this page:"
+        echo "https://www.docker.com/get-started"
+        echo
+        exit 1
+    fi
+fi
+
+# Commands
+intro() {
+    echo "Usage: ./appctl [arg] ..."
+    echo "Arguments grouped by type:"
+    echo
+}
+
+# Handle invalid argument
+invalid_argument() {
+    echo -e "Invalid argument: ${RED}$1${NORMAL}"
+    echo "Please run this script without any arguments to see the list of available arguments."
+    exit 1
+}
+
+# Command dispatcher
+if [[ $1 ]]; then
+    if [[ $1 = "setup" ]]; then
+        echo "Not implemented yet"
+    else
+        invalid_argument $1
+    fi
+else
+    intro
+fi
