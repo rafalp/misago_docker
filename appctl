@@ -1,5 +1,5 @@
 #!/bin/bash
-# appctl is an utility script for controlling your Misago deployment.
+# appctl is an utility script for managing your Misago deployment.
 # To find out what options are available, run it without any arguments.
 
 # Text styles
