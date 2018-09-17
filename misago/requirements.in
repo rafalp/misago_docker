@@ -1,0 +1,5 @@
+misago
+django-anymail
+django-redis
+raven
+uwsgi
