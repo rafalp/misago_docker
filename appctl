@@ -48,6 +48,26 @@ intro() {
     echo "Usage: ./appctl [arg] ..."
     echo "Arguments grouped by type:"
     echo
+    echo "Setup and update:"
+    echo
+    echo "    ${BOLD}setup${NORMAL}         setup new Misago site."
+    echo "    ${BOLD}update${NORMAL}        run update commands."
+    echo
+    echo "Process control:"
+    echo
+    echo "    ${BOLD}start${NORMAL}         start Misago and services."
+    echo "    ${BOLD}stop${NORMAL}          stop any running services."
+    echo "    ${BOLD}restart${NORMAL}       restart all services."
+    echo
+    echo "Backup:"
+    echo
+    echo "Shortcuts:"
+    echo
+    echo "    ${BOLD}manage.py${NORMAL}         runs \"python manage.py\" inside docker."
+    echo "    ${BOLD}bash${NORMAL}              starts bash session inside running Misago container."
+    echo "    ${BOLD}run${NORMAL}               runs \"docker-compose run --rm misago\"."
+    echo "    ${BOLD}psql${NORMAL}              runs psql connected to your database."
+    echo
 }
 
 # Handle invalid argument
@@ -57,10 +77,15 @@ invalid_argument() {
     exit 1
 }
 
+# Run new site setup
+setup() {
+    python3 wizard/main.py
+}
+
 # Command dispatcher
 if [[ $1 ]]; then
     if [[ $1 = "setup" ]]; then
-        echo "Not implemented yet"
+        setup
     else
         invalid_argument $1
     fi
