@@ -4,20 +4,20 @@ services:
   postgres:
     image: postgres:10-alpine
     restart: unless-stopped
+    volumes:
+      - misago-database:/var/lib/postgresql/data
     networks:
       - misago
     env_file:
-      - misago.env
-    volumes:
-      - misago-database:/var/lib/postgresql/data
+      - ./env/postgres.env
 
   redis:
-    image: redis:3-alpine
+    image: redis:4-alpine
     restart: unless-stopped
-    networks:
-      - misago
     volumes:
       - misago-redis:/data
+    networks:
+      - misago
 
   misago:
     build: misago
@@ -29,17 +29,17 @@ services:
         aliases:
           - misago
     env_file:
-      - misago.env
-      - postgres.env
+      - ./env/misago.env
+      - ./env/postgres.env
     depends_on:
       - postgres
       - redis
     tty: true
 
-volumes:
-  - misago-database
-  - misago-media
-  - misago-redis
-
 networks:
-  - misago
+  misago:
+
+volumes:
+  misago-database:
+  misago-media:
+  misago-redis:

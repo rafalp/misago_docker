@@ -12,7 +12,7 @@ RUN apt-get update && \
       libopenjpeg-dev \
       locales \
       cron \
-      postgresql-client
+      postgresql-client \
       gettext && \
     apt-get clean
 
