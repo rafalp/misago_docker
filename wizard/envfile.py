@@ -20,7 +20,7 @@ class EnvFile:
     def save(self, header=None):
         lines = []
         if header:
-           lines.append("# %s" % header)
+            lines.append("# %s" % header)
         lines.append("# %s\n" % datetime.now())
 
         for key in sorted(self.variables.keys()):
@@ -40,7 +40,7 @@ class EnvFile:
 
     def get(self, name, default=None):
         return self.variables.get(name, default)
-    
+
 
 def parse_env_file(file_contents):
     variables = {}
@@ -52,10 +52,10 @@ def parse_env_file(file_contents):
             continue
         if "=" not in stripped_line:
             continue
-        
+
         assignment_position = stripped_line.find("=")
         key = stripped_line[:assignment_position]
-        value = stripped_line[assignment_position + 1:].strip('"')
+        value = stripped_line[assignment_position + 1 :].strip('"')
         variables[key] = value
 
     return variables
