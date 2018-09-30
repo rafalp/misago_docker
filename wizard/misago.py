@@ -38,9 +38,6 @@ def run_misago_wizard(env_file):
     run_timezone_wizard(env_file)
     run_email_wizard(env_file)
 
-    env_file["SENDINBLUE_API_KEY"] = "fixme"
-    env_file["SENTRY_DSN"] = "fixme"
-
     env_file.save(FILE_HEADER)
 
 
@@ -76,7 +73,7 @@ def run_address_wizard(env_file):
             print()
 
     env_file["VIRTUAL_HOST"] = hostname
-    env_file["MISAGO_ADDRESS"] = "https://%s" % hostname
+    env_file["ADDRESS"] = "https://%s" % hostname
 
 
 def run_language_wizard(env_file):
@@ -137,7 +134,7 @@ def run_email_provider_wizard(env_file):
     email_provider_prompt = [
         "Which e-mail provider do you want to use?",
         "",
-        "1 - Any SMTP provider",
+        "1 - SMTP",
         "2 - Gmail (gmail.com)",
         "3 - Mailgun (mailgun.com)",
         "4 - Mailjet (mailjet.com)",
@@ -182,31 +179,46 @@ def run_smtp_wizard(env_file):
             print()
 
     email_password_prompt = "Enter your SMTP user password (optinal but recommended): "
-    email_password = None
+    email_password = input(email_password_prompt).strip()
 
-    while not email_password:
-        email_password = input(email_password_prompt).strip()
+    email_ssl = input_bool("Enable SSL", default=False)
+    email_tls = input_bool("Enable TLS", default=False)
 
-    email_ssl = input_bool("Enable SSL")
-    email_tls = input_bool("Enable TLS")
+    email_port_prompt = "Enter your SMTP port: "
+    email_port = None
 
-    email_password_prompt = "Enter your SMTP port: "
-    email_password = None
+    while not email_port:
+        email_port = input(email_port_prompt).strip()
+        if not email_port:
+            email_port = None
+            print("You have to enter a SMTP port.")
+            print()
 
-    while not email_password:
-        email_password = input(email_password_prompt).strip()
+    email_address_prompt = "Enter your site's e-mail address: "
+    email_address = input(email_address_prompt).strip()
+
+    while not email_address:
+        email_address = input(email_address_prompt).strip()
+        if not email_address:
+            email_address = None
+            print("You have to enter e-mail address.")
+            print()
+
+    email_from_prompt = 'Enter your sender name (eg. "Misago Forums", optional): '
+    email_from = input(email_from_prompt).strip()
 
     env_file["EMAIL_PROVIDER"] = "smtp"
     env_file["EMAIL_HOST"] = email_host
-    env_file["EMAIL_HOST_USER"] = email_user
-    env_file["EMAIL_HOST_PASSWORD"] = email_password
-    # EMAIL_USE_SSL
-    # EMAIL_USE_TLS
-    # EMAIL_HOST
-    # EMAIL_HOST_PASSWORD
-    # EMAIL_HOST_USER
-    # EMAIL_PORT
-    pass
+    env_file["EMAIL_USER"] = email_user
+    env_file["EMAIL_PASSWORD"] = email_password
+    env_file["EMAIL_USE_SSL"] = "yes" if email_ssl else "no"
+    env_file["EMAIL_USE_TLS"] = "yes" if email_tls else "no"
+    env_file["EMAIL_PORT"] = email_port
+
+    if email_from:
+        env_file["DEFAULT_FROM_EMAIL"] = "%s <%s>" % (email_from, email_address)
+    else:
+        env_file["DEFAULT_FROM_EMAIL"] = email_address
 
 
 def run_gmail_wizard(env_file):
@@ -236,6 +248,7 @@ def run_gmail_wizard(env_file):
     env_file["EMAIL_PROVIDER"] = "gmail"
     env_file["GMAIL_USER"] = email_address
     env_file["GMAIL_PASSWORD"] = password
+
     if email_from:
         env_file["DEFAULT_FROM_EMAIL"] = "%s <%s>" % (email_from, email_address)
     else:
@@ -255,6 +268,7 @@ def run_mailgun_wizard(env_file):
 
     env_file["EMAIL_PROVIDER"] = "mailgun"
     env_file["MAILGUN_API_KEY"] = api_key
+    env_file["DEFAULT_FROM_EMAIL"] = ""
 
 
 def run_mailjet_wizard(env_file):
@@ -281,3 +295,20 @@ def run_mailjet_wizard(env_file):
     env_file["EMAIL_PROVIDER"] = "mailjet"
     env_file["MAILJET_API_KEY_PUBLIC"] = api_key
     env_file["MAILJET_API_KEY_PRIVATE"] = api_secret
+    env_file["DEFAULT_FROM_EMAIL"] = ""
+
+
+def run_sendinblue_wizard(env_file):
+    api_key_prompt = "Enter your SendinBlue api key: "
+    api_key = None
+
+    while not api_key:
+        api_key = input(api_key_prompt).strip()
+        if not api_key:
+            api_key = None
+            print("You have to enter an api key.")
+            print()
+
+    env_file["EMAIL_PROVIDER"] = "sendinblue"
+    env_file["SENDINBLUE_API_KEY"] = api_key
+    env_file["DEFAULT_FROM_EMAIL"] = ""
