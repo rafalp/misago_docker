@@ -150,7 +150,7 @@ def run_email_provider_wizard(env_file):
         2: run_gmail_wizard,
         3: run_mailgun_wizard,
         4: run_mailjet_wizard,
-        5: run_mailgun_wizard,
+        5: run_sendinblue_wizard,
     }
 
     email_provider_wizard = wizards_map[int(email_provider)]
