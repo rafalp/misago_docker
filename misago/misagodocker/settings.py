@@ -47,10 +47,10 @@ DATABASES = {
     'default': {
         # Misago requires PostgreSQL to run
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': os.environ.get('POSTGRES_USER'),
+        'NAME': os.environ.get('POSTGRES_DB') or os.environ.get('POSTGRES_USER'),
         'USER': os.environ.get('POSTGRES_USER'),
         'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-        'HOST': 'postgres',
+        'HOST': os.environ.get('POSTGRES_HOST', 'postgres'),
         'PORT': 5432,
     }
 }
@@ -152,19 +152,35 @@ STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesSto
 # Email configuration
 # https://docs.djangoproject.com/en/1.11/ref/settings/#email-backend
 
-# Misago Docker performs some magic based on whichever setting we are using
-if os.environ.get('MAILGUN_API_KEY'):
+# Misago Docker autoconfigures the email provider based on user preferences
+
+if os.environ.get('EMAIL_PROVIDER') == "smtp":
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_USE_SSL = strtobool(os.environ['EMAIL_SSL'])
+    EMAIL_USE_TLS = strtobool(os.environ['EMAIL_TLS'])
+    EMAIL_HOST = os.environ['EMAIL_HOST']
+    EMAIL_HOST_PASSWORD = os.environ['EMAIL_PASSWORD']
+    EMAIL_HOST_USER = os.environ['EMAIL_USER']
+    EMAIL_PORT =  os.environ['EMAIL_PORT']
+elif os.environ.get('EMAIL_PROVIDER') == "gmail":
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_USE_TLS = True
+    EMAIL_HOST = 'smtp.gmail.com'
+    EMAIL_HOST_PASSWORD = os.environ['GMAIL_PASSWORD']
+    EMAIL_HOST_USER = os.environ['GMAIL_USER']
+    EMAIL_PORT = 587
+elif os.environ.get('EMAIL_PROVIDER') == "mailgun":
     EMAIL_BACKEND = 'anymail.backends.mailgun.EmailBackend'
     ANYMAIL = {
         'MAILGUN_API_KEY': os.environ['MAILGUN_API_KEY'],
     }
-elif os.environ.get('MAILJET_API_KEY_PUBLIC') and os.environ.get('MAILJET_API_KEY_PRIVATE'):
+elif os.environ.get('EMAIL_PROVIDER') == "mailjet":
     EMAIL_BACKEND = 'anymail.backends.mailjet.EmailBackend'
     ANYMAIL = {
         'MAILJET_API_KEY': os.environ['MAILJET_API_KEY_PUBLIC'],
         'MAILJET_SECRET_KEY': os.environ['MAILJET_API_KEY_PRIVATE'],
     }
-elif os.environ.get('SENDINBLUE_API_KEY'):
+elif os.environ.get('EMAIL_PROVIDER') == "sendinblue":
     EMAIL_BACKEND = 'anymail.backends.sendinblue.EmailBackend'
     ANYMAIL = {
         'SENDINBLUE_API_KEY': os.environ['SENDINBLUE_API_KEY'],
