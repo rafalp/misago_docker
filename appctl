@@ -37,22 +37,6 @@ intro() {
     echo "Setup and update:"
     echo
     echo "    ${BOLD}setup${NORMAL}         setup new Misago site."
-    echo "    ${BOLD}update${NORMAL}        run update commands."
-    echo
-    echo "Process control:"
-    echo
-    echo "    ${BOLD}start${NORMAL}         start Misago and services."
-    echo "    ${BOLD}stop${NORMAL}          stop any running services."
-    echo "    ${BOLD}restart${NORMAL}       restart all services."
-    echo
-    echo "Backup:"
-    echo
-    echo "Shortcuts:"
-    echo
-    echo "    ${BOLD}manage.py${NORMAL}         runs \"python manage.py\" inside docker."
-    echo "    ${BOLD}bash${NORMAL}              starts bash session inside running Misago container."
-    echo "    ${BOLD}run${NORMAL}               runs \"docker-compose run --rm misago\"."
-    echo "    ${BOLD}psql${NORMAL}              runs psql connected to your database."
     echo
 }
 
@@ -76,16 +60,11 @@ setup() {
     # Run wizard to let user create env files
     python3 wizard/main.py
     # Initialize default database?
-    read -p "Do you want to initialize default database? [Y/n]: " initialize_default_database
-    # Initialize crontab?
-    read -p "Do you want to enable default crontab? [Y/n]: " enable_default_crontab
+    read -p "Do you want to initialize database? [Y/n]: " initialize_default_database
     # Run docker build
     docker-compose build --pull
     if [ "$initialize_default_database" != "n" ]; then
         docker-compose run --rm misago ./.run initialize_default_database
-    fi
-    if [ "$enable_default_crontab" != "n" ]; then
-        echo "SETUP CRONTAB!"
     fi
 }
 
