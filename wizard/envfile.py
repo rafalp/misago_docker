@@ -25,8 +25,6 @@ class EnvFile:
 
         for key in sorted(self.variables.keys()):
             value = self.variables[key]
-            if " " in value or "=" in value:
-                value = '"%s"' % value
             lines.append("%s=%s" % (key, value))
 
         with open(self.path, "w") as f:
