@@ -1,12 +1,22 @@
 import random
 
 
-def ask_for_bool(question, default=True):
+def input_bool(prompt, default=True):
     if default:
         suggestion = "Y/n"
     else:
         suggestion = "N/y"
-    print("%s (%s):" % (question, suggestion))
+
+    result = None
+    while result is None:
+        result = input("%s [%s]: " % (prompt, suggestion))
+        result = result.strip().lower()
+        if result == '':
+            return default
+        if result not in ['y', 'n']:
+            result = None
+            print("Invalid choice.")
+    return result == "y"
 
 
 RANDOM_CHARS = (
