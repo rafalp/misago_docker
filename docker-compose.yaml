@@ -1,17 +1,8 @@
 version: '3.0'
 services:
 
-  reverse-proxy:
-    image: traefik
-    command: --api --docker
-    ports:
-      - "8888:80"
-      - "8080:8080"
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-
   postgres:
-    image: postgres:10-alpine
+    image: postgres:10
     restart: unless-stopped
     networks:
       - misago
@@ -21,7 +12,7 @@ services:
       - misago-database:/var/lib/postgresql/data
 
   redis:
-    image: redis:4-alpine
+    image: redis:4
     restart: unless-stopped
     networks:
       - misago
@@ -41,9 +32,9 @@ services:
     depends_on:
       - postgres
       - redis
-    tty: true
     volumes:
       - misago-media:/misago/media
+    tty: true
 
 networks:
   misago:

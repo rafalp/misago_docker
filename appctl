@@ -7,28 +7,16 @@ RED='\033[0;31m'
 BOLD=$(tput bold)
 NORMAL=$(tput sgr0)
 
+# Define env paths
+# Those are paths to env files created by wizard
+env_paths=(
+    "./env/misago.env"
+    "./env/postgres.env"
+)
+
 # Utility functions used by action commands
 error() {
     echo -e "${RED}Error:${NORMAL} $1"
-}
-
-require_in_docker() {
-    if [[ ! $IN_MISAGO_DOCKER = 1 ]]; then
-        error "This command can only be ran inside the running Misago docker container."
-        exit 1
-    fi
-}
-
-wait_for_db() {
-    require_in_docker
-
-    export PGPASSWORD=$POSTGRES_PASSWORD
-    RETRIES=10
-
-    until psql -h $POSTGRES_HOST -U $POSTGRES_USER -d $POSTGRES_DB -c "select 1" > /dev/null 2>&1 || [ $RETRIES -eq 0 ]; do
-        echo "Waiting for PostgreSQL to start, $((RETRIES--)) remaining attempts..."
-        sleep 2
-    done
 }
 
 # Check if user has docker-compose
@@ -79,7 +67,28 @@ invalid_argument() {
 
 # Run new site setup
 setup() {
+    # Test if env files already exist
+    for env_path in "${env_paths[@]}"; do
+        if [ -e $env_path ]; then
+            error "Setup appears to already been completed."
+            echo
+            exit 1
+        fi
+    done
+    # Run wizard to let user create env files
     python3 wizard/main.py
+    # Initialize default database?
+    read -p "Do you want to initialize default database? [Y/n]: " initialize_default_database
+    # Initialize crontab?
+    read -p "Do you want to enable default crontab? [Y/n]: " enable_default_crontab
+    # Run docker build
+    docker-compose build --pull
+    if [ "$initialize_default_database" != "n" ]; then
+        docker-compose run --rm misago ./.run initialize_default_database
+    fi
+    if [ "$enable_default_crontab" != "n" ]; then
+        echo "SETUP CRONTAB!"
+    fi
 }
 
 # Command dispatcher

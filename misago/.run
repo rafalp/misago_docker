@@ -1,0 +1,50 @@
+#!/bin/bash
+# ".run" is an utility script that is called by main appctl
+# to run certain actions inside Misago's docker container.
+
+# Check if we are inside Misago's docker container
+if [[ ! $IN_MISAGO_DOCKER = 1 ]]; then
+    error "This command can only be ran inside the running Misago docker container."
+    exit 1
+fi
+
+# Utility functions used by action commands
+error() {
+    echo -e "${RED}Error:${NORMAL} $1"
+}
+
+wait_for_db() {
+    export PGPASSWORD=$POSTGRES_PASSWORD
+    RETRIES=10
+    until psql -h postgres -U $POSTGRES_USER -d $POSTGRES_USER -c "select 1" > /dev/null 2>&1 || [ $RETRIES -eq 0 ]; do
+        ((RETRIES--))
+        sleep 2
+    done
+}
+
+# Handle invalid argument
+invalid_argument() {
+    echo -e "Invalid argument: ${RED}$1${NORMAL}"
+    exit 1
+}
+
+# Initialize default database
+initialize_default_database() {
+    # wait for DB to be ready
+    wait_for_db
+    # migrate default database
+    echo "Migrating database"
+    python manage.py migrate
+    # ask user to create first admin account
+    echo "Creating first superuser account"
+    python manage.py createsuperuser
+}
+
+# Command dispatcher
+if [[ $1 ]]; then
+    if [[ $1 = "initialize_default_database" ]]; then
+        initialize_default_database
+    else
+        invalid_argument $1
+    fi
+fi
