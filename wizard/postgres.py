@@ -15,10 +15,7 @@ def generate_default_postgres_env_file(env_file):
     env_file["POSTGRES_PASSWORD"] = "%s" % get_random_string(100)
     env_file.save(FILE_HEADER)
 
-    print("Saved postgres.env file with following database settings:")
-    print()
-    print("User:       %s" % env_file["POSTGRES_USER"])
-    print("Password:   %s" % env_file["POSTGRES_PASSWORD"])
+    print("Auto-configured PostgreSQL database.")
 
 
 def update_postgres_env_file(env_file):

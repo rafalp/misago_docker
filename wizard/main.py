@@ -7,4 +7,4 @@ WIZARDS_ANDS_FILES = ((run_misago_wizard, misago), (run_postgres_wizard, postgre
 if __name__ == "__main__":
     for run_wizard, env_file in WIZARDS_ANDS_FILES:
         run_wizard(env_file)
-        print()
+    print()

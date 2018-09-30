@@ -1,24 +1,25 @@
-FROM python:3.6-slim
+FROM python:3.6
+
 ENV PYTHONUNBUFFERED 1
+ENV IN_MISAGO_DOCKER 1
 
 # Install dependencies in one single command/layer
 RUN apt-get update && \
     apt-get install -y \
-      build-essential \
       vim \
       libffi-dev \
       libssl-dev \
-      sqlite3 \
       libjpeg-dev \
       libopenjp2-7-dev \
       locales \
       cron \
+      postgresql-client \
       gettext && \
     apt-get clean
 
 # Install requirements file
 ADD requirements.txt /
-RUN pip install -r requirements.txt
+RUN pip install --upgrade pip && pip install -r requirements.txt
 
 # Make current directory available as "Misago" within docker
 ADD . /misago
