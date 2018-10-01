@@ -28,10 +28,10 @@ _ = lambda s: s
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get('SECRET_KEY')
+SECRET_KEY = os.environ.get('MISAGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = strtobool(os.environ.get('DEBUG'))
+DEBUG = strtobool(os.environ.get('MISAGO_DEBUG'))
 
 
 # A list of strings representing the host/domain names that this Django site can serve.
@@ -50,7 +50,7 @@ DATABASES = {
         'NAME': os.environ.get('POSTGRES_DB') or os.environ.get('POSTGRES_USER'),
         'USER': os.environ.get('POSTGRES_USER'),
         'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
-        'HOST': os.environ.get('POSTGRES_HOST', 'postgres'),
+        'HOST': os.environ.get('POSTGRES_HOST'),
         'PORT': 5432,
     }
 }
@@ -98,9 +98,9 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
-LANGUAGE_CODE = os.environ.get('LANGUAGE_CODE', 'en-us')
+LANGUAGE_CODE = os.environ.get('MISAGO_LANGUAGE_CODE', 'en-us')
 
-TIME_ZONE = os.environ.get('TIME_ZONE', 'UTC')
+TIME_ZONE = os.environ.get('MISAGO_TIME_ZONE', 'UTC')
 
 USE_I18N = True
 
@@ -154,36 +154,36 @@ STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesSto
 
 # Misago Docker autoconfigures the email provider based on user preferences
 
-if os.environ.get('EMAIL_PROVIDER') == "smtp":
+if os.environ.get('MISAGO_EMAIL_PROVIDER') == "smtp":
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-    EMAIL_USE_SSL = strtobool(os.environ['EMAIL_SSL'])
-    EMAIL_USE_TLS = strtobool(os.environ['EMAIL_TLS'])
-    EMAIL_HOST = os.environ['EMAIL_HOST']
-    EMAIL_HOST_PASSWORD = os.environ['EMAIL_PASSWORD']
-    EMAIL_HOST_USER = os.environ['EMAIL_USER']
-    EMAIL_PORT =  os.environ['EMAIL_PORT']
-elif os.environ.get('EMAIL_PROVIDER') == "gmail":
+    EMAIL_USE_SSL = strtobool(os.environ['MISAGO_EMAIL_USE_SSL'])
+    EMAIL_USE_TLS = strtobool(os.environ['MISAGO_EMAIL_USE_TLS'])
+    EMAIL_HOST = os.environ['MISAGO_EMAIL_HOST']
+    EMAIL_HOST_PASSWORD = os.environ['MISAGO_EMAIL_PASSWORD']
+    EMAIL_HOST_USER = os.environ['MISAGO_EMAIL_USER']
+    EMAIL_PORT =  os.environ['MISAGO_EMAIL_PORT']
+elif os.environ.get('MISAGO_EMAIL_PROVIDER') == "gmail":
     EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
     EMAIL_USE_TLS = True
     EMAIL_HOST = 'smtp.gmail.com'
-    EMAIL_HOST_PASSWORD = os.environ['GMAIL_PASSWORD']
-    EMAIL_HOST_USER = os.environ['GMAIL_USER']
+    EMAIL_HOST_PASSWORD = os.environ['MISAGO_GMAIL_PASSWORD']
+    EMAIL_HOST_USER = os.environ['MISAGO_GMAIL_USER']
     EMAIL_PORT = 587
-elif os.environ.get('EMAIL_PROVIDER') == "mailgun":
+elif os.environ.get('MISAGO_EMAIL_PROVIDER') == "mailgun":
     EMAIL_BACKEND = 'anymail.backends.mailgun.EmailBackend'
     ANYMAIL = {
-        'MAILGUN_API_KEY': os.environ['MAILGUN_API_KEY'],
+        'MAILGUN_API_KEY': os.environ['MISAGO_MAILGUN_API_KEY'],
     }
-elif os.environ.get('EMAIL_PROVIDER') == "mailjet":
+elif os.environ.get('MISAGO_EMAIL_PROVIDER') == "mailjet":
     EMAIL_BACKEND = 'anymail.backends.mailjet.EmailBackend'
     ANYMAIL = {
-        'MAILJET_API_KEY': os.environ['MAILJET_API_KEY_PUBLIC'],
-        'MAILJET_SECRET_KEY': os.environ['MAILJET_API_KEY_PRIVATE'],
+        'MAILJET_API_KEY': os.environ['MISAGO_MAILJET_API_KEY_PUBLIC'],
+        'MAILJET_SECRET_KEY': os.environ['MISAGO_MAILJET_API_KEY_PRIVATE'],
     }
-elif os.environ.get('EMAIL_PROVIDER') == "sendinblue":
+elif os.environ.get('MISAGO_EMAIL_PROVIDER') == "sendinblue":
     EMAIL_BACKEND = 'anymail.backends.sendinblue.EmailBackend'
     ANYMAIL = {
-        'SENDINBLUE_API_KEY': os.environ['SENDINBLUE_API_KEY'],
+        'SENDINBLUE_API_KEY': os.environ['MISAGO_SENDINBLUE_API_KEY'],
     }
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
@@ -191,7 +191,7 @@ else:
 
 # Default email address to use for various automated correspondence from the site manager(s).
 
-DEFAULT_FROM_EMAIL = os.environ.get('DEFAULT_FROM_EMAIL', '')
+DEFAULT_FROM_EMAIL = os.environ.get('MISAGO_DEFAULT_FROM_EMAIL', '')
 
 
 # Application definition
@@ -478,7 +478,7 @@ if os.environ.get('SENTRY_DSN'):
 # On Misago admin panel home page you will find a message telling you if you have entered the
 # correct value, or what value is correct in case you've didn't.
 
-MISAGO_ADDRESS = os.environ.get('ADDRESS')
+MISAGO_ADDRESS = os.environ.get('MISAGO_ADDRESS')
 
 
 # PostgreSQL text search configuration to use in searches
@@ -488,14 +488,16 @@ MISAGO_ADDRESS = os.environ.get('ADDRESS')
 # spanish, swedish and turkish
 # Example on adding custom language can be found here: https://github.com/lemonskyjwt/plpstgrssearch
 
-MISAGO_SEARCH_CONFIG = os.environ.get('SEARCH_CONFIG', 'simple')
+MISAGO_SEARCH_CONFIG = os.environ.get('MISAGO_SEARCH_CONFIG', 'simple')
 
 
 # Allow users to download their personal data
 # Enables users to learn what data about them is being held by the site without having to contact
 # site's administrators.
 
-MISAGO_ENABLE_DOWNLOAD_OWN_DATA = strtobool(os.environ.get('ENABLE_DOWNLOAD_OWN_DATA'))
+MISAGO_ENABLE_DOWNLOAD_OWN_DATA = strtobool(
+    os.environ.get('MISAGO_ENABLE_DOWNLOAD_OWN_DATA', 'yes')
+)
 
 # Path to the directory that Misago should use to prepare user data downloads.
 # Should not be accessible from internet.
@@ -508,7 +510,9 @@ MISAGO_USER_DATA_DOWNLOADS_WORKING_DIR = os.path.join(BASE_DIR, 'userdata')
 # This mechanism doesn't delete user posts, polls or attachments, but attempts to anonymize any
 # data about user left behind after user is deleted.
 
-MISAGO_ENABLE_DELETE_OWN_ACCOUNT = strtobool(os.environ.get('ENABLE_DELETE_OWN_ACCOUNT'))
+MISAGO_ENABLE_DELETE_OWN_ACCOUNT = strtobool(
+    os.environ.get('MISAGO_ENABLE_DELETE_OWN_ACCOUNT', 'yes')
+)
 
 
 # Automatically delete new user accounts that weren't activated in specified time
@@ -517,7 +521,7 @@ MISAGO_ENABLE_DELETE_OWN_ACCOUNT = strtobool(os.environ.get('ENABLE_DELETE_OWN_A
 # keep it short to give users a chance to retry on their own after few days pass.
 
 MISAGO_DELETE_NEW_INACTIVE_USERS_OLDER_THAN_DAYS = int(
-    os.environ.get('DELETE_NEW_INACTIVE_USERS_OLDER_THAN_DAYS', 2)
+    os.environ.get('MISAGO_DELETE_NEW_INACTIVE_USERS_OLDER_THAN_DAYS', 2)
 )
 
 
@@ -531,7 +535,7 @@ MISAGO_AVATAR_GALLERY = os.path.join(BASE_DIR, 'avatargallery')
 # Change this setting to None to never remove old IP addresses.
 
 MISAGO_IP_STORE_TIME = int(
-    os.environ.get('IP_STORE_TIME', 50)
+    os.environ.get('MISAGO_IP_STORE_TIME', 50)
 )
 
 

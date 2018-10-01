@@ -58,7 +58,7 @@ setup() {
         fi
     done
     # Run wizard to let user create env files
-    python3 wizard/main.py
+    python3 wizard/setup.py
     # Initialize default database?
     read -p "Do you want to initialize database? [Y/n]: " initialize_default_database
     # Run docker build

@@ -26,6 +26,8 @@ services:
       misago:
         aliases:
           - misago
+    environment:
+      - POSTGRES_HOST=postgres
     env_file:
       - ./env/misago.env
       - ./env/postgres.env
