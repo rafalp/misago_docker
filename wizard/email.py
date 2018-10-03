@@ -2,18 +2,10 @@ from utils import input_bool, input_choice
 
 
 def run_email_wizard(env_file):
-    email_prompt = "Configure e-mail sending?"
-    if not input_bool(email_prompt):
-        env_file["MISAGO_EMAIL_PROVIDER"] = "console"
-        return
-
-    run_email_provider_wizard(env_file)
-
-
-def run_email_provider_wizard(env_file):
     email_provider_prompt = [
         "Which e-mail provider do you want to use?",
         "",
+        "0 - None (disables sending e-mails)",
         "1 - SMTP",
         "2 - Gmail (gmail.com)",
         "3 - Mailgun (mailgun.com)",
@@ -23,9 +15,10 @@ def run_email_provider_wizard(env_file):
         "Enter choice's number",
     ]
 
-    email_provider = input_choice("\n".join(email_provider_prompt), "12345")
+    email_provider = input_choice("\n".join(email_provider_prompt), "012345")
 
     wizards_map = {
+        0: disable_sending_emails,
         1: run_smtp_wizard,
         2: run_gmail_wizard,
         3: run_mailgun_wizard,
@@ -35,6 +28,10 @@ def run_email_provider_wizard(env_file):
 
     email_provider_wizard = wizards_map[int(email_provider)]
     email_provider_wizard(env_file)
+
+
+def disable_sending_emails(env_file):
+    env_file["MISAGO_EMAIL_PROVIDER"] = "console"
 
 
 def run_smtp_wizard(env_file):
