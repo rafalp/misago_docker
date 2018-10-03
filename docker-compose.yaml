@@ -2,17 +2,17 @@ version: '3.0'
 services:
 
   postgres:
-    image: postgres:10-alpine
+    image: postgres:10
     restart: unless-stopped
     networks:
       - misago
     env_file:
-      - misago.env
+      - ./env/postgres.env
     volumes:
       - misago-database:/var/lib/postgresql/data
 
   redis:
-    image: redis:3-alpine
+    image: redis:4
     restart: unless-stopped
     networks:
       - misago
@@ -22,24 +22,26 @@ services:
   misago:
     build: misago
     restart: unless-stopped
-    volumes:
-      - misago-media:/misago/media
     networks:
       misago:
         aliases:
           - misago
+    environment:
+      - POSTGRES_HOST=postgres
     env_file:
-      - misago.env
-      - postgres.env
+      - ./env/misago.env
+      - ./env/postgres.env
     depends_on:
       - postgres
       - redis
+    volumes:
+      - misago-media:/misago/media
     tty: true
 
-volumes:
-  - misago-database
-  - misago-media
-  - misago-redis
-
 networks:
-  - misago
+  misago:
+
+volumes:
+  misago-database:
+  misago-media:
+  misago-redis:
