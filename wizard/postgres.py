@@ -15,7 +15,7 @@ def generate_default_postgres_env_file(env_file):
     env_file["POSTGRES_PASSWORD"] = "%s" % get_random_string(100)
     env_file.save(FILE_HEADER)
 
-    print("Auto-configured PostgreSQL database.")
+    print("PostgreSQL configuration has been saved to %s" % env_file.path)
 
 
 def update_postgres_env_file(env_file):
@@ -30,9 +30,11 @@ def update_postgres_env_file(env_file):
         changes.append("Password:   %s" % env_file["POSTGRES_PASSWORD"])
 
     if changes:
-        print("postgres.env has been updated with following database settings:")
+        print(
+            "PostgreSQL configuration file has been updated with following database settings:"
+        )
         print()
         print("\n".join(changes))
         env_file.save(FILE_HEADER)
     else:
-        print("postgres.env is up to date.")
+        print("PostgreSQL configuration file is up to date.")

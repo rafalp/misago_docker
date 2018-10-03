@@ -40,6 +40,7 @@ def run_misago_wizard(env_file):
     run_email_wizard(env_file)
 
     env_file.save(FILE_HEADER)
+    print("Misago configuration has been saved to %s" % env_file.path)
 
 
 def run_address_wizard(env_file):
