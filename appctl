@@ -9,8 +9,9 @@ NORMAL=$(tput sgr0)
 
 # Define env paths
 # Those are paths to env files created by wizard
+misago_env_path="./env/misago.env"
 env_paths=(
-    "./env/misago.env"
+    misago_env_path
     "./env/postgres.env"
 )
 
@@ -34,9 +35,13 @@ intro() {
     echo "Usage: ./appctl [arg] ..."
     echo "Arguments grouped by type:"
     echo
-    echo "Setup and update:"
+    echo "Setup and upgrade:"
     echo
-    echo "    ${BOLD}setup${NORMAL}         setup new Misago site."
+    echo "    ${BOLD}setup${NORMAL}             setup new Misago site."
+    echo
+    echo "Change configuration:"
+    echo
+    echo "    ${BOLD}config email${NORMAL}      change email setup."
     echo
 }
 
@@ -59,6 +64,12 @@ setup() {
     done
     # Run wizard to let user create env files
     python3 wizard/setup.py
+    # Recheck if user completed setup
+    for env_path in "${env_paths[@]}"; do
+        if [ ! -e $env_path ]; then
+            exit 1
+        fi
+    done
     # Initialize default database?
     read -p "Do you want to initialize database? [Y/n]: " initialize_default_database
     # Run docker build
@@ -68,10 +79,29 @@ setup() {
     fi
 }
 
+# E-mail configuration
+config_email() {
+    if [ -e $misago_env_path ]; then
+        python3 wizard/email.py
+    else
+        error "You need to setup your site using \"setup\" option before you will be able to change email configuration."
+    fi
+}
+
 # Command dispatcher
 if [[ $1 ]]; then
     if [[ $1 = "setup" ]]; then
         setup
+    elif [[ $1 = "config" ]]; then
+        if [[ $2 ]]; then
+            if [[ $2 = "email" ]]; then
+                config_email
+            else
+                invalid_argument $2
+            fi
+        else
+            error "\"config\" command needs to be followed by name of configuration you want to change (eg. \"config email\")."
+        fi
     else
         invalid_argument $1
     fi
