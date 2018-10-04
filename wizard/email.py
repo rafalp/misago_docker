@@ -1,3 +1,4 @@
+from env import misago
 from utils import input_bool, input_choice
 
 
@@ -189,3 +190,11 @@ def run_sendinblue_wizard(env_file):
     env_file["MISAGO_EMAIL_PROVIDER"] = "sendinblue"
     env_file["MISAGO_SENDINBLUE_API_KEY"] = api_key
     env_file["MISAGO_DEFAULT_FROM_EMAIL"] = ""
+
+
+if __name__ == "__main__":
+    if misago.is_file():
+        try:
+            run_email_wizard(misago)
+        except KeyboardInterrupt:
+            print()
