@@ -53,7 +53,7 @@ intro() {
     echo
     echo "    ${BOLD}setup${NORMAL}         setup new Misago site."
     echo
-    echo "Docker process"
+    echo "Docker process:"
     echo
     echo "    ${BOLD}start${NORMAL}         start Misago and other containers."
     echo "    ${BOLD}stop${NORMAL}          stop Misago and other containers."
