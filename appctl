@@ -42,6 +42,7 @@ intro() {
     echo "Change configuration:"
     echo
     echo "    ${BOLD}config email${NORMAL}      change email setup."
+    echo "    ${BOLD}config locale${NORMAL}     change locale setup."
     echo
 }
 
@@ -88,6 +89,15 @@ config_email() {
     fi
 }
 
+# Locale configuration
+config_locale() {
+    if [ -e $misago_env_path ]; then
+        python3 wizard/locale.py
+    else
+        error "You need to setup your site using \"setup\" option before you will be able to change locale configuration."
+    fi
+}
+
 # Command dispatcher
 if [[ $1 ]]; then
     if [[ $1 = "setup" ]]; then
@@ -96,6 +106,8 @@ if [[ $1 ]]; then
         if [[ $2 ]]; then
             if [[ $2 = "email" ]]; then
                 config_email
+            elif [[ $2 = "locale" ]]; then
+                config_locale
             else
                 invalid_argument $2
             fi
