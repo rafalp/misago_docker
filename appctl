@@ -94,7 +94,7 @@ config_email() {
 }
 
 # Hostname configuration
-config_hostname() {
+change_hostname() {
     if [ -e $misago_env_path ]; then
         python3 wizard/hostname.py
     else
@@ -103,7 +103,7 @@ config_hostname() {
 }
 
 # Locale configuration
-config_locale() {
+change_locale() {
     if [ -e $misago_env_path ]; then
         python3 wizard/locale.py
     else
@@ -112,7 +112,7 @@ config_locale() {
 }
 
 # Timezone configuration
-config_timezone() {
+change_timezone() {
     if [ -e $misago_env_path ]; then
         python3 wizard/timezone.py
     else
@@ -121,7 +121,7 @@ config_timezone() {
 }
 
 # Debug configuration
-config_debug() {
+change_debug() {
     if [ -e $misago_env_path ]; then
         python3 wizard/debug.py
     else
@@ -143,15 +143,15 @@ if [[ $1 ]]; then
     if [[ $1 = "setup" ]]; then
         setup
     elif [[ $1 = "email" ]]; then
-        config_email
+        change_email
     elif [[ $1 = "hostname" ]]; then
-        config_hostname
+        change_hostname
     elif [[ $1 = "locale" ]]; then
-        config_locale
+        change_locale
     elif [[ $1 = "timezone" ]]; then
-        config_timezone
+        change_timezone
     elif [[ $1 = "debug" ]]; then
-        config_debug
+        change_debug
     elif [[ $1 = "secret" ]]; then
         reset_secret_key
     else
