@@ -9,8 +9,9 @@ NORMAL=$(tput sgr0)
 
 # Define env paths
 # Those are paths to env files created by wizard
+misago_env_path="./env/misago.env"
 env_paths=(
-    "./env/misago.env"
+    misago_env_path
     "./env/postgres.env"
 )
 
@@ -34,9 +35,18 @@ intro() {
     echo "Usage: ./appctl [arg] ..."
     echo "Arguments grouped by type:"
     echo
-    echo "Setup and update:"
+    echo "Setup and upgrade:"
     echo
     echo "    ${BOLD}setup${NORMAL}         setup new Misago site."
+    echo
+    echo "Change configuration:"
+    echo
+    echo "    ${BOLD}email${NORMAL}         change email setup."
+    echo "    ${BOLD}hostname${NORMAL}      change hostname setup."
+    echo "    ${BOLD}locale${NORMAL}        change locale setup."
+    echo "    ${BOLD}timezone${NORMAL}      change timezone setup."
+    echo "    ${BOLD}debug${NORMAL}         change debug mode."
+    echo "    ${BOLD}secret${NORMAL}        reset secret key."
     echo
 }
 
@@ -59,6 +69,12 @@ setup() {
     done
     # Run wizard to let user create env files
     python3 wizard/setup.py
+    # Recheck if user completed setup
+    for env_path in "${env_paths[@]}"; do
+        if [ ! -e $env_path ]; then
+            exit 1
+        fi
+    done
     # Initialize default database?
     read -p "Do you want to initialize database? [Y/n]: " initialize_default_database
     # Run docker build
@@ -68,10 +84,76 @@ setup() {
     fi
 }
 
+# E-mail configuration
+config_email() {
+    if [ -e $misago_env_path ]; then
+        python3 wizard/email.py
+    else
+        error "You need to setup your site using \"setup\" option before you will be able to change email configuration."
+    fi
+}
+
+# Hostname configuration
+config_hostname() {
+    if [ -e $misago_env_path ]; then
+        python3 wizard/hostname.py
+    else
+        error "You need to setup your site using \"setup\" option before you will be able to change hostname configuration."
+    fi
+}
+
+# Locale configuration
+config_locale() {
+    if [ -e $misago_env_path ]; then
+        python3 wizard/locale.py
+    else
+        error "You need to setup your site using \"setup\" option before you will be able to change locale configuration."
+    fi
+}
+
+# Timezone configuration
+config_timezone() {
+    if [ -e $misago_env_path ]; then
+        python3 wizard/timezone.py
+    else
+        error "You need to setup your site using \"setup\" option before you will be able to change timezone configuration."
+    fi
+}
+
+# Debug configuration
+config_debug() {
+    if [ -e $misago_env_path ]; then
+        python3 wizard/debug.py
+    else
+        error "You need to setup your site using \"setup\" option before you will be able to change debug mode."
+    fi
+}
+
+# Reset secret key
+reset_secret_key() {
+    if [ -e $misago_env_path ]; then
+        python3 wizard/secretkey.py
+    else
+        error "You need to setup your site using \"setup\" option before you will be able to reset secret key."
+    fi
+}
+
 # Command dispatcher
 if [[ $1 ]]; then
     if [[ $1 = "setup" ]]; then
         setup
+    elif [[ $1 = "email" ]]; then
+        config_email
+    elif [[ $1 = "hostname" ]]; then
+        config_hostname
+    elif [[ $1 = "locale" ]]; then
+        config_locale
+    elif [[ $1 = "timezone" ]]; then
+        config_timezone
+    elif [[ $1 = "debug" ]]; then
+        config_debug
+    elif [[ $1 = "secret" ]]; then
+        reset_secret_key
     else
         invalid_argument $1
     fi
