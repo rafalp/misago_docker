@@ -2,6 +2,7 @@ import re
 
 from email import run_email_wizard
 from locale import run_locale_wizard
+from secretkey import set_random_secret_key
 from timezone import run_timezone_wizard
 from utils import get_random_secret_key
 
@@ -14,7 +15,7 @@ def run_misago_wizard(env_file):
     env_file["MISAGO_DEBUG"] = "no"
 
     # Generate random secret key using Django's algorithm
-    env_file["MISAGO_SECRET_KEY"] = get_random_secret_key()
+    set_random_secret_key(env_file)
 
     # Ask user to fill in some values
     run_address_wizard(env_file)
