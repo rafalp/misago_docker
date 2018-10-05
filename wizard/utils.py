@@ -54,3 +54,10 @@ def serialize_bool(value):
     if value:
         return "yes"
     return "No"
+
+
+def print_setup_changed_message():
+    print(
+        "Changes saved. "
+        'Remember to run "./appctl restart" to load new configuration.'
+    )

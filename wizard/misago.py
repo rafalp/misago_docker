@@ -2,6 +2,7 @@ import re
 
 from email import run_email_wizard
 from locale import run_locale_wizard
+from timezone import run_timezone_wizard
 from utils import get_random_secret_key
 
 FILE_HEADER = "Misago service settings"
@@ -58,20 +59,3 @@ def run_address_wizard(env_file):
 
     env_file["VIRTUAL_HOST"] = hostname
     env_file["MISAGO_ADDRESS"] = "https://%s" % hostname
-
-
-def run_timezone_wizard(env_file):
-    timezone_prompt = (
-        "Enter the TZ Database (https://bit.ly/2glGdNY) timezone name for your site "
-        '(eg. "Europe/Warsaw"): '
-    )
-    timezone = None
-
-    while not timezone:
-        timezone = input(timezone_prompt).strip().replace("\\", "/")
-        if not timezone:
-            timezone = None
-            print("You have to enter a timezone name.")
-            print()
-
-    env_file["MISAGO_TIME_ZONE"] = timezone

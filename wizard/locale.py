@@ -1,7 +1,7 @@
 import re
 
 from env import misago
-from utils import input_bool
+from utils import input_bool, print_setup_changed_message
 
 LOCALE_REGEX = re.compile(r"^[a-z]{2,3}(-[a-z]+)?$", re.IGNORECASE)
 LANGUAGE_SEARCH_CONFIGS = {
@@ -57,7 +57,7 @@ def print_locale_setup(env_file):
         env_file.get("MISAGO_LANGUAGE_CODE"),
         env_file.get("MISAGO_SEARCH_CONFIG", "simple"),
     )
-    print('Using "%s" locale and "%s" search config' % settings)
+    print('Using "%s" locale and "%s" search config.' % settings)
 
 
 def change_locale_setup(env_file):
@@ -66,6 +66,7 @@ def change_locale_setup(env_file):
     if input_bool("Change locale configuration?", default=False):
         run_locale_wizard(env_file)
         env_file.save()
+        print_setup_changed_message()
 
 
 if __name__ == "__main__":

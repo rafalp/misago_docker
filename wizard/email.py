@@ -1,5 +1,11 @@
 from env import misago
-from utils import get_bool_display, input_bool, input_choice, serialize_bool
+from utils import (
+    get_bool_display,
+    input_bool,
+    input_choice,
+    print_setup_changed_message,
+    serialize_bool,
+)
 
 PROVIDER_CONSOLE = "console"
 PROVIDER_GMAIL = "gmail"
@@ -264,6 +270,7 @@ def change_email_setup(env_file):
     if input_bool("Change e-mail configuration?", default=False):
         run_email_wizard(env_file)
         env_file.save()
+        print_setup_changed_message()
 
 
 if __name__ == "__main__":
