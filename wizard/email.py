@@ -1,5 +1,12 @@
 from env import misago
-from utils import input_bool, input_choice
+from utils import get_bool_display, input_bool, input_choice, serialize_bool
+
+PROVIDER_CONSOLE = "console"
+PROVIDER_GMAIL = "gmail"
+PROVIDER_MAILGUN = "mailgun"
+PROVIDER_MAILJET = "mailjet"
+PROVIDER_SENDINBLUE = "sendinblue"
+PROVIDER_SMTP = "smtp"
 
 
 def run_email_wizard(env_file):
@@ -11,7 +18,7 @@ def run_email_wizard(env_file):
         "2 - Gmail (gmail.com)",
         "3 - Mailgun (mailgun.com)",
         "4 - Mailjet (mailjet.com)",
-        "5 - SendinBlue (sendinblue.com/)",
+        "5 - SendinBlue (sendinblue.com)",
         "",
         "Enter choice's number",
     ]
@@ -32,7 +39,7 @@ def run_email_wizard(env_file):
 
 
 def disable_sending_emails(env_file):
-    env_file["MISAGO_EMAIL_PROVIDER"] = "console"
+    env_file["MISAGO_EMAIL_PROVIDER"] = PROVIDER_CONSOLE
 
 
 def run_smtp_wizard(env_file):
@@ -85,13 +92,13 @@ def run_smtp_wizard(env_file):
     email_from_prompt = 'Enter your sender name (eg. "Misago Forums", optional): '
     email_from = input(email_from_prompt).strip()
 
-    env_file["MISAGO_EMAIL_PROVIDER"] = "smtp"
+    env_file["MISAGO_EMAIL_PROVIDER"] = PROVIDER_SMTP
     env_file["MISAGO_EMAIL_HOST"] = email_host
+    env_file["MISAGO_EMAIL_PORT"] = email_port
     env_file["MISAGO_EMAIL_USER"] = email_user
     env_file["MISAGO_EMAIL_PASSWORD"] = email_password
-    env_file["MISAGO_EMAIL_USE_SSL"] = "yes" if email_ssl else "no"
-    env_file["MISAGO_EMAIL_USE_TLS"] = "yes" if email_tls else "no"
-    env_file["MISAGO_EMAIL_PORT"] = email_port
+    env_file["MISAGO_EMAIL_USE_SSL"] = serialize_bool(email_ssl)
+    env_file["MISAGO_EMAIL_USE_TLS"] = serialize_bool(email_tls)
 
     if email_from:
         env_file["MISAGO_DEFAULT_FROM_EMAIL"] = "%s <%s>" % (email_from, email_address)
@@ -123,7 +130,7 @@ def run_gmail_wizard(env_file):
     email_from_prompt = 'Enter your sender name (eg. "Misago Forums", optional): '
     email_from = input(email_from_prompt).strip()
 
-    env_file["MISAGO_EMAIL_PROVIDER"] = "gmail"
+    env_file["MISAGO_EMAIL_PROVIDER"] = PROVIDER_GMAIL
     env_file["MISAGO_GMAIL_USER"] = email_address
     env_file["MISAGO_GMAIL_PASSWORD"] = password
 
@@ -134,30 +141,30 @@ def run_gmail_wizard(env_file):
 
 
 def run_mailgun_wizard(env_file):
-    api_key_prompt = "Enter your Mailgun api key: "
+    api_key_prompt = "Enter your Mailgun API key: "
     api_key = None
 
     while not api_key:
         api_key = input(api_key_prompt).strip()
         if not api_key:
             api_key = None
-            print("You have to enter an api key.")
+            print("You have to enter an API key.")
             print()
 
-    env_file["MISAGO_EMAIL_PROVIDER"] = "mailgun"
+    env_file["MISAGO_EMAIL_PROVIDER"] = PROVIDER_MAILGUN
     env_file["MISAGO_MAILGUN_API_KEY"] = api_key
     env_file["MISAGO_DEFAULT_FROM_EMAIL"] = ""
 
 
 def run_mailjet_wizard(env_file):
-    api_key_prompt = "Enter your Mailjet api key: "
+    api_key_prompt = "Enter your Mailjet API key: "
     api_key = None
 
     while not api_key:
         api_key = input(api_key_prompt).strip()
         if not api_key:
             api_key = None
-            print("You have to enter an api key.")
+            print("You have to enter an API key.")
             print()
 
     api_secret_prompt = "Enter your Mailjet secret key: "
@@ -170,31 +177,98 @@ def run_mailjet_wizard(env_file):
             print("You have to enter an secret key.")
             print()
 
-    env_file["MISAGO_EMAIL_PROVIDER"] = "mailjet"
+    env_file["MISAGO_EMAIL_PROVIDER"] = PROVIDER_MAILJET
     env_file["MISAGO_MAILJET_API_KEY_PUBLIC"] = api_key
     env_file["MISAGO_MAILJET_API_KEY_PRIVATE"] = api_secret
     env_file["MISAGO_DEFAULT_FROM_EMAIL"] = ""
 
 
 def run_sendinblue_wizard(env_file):
-    api_key_prompt = "Enter your SendinBlue api key: "
+    api_key_prompt = "Enter your SendinBlue API key: "
     api_key = None
 
     while not api_key:
         api_key = input(api_key_prompt).strip()
         if not api_key:
             api_key = None
-            print("You have to enter an api key.")
+            print("You have to enter an API key.")
             print()
 
-    env_file["MISAGO_EMAIL_PROVIDER"] = "sendinblue"
+    env_file["MISAGO_EMAIL_PROVIDER"] = PROVIDER_SENDINBLUE
     env_file["MISAGO_SENDINBLUE_API_KEY"] = api_key
     env_file["MISAGO_DEFAULT_FROM_EMAIL"] = ""
+
+
+def print_email_setup(env_file):
+    if env_file.get("MISAGO_EMAIL_PROVIDER") == PROVIDER_CONSOLE:
+        print("Sending e-mails is currently disabled.")
+
+    if env_file.get("MISAGO_EMAIL_PROVIDER") == PROVIDER_SMTP:
+        print_smtp_setup(env_file)
+
+    if env_file.get("MISAGO_EMAIL_PROVIDER") == PROVIDER_GMAIL:
+        print_gmail_setup(env_file)
+
+    if env_file.get("MISAGO_EMAIL_PROVIDER") == PROVIDER_MAILGUN:
+        print_mailgun_setup(env_file)
+
+    if env_file.get("MISAGO_EMAIL_PROVIDER") == PROVIDER_MAILJET:
+        print_mailjet_setup(env_file)
+
+    if env_file.get("MISAGO_EMAIL_PROVIDER") == PROVIDER_SENDINBLUE:
+        print_sendinblue_setup(env_file)
+
+
+def print_smtp_setup(env_file):
+    print("Using custom SMTP configuration to send e-mails:")
+    print()
+    print("From:        %s" % env_file.get("MISAGO_DEFAULT_FROM_EMAIL"))
+    print("User:        %s" % env_file.get("MISAGO_EMAIL_USER", ""))
+    print("Password:    %s" % env_file.get("MISAGO_EMAIL_PASSWORD", ""))
+    print("Host:        %s" % env_file.get("MISAGO_EMAIL_HOST", ""))
+    print("Port:        %s" % env_file.get("MISAGO_EMAIL_PORT", ""))
+    print("SSL:         %s" % get_bool_display(env_file.get("MISAGO_EMAIL_USE_SSL")))
+    print("TLS:         %s" % get_bool_display(env_file.get("MISAGO_EMAIL_USE_TLS")))
+
+
+def print_gmail_setup(env_file):
+    print("Using Gmail to send e-mails:")
+    print()
+    print("From:        %s" % env_file.get("MISAGO_DEFAULT_FROM_EMAIL"))
+    print("User:        %s" % env_file.get("MISAGO_GMAIL_USER", ""))
+    print("Password:    %s" % env_file.get("MISAGO_GMAIL_PASSWORD", ""))
+
+
+def print_mailgun_setup(env_file):
+    print("Using Mailgun to send e-mails:")
+    print()
+    print("API key:     %s" % env_file.get("MISAGO_MAILGUN_API_KEY"))
+
+
+def print_mailjet_setup(env_file):
+    print("Using Mailjet to send e-mails:")
+    print()
+    print("API key:     %s" % env_file.get("MISAGO_MAILJET_API_KEY_PUBLIC"))
+    print("Secret key:  %s" % env_file.get("MISAGO_MAILJET_API_KEY_PRIVATE"))
+
+
+def print_sendinblue_setup(env_file):
+    print("Using SendinBlue to send e-mails:")
+    print()
+    print("API key:     %s" % env_file.get("MISAGO_SENDINBLUE_API_KEY"))
+
+
+def change_email_setup(env_file):
+    print_email_setup(misago)
+    print()
+    if input_bool("Change e-mail configuration?", default=False):
+        run_email_wizard(env_file)
+        env_file.save()
 
 
 if __name__ == "__main__":
     if misago.is_file():
         try:
-            run_email_wizard(misago)
+            change_email_setup(misago)
         except KeyboardInterrupt:
             print()

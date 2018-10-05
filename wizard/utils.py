@@ -1,5 +1,7 @@
 import random
 
+BOOL_TRUE = ("y", "yes", "true", "1")
+
 
 def input_bool(prompt, default=True):
     if default:
@@ -40,3 +42,15 @@ def get_random_string(length, allowed_chars=RANDOM_CHARS):
 def get_random_secret_key():
     chars = "abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)"
     return get_random_string(50, chars)
+
+
+def get_bool_display(value):
+    if value in BOOL_TRUE:
+        return "Yes"
+    return "No"
+
+
+def serialize_bool(value):
+    if value:
+        return "yes"
+    return "No"
