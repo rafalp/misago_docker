@@ -48,7 +48,7 @@ def get_bool_display(value):
 def serialize_bool(value):
     if value:
         return "yes"
-    return "No"
+    return "no"
 
 
 def print_setup_changed_message():
