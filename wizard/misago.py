@@ -1,29 +1,11 @@
 import re
 
 from email import run_email_wizard
+from locale import run_locale_wizard
 from utils import get_random_secret_key
 
 FILE_HEADER = "Misago service settings"
 HOSTNAME_REGEX = re.compile(r"(?!-)[A-Z\d-]{1,63}(?<!-)$", re.IGNORECASE)
-LANGUAGE_REGEX = re.compile(r"^[a-z]{2,3}(-[a-z]+)?$", re.IGNORECASE)
-LANGUAGE_SEARCH_CONFIGS = {
-    "en": "english",
-    "nl": "dutch",
-    "fi": "finnish",
-    "fr": "french",
-    "de": "german",
-    "hu": "hungarian",
-    "it": "italian",
-    "no": "norwegian",
-    "nb": "norwegian",
-    "nn": "norwegian",
-    "pt": "portuguese",
-    "ro": "romanian",
-    "ru": "russian",
-    "es": "spanish",
-    "sv": "swedish",
-    "tt": "turkish",
-}
 
 
 def run_misago_wizard(env_file):
@@ -35,7 +17,7 @@ def run_misago_wizard(env_file):
 
     # Ask user to fill in some values
     run_address_wizard(env_file)
-    run_language_wizard(env_file)
+    run_locale_wizard(env_file)
     run_timezone_wizard(env_file)
     run_email_wizard(env_file)
 
@@ -76,34 +58,6 @@ def run_address_wizard(env_file):
 
     env_file["VIRTUAL_HOST"] = hostname
     env_file["MISAGO_ADDRESS"] = "https://%s" % hostname
-
-
-def run_language_wizard(env_file):
-    language_prompt = (
-        'Enter the language code for your site\'s locale (eg. "pl" or "en-us"): '
-    )
-    language = None
-
-    while not language:
-        language = input(language_prompt).strip().lower().replace("_", "-")
-        try:
-            if not language:
-                raise ValueError("You have to enter a language.")
-            if not LANGUAGE_REGEX.match(language):
-                raise ValueError("This is not a valid language code.")
-        except ValueError as e:
-            language = None
-            print(e.args[0])
-            print()
-
-    env_file["MISAGO_LANGUAGE_CODE"] = language
-
-    search_config_name = language[:2]
-    if search_config_name in LANGUAGE_SEARCH_CONFIGS:
-        env_file["MISAGO_SEARCH_CONFIG"] = LANGUAGE_SEARCH_CONFIGS[search_config_name]
-    else:
-        # fallback to "simple" config
-        env_file["MISAGO_SEARCH_CONFIG"] = "simple"
 
 
 def run_timezone_wizard(env_file):
