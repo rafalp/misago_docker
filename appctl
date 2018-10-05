@@ -43,6 +43,7 @@ intro() {
     echo
     echo "    ${BOLD}config email${NORMAL}      change email setup."
     echo "    ${BOLD}config locale${NORMAL}     change locale setup."
+    echo "    ${BOLD}config timezone${NORMAL}   change timezone setup."
     echo
 }
 
@@ -98,6 +99,15 @@ config_locale() {
     fi
 }
 
+# Timezone configuration
+config_timezone() {
+    if [ -e $misago_env_path ]; then
+        python3 wizard/timezone.py
+    else
+        error "You need to setup your site using \"setup\" option before you will be able to change timezone configuration."
+    fi
+}
+
 # Command dispatcher
 if [[ $1 ]]; then
     if [[ $1 = "setup" ]]; then
@@ -108,6 +118,8 @@ if [[ $1 ]]; then
                 config_email
             elif [[ $2 = "locale" ]]; then
                 config_locale
+            elif [[ $2 = "timezone" ]]; then
+                config_timezone
             else
                 invalid_argument $2
             fi
