@@ -42,6 +42,7 @@ intro() {
     echo "Change configuration:"
     echo
     echo "    ${BOLD}config email${NORMAL}      change email setup."
+    echo "    ${BOLD}config hostname${NORMAL}   change hostname setup."
     echo "    ${BOLD}config locale${NORMAL}     change locale setup."
     echo "    ${BOLD}config timezone${NORMAL}   change timezone setup."
     echo "    ${BOLD}config debug${NORMAL}      change debug mode."
@@ -92,6 +93,15 @@ config_email() {
     fi
 }
 
+# Hostname configuration
+config_hostname() {
+    if [ -e $misago_env_path ]; then
+        python3 wizard/hostname.py
+    else
+        error "You need to setup your site using \"setup\" option before you will be able to change hostname configuration."
+    fi
+}
+
 # Locale configuration
 config_locale() {
     if [ -e $misago_env_path ]; then
@@ -136,6 +146,8 @@ if [[ $1 ]]; then
         if [[ $2 ]]; then
             if [[ $2 = "email" ]]; then
                 config_email
+            elif [[ $2 = "hostname" ]]; then
+                config_hostname
             elif [[ $2 = "locale" ]]; then
                 config_locale
             elif [[ $2 = "timezone" ]]; then
