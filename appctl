@@ -44,6 +44,7 @@ intro() {
     echo "    ${BOLD}config email${NORMAL}      change email setup."
     echo "    ${BOLD}config locale${NORMAL}     change locale setup."
     echo "    ${BOLD}config timezone${NORMAL}   change timezone setup."
+    echo "    ${BOLD}config secret${NORMAL}     reset secret key."
     echo
 }
 
@@ -108,6 +109,15 @@ config_timezone() {
     fi
 }
 
+# Reset secret key
+reset_secret_key() {
+    if [ -e $misago_env_path ]; then
+        python3 wizard/secretkey.py
+    else
+        error "You need to setup your site using \"setup\" option before you will be able to reset secret key."
+    fi
+}
+
 # Command dispatcher
 if [[ $1 ]]; then
     if [[ $1 = "setup" ]]; then
@@ -120,6 +130,8 @@ if [[ $1 ]]; then
                 config_locale
             elif [[ $2 = "timezone" ]]; then
                 config_timezone
+            elif [[ $2 = "secret" ]]; then
+                reset_secret_key
             else
                 invalid_argument $2
             fi
