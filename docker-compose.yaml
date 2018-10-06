@@ -36,6 +36,7 @@ services:
       - redis
     volumes:
       - misago-media:/misago/media
+      - misago-static:/misago/static
     tty: true
     ports:
       - "127.0.0.1:8080:80"
@@ -47,3 +48,4 @@ volumes:
   misago-database:
   misago-media:
   misago-redis:
+  misago-static:

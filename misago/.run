@@ -44,6 +44,8 @@ initialize_default_database() {
 if [[ $1 ]]; then
     if [[ $1 = "initialize_default_database" ]]; then
         initialize_default_database
+    elif [[ $1 = "wait_for_db" ]]; then
+        wait_for_db
     else
         invalid_argument $1
     fi
