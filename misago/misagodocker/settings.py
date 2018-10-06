@@ -38,6 +38,7 @@ DEBUG = strtobool(os.environ.get('MISAGO_DEBUG'))
 # If you are unsure, just enter here your domain name, eg. ['mysite.com', 'www.mysite.com']
 
 ALLOWED_HOSTS = strtolist(os.environ.get('VIRTUAL_HOST'))
+ALLOWED_HOSTS = ['127.0.0.1']
 
 
 # Database
