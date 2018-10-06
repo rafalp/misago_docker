@@ -132,7 +132,7 @@ show_stats() {
 }
 
 # E-mail configuration
-config_email() {
+change_email() {
     require_setup "You need to setup your site using \"setup\" option before you will be able to change email configuration."
     python3 wizard/email.py
 }
