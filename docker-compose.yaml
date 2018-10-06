@@ -37,6 +37,8 @@ services:
     volumes:
       - misago-media:/misago/media
     tty: true
+    ports:
+      - "127.0.0.1:8080:80"
 
 networks:
   misago:

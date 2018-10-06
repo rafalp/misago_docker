@@ -11,13 +11,27 @@ NORMAL=$(tput sgr0)
 # Those are paths to env files created by wizard
 misago_env_path="./env/misago.env"
 env_paths=(
-    misago_env_path
+    $misago_env_path
     "./env/postgres.env"
 )
 
 # Utility functions used by action commands
 error() {
     echo -e "${RED}Error:${NORMAL} $1"
+}
+
+require_setup() {
+    for env_path in "${env_paths[@]}"; do
+        if [ ! -e $env_path ]; then
+            if [[ $1 ]]; then
+                error $1
+            else
+                error "You need to setup your site using \"setup\" option before you will be able to use this option."
+            fi
+            echo
+            exit 1
+        fi
+    done
 }
 
 # Check if user has docker-compose
@@ -38,6 +52,13 @@ intro() {
     echo "Setup and upgrade:"
     echo
     echo "    ${BOLD}setup${NORMAL}         setup new Misago site."
+    echo
+    echo "Docker process:"
+    echo
+    echo "    ${BOLD}start${NORMAL}         start Misago and other containers."
+    echo "    ${BOLD}stop${NORMAL}          stop Misago and other containers."
+    echo "    ${BOLD}restart${NORMAL}       stop and start docker containers."
+    echo "    ${BOLD}stats${NORMAL}         see list of running docker containers."
     echo
     echo "Change configuration:"
     echo
@@ -72,6 +93,7 @@ setup() {
     # Recheck if user completed setup
     for env_path in "${env_paths[@]}"; do
         if [ ! -e $env_path ]; then
+            echo "Setup canceled."
             exit 1
         fi
     done
@@ -84,64 +106,81 @@ setup() {
     fi
 }
 
+# Start docker containers
+start_containers() {
+    require_setup
+    docker-compose up --detach
+}
+
+# Stop docker containers
+stop_containers() {
+    require_setup
+    docker-compose stop
+}
+
+# Restart docker containers
+restart_containers() {
+    require_setup
+    docker-compose stop
+    docker-compose up --detach
+}
+
+# Show stats for running docker containers
+show_stats() {
+    require_setup
+    docker stats
+}
+
 # E-mail configuration
 config_email() {
-    if [ -e $misago_env_path ]; then
-        python3 wizard/email.py
-    else
-        error "You need to setup your site using \"setup\" option before you will be able to change email configuration."
-    fi
+    require_setup "You need to setup your site using \"setup\" option before you will be able to change email configuration."
+    python3 wizard/email.py
 }
 
 # Hostname configuration
 change_hostname() {
-    if [ -e $misago_env_path ]; then
-        python3 wizard/hostname.py
-    else
-        error "You need to setup your site using \"setup\" option before you will be able to change hostname configuration."
-    fi
+    require_setup "You need to setup your site using \"setup\" option before you will be able to change hostname configuration."
+    python3 wizard/hostname.py
 }
 
 # Locale configuration
 change_locale() {
-    if [ -e $misago_env_path ]; then
-        python3 wizard/locale.py
-    else
-        error "You need to setup your site using \"setup\" option before you will be able to change locale configuration."
-    fi
+    require_setup "You need to setup your site using \"setup\" option before you will be able to change locale configuration."
+    python3 wizard/locale.py
 }
 
 # Timezone configuration
 change_timezone() {
-    if [ -e $misago_env_path ]; then
-        python3 wizard/timezone.py
-    else
-        error "You need to setup your site using \"setup\" option before you will be able to change timezone configuration."
-    fi
+    require_setup "You need to setup your site using \"setup\" option before you will be able to change timezone configuration."
+    python3 wizard/timezone.py
 }
 
 # Debug configuration
 change_debug() {
-    if [ -e $misago_env_path ]; then
-        python3 wizard/debug.py
-    else
-        error "You need to setup your site using \"setup\" option before you will be able to change debug mode."
-    fi
+    require_setup "You need to setup your site using \"setup\" option before you will be able to change debug mode."
+    python3 wizard/debug.py
 }
 
 # Reset secret key
 reset_secret_key() {
-    if [ -e $misago_env_path ]; then
-        python3 wizard/secretkey.py
-    else
-        error "You need to setup your site using \"setup\" option before you will be able to reset secret key."
-    fi
+    require_setup "You need to setup your site using \"setup\" option before you will be able to reset secret key."
+    python3 wizard/secretkey.py
 }
 
 # Command dispatcher
 if [[ $1 ]]; then
     if [[ $1 = "setup" ]]; then
         setup
+    elif [[ $1 = "up" ]]; then
+        start_containers
+    elif [[ $1 = "start" ]]; then
+        start_containers
+    elif [[ $1 = "stop" ]]; then
+        stop_containers
+    elif [[ $1 = "restart" ]]; then
+        restart_containers
+    elif [[ $1 = "stats" ]]; then
+        show_stats
     elif [[ $1 = "email" ]]; then
         change_email
     elif [[ $1 = "hostname" ]]; then
