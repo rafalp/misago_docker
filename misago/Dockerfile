@@ -29,4 +29,4 @@ WORKDIR /misago
 EXPOSE 80
 
 # Call entrypoint script to setup 
-CMD ["uwsgi" "--ini uwsgi.ini"]
+CMD ["uwsgi", "--ini", "uwsgi.ini"]
