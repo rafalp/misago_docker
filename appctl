@@ -97,13 +97,15 @@ setup() {
             exit 1
         fi
     done
-    # Initialize default database?
-    read -p "Do you want to initialize database? [Y/n]: " initialize_default_database
+    # Ask user what actions to perform
+    read -p "Initialize default database? [Y/n]: " initialize_default_database
     # Run docker build
     docker-compose build --pull
     if [ "$initialize_default_database" != "n" ]; then
         docker-compose run --rm misago ./.run initialize_default_database
     fi
+    # Run collectstatic (uses misago-static volume) so site has loaded assets
+    docker-compose run --rm misago python manage.py collectstatic --no-input
 }
 
 # Start docker containers
