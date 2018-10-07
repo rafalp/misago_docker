@@ -29,9 +29,11 @@ def run_email_wizard(env_file):
         "Enter choice's number",
     ]
 
-    email_provider = input_choice("\n".join(email_provider_prompt), "012345")
+    email_provider = input_choice(
+        "\n".join(email_provider_prompt), "012345", coerce_to=int
+    )
 
-    wizards_map = {
+    choices_values = {
         0: disable_sending_emails,
         1: run_smtp_wizard,
         2: run_gmail_wizard,
@@ -40,7 +42,7 @@ def run_email_wizard(env_file):
         5: run_sendinblue_wizard,
     }
 
-    email_provider_wizard = wizards_map[int(email_provider)]
+    email_provider_wizard = choices_values[email_provider]
     email_provider_wizard(env_file)
 
 
