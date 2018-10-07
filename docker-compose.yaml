@@ -37,6 +37,7 @@ services:
     volumes:
       - misago-media:/misago/media
       - misago-static:/misago/static
+      - "./logs:/misago/logs:z"
     tty: true
     ports:
       - "127.0.0.1:8080:80"
