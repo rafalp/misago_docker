@@ -1,19 +1,19 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
-# This is the cron job that does the scheduled maintenace on the Misago.
+# This is the cron job that does the scheduled maintenace for Misago.
 # It deletes old sessions, refreshes active posters list, prunes categories
 # set to delete old threads, keeps read tracking record small, disables
 # expired bans, etc. ect.
 #
-# Tasks defined in this file are ran serially, one after another, making it
+# Tasks defined in this file are ran sequentially, one after the other, making it
 # simpler to keep things in order (eg. active posters list is populated after
-# specified categories are pruned) and their memory usage is in check (no more
-# than single maintenance task is running at single time)
+# users and categories are pruned) and their memory usage is kept in check (no more
+# than single maintenance task will be running at single time).
 #
 # You are free to edit this file to add custom `manage.py` calls for your site.
 
 # Make sure database is available
-./wait_for_postgres.sh
+./.run wait_for_db
 
 # Run maintenance commands
 python manage.py deletemarkedusers
