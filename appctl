@@ -58,7 +58,7 @@ intro() {
     echo "    ${BOLD}start${NORMAL}         start all containers."
     echo "    ${BOLD}stop${NORMAL}          stop all containers."
     echo "    ${BOLD}restart${NORMAL}       stop and start all docker containers."
-    echo "    ${BOLD}reload${NORMAL}        rebuild and restart Misago container."
+    echo "    ${BOLD}rebuild${NORMAL}       rebuild and restart Misago container."
     echo "    ${BOLD}stats${NORMAL}         see list and stats of running docker containers."
     echo
     echo "Change configuration:"
@@ -129,8 +129,8 @@ restart_containers() {
     docker-compose up --detach
 }
 
-# Reload misago container
-reload_misago_container() {
+# Rebuild misago container
+rebuild_misago_container() {
     require_setup
     docker-compose build misago
     docker-compose stop misago
@@ -197,8 +197,8 @@ if [[ $1 ]]; then
         stop_containers
     elif [[ $1 = "restart" ]]; then
         restart_containers
-    elif [[ $1 = "reload" ]]; then
-        reload_misago_container
+    elif [[ $1 = "rebuild" ]]; then
+        rebuild_misago_container
     elif [[ $1 = "stats" ]]; then
         show_stats
     elif [[ $1 = "email" ]]; then
