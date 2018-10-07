@@ -421,11 +421,6 @@ if os.environ.get('SENTRY_DSN'):
                 'format': '[%(asctime)s] %(levelname)s %(message)s'
             },
         },
-        'formatters': {
-            'verbose': {
-                'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
-            },
-        },
         'handlers': {
             'sentry': {
                 'level': 'INFO', # Change to ERROR, WARNING, INFO, etc.
@@ -466,6 +461,33 @@ if os.environ.get('SENTRY_DSN'):
                 'level': 'DEBUG',
                 'handlers': ['console'],
                 'propagate': False,
+            },
+        },
+    }
+else:
+    # Fallback to simple logging to `/misago/logs`
+    LOGGING = {
+        'version': 1,
+        'disable_existing_loggers': False,
+        'formatters': {
+            'simple': {
+                'format': '[%(asctime)s] %(levelname)s %(message)s',
+                'style': '{',
+            },
+        },
+        'handlers': {
+            'file': {
+                'level': 'ERROR',
+                'class': 'logging.FileHandler',
+                'formatter': 'simple',
+                'filename': os.path.join(BASE_DIR, 'logs', 'misago.log'),
+            },
+        },
+        'loggers': {
+            'django': {
+                'handlers': ['file'],
+                'level': 'DEBUG',
+                'propagate': True,
             },
         },
     }
