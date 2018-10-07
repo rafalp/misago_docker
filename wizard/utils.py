@@ -54,6 +54,6 @@ def serialize_bool(value):
 def print_setup_changed_message():
     print(
         "Changes saved. "
-        'Remember to run "./appctl reload" to rebuild and restart '
-        "container to use new configuration."
+        'Remember to run "./appctl rebulid" to rebuild and restart '
+        "Misago container to use new configuration."
     )
