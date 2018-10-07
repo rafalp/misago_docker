@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/bash
 
 # This is the cron job that does the scheduled maintenace for Misago.
 # It deletes old sessions, refreshes active posters list, prunes categories
