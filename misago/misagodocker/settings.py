@@ -226,6 +226,7 @@ INSTALLED_APPS = [
     'mptt',
     'rest_framework',
     'social_django',
+    'raven.contrib.django.raven_compat',
 
     # Misago apps
     'misago.admin',
@@ -397,77 +398,53 @@ REST_FRAMEWORK = {
 }
 
 
-# Setup custom logging if SENTRY_DSN is specified
+# Default logging configuration
+# Logs errors to /logs/misago.log, rotates them every week
 
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process} {thread} {message}',
+            'style': '{',
+        },
+        'simple': {
+            'format': '[{asctime}] {levelname} {message}',
+            'style': '{',
+        },
+    },
+    'handlers': {
+        'file': {
+            'level': 'ERROR',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'formatter': 'simple',
+            'filename': os.path.join(BASE_DIR, 'logs', 'misago.log'),
+            'when': 'W0', # Rotate logs on mondays
+        },
+    },
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'INFO',
+        },
+    },
+}
+
+
+# Enable sentry for logging, if Sentry DNS is specified
 if os.environ.get('SENTRY_DSN'):
     RAVEN_CONFIG = {
         'dsn': os.environ['SENTRY_DSN'],
         'include_versions': False,
     }
-
-    LOGGING = {
-        'version': 1,
-        'disable_existing_loggers': True,
-        'root': {
-            'level': 'INFO',
-            'handlers': ['sentry', 'file'],
-        },
-        'formatters': {
-            'verbose': {
-                'format': '%(levelname)s %(asctime)s %(module)s '
-                        '%(process)d %(thread)d %(message)s'
-            },
-            'simple': {
-                'format': '[%(asctime)s] %(levelname)s %(message)s'
-            },
-        },
-        'formatters': {
-            'verbose': {
-                'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
-            },
-        },
-        'handlers': {
-            'sentry': {
-                'level': 'INFO', # Change to ERROR, WARNING, INFO, etc.
-                'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
-            },
-            'file': {
-                'level': 'INFO',
-                'class': 'logging.FileHandler',
-                'formatter': 'simple',
-                'filename': os.path.join(BASE_DIR, 'misago.log'),
-            },
-            'console': {
-                'level': 'DEBUG',
-                'class': 'logging.StreamHandler',
-                'formatter': 'verbose'
-            },
-            'null': {
-                'level': 'DEBUG',
-                'class': 'logging.NullHandler',
-            },
-        },
-        'loggers': {
-            'django.db.backends': {
-                'level': 'ERROR',
-                'handlers': ['console'],
-                'propagate': False,
-            },
-            'django.security.DisallowedHost': {
-                'handlers': ['null'],
-                'propagate': False,
-            },
-            'raven': {
-                'level': 'DEBUG',
-                'handlers': ['console'],
-                'propagate': False,
-            },
-            'sentry.errors': {
-                'level': 'DEBUG',
-                'handlers': ['console'],
-                'propagate': False,
-            },
-        },
+    LOGGING['root'] = {
+        'level': 'DEBUG',
+        'handlers': ['sentry', 'file'],
+    }
+    LOGGING['handlers']['sentry'] = {
+        'level': os.environ.get('SENTRY_LEVEL', 'ERROR'), # Change to ERROR, WARNING, INFO, etc.
+        'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
     }
 
 

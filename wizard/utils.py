@@ -21,7 +21,7 @@ def input_bool(prompt, default=True):
     return result == "y"
 
 
-def input_choice(prompt, choices):
+def input_choice(prompt, choices, coerce_to=str):
     result = None
     while result is None:
         result = input("%s [%s]: " % (prompt, "/".join(choices)))
@@ -29,7 +29,7 @@ def input_choice(prompt, choices):
         if result not in choices:
             result = None
             print("Invalid choice.")
-    return result
+    return coerce_to(result)
 
 
 RANDOM_CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
