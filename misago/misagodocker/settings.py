@@ -439,7 +439,7 @@ if os.environ.get('SENTRY_DSN'):
         'include_versions': False,
     }
     LOGGING['root'] = {
-        'level': 'INFO',
+        'level': 'DEBUG',
         'handlers': ['sentry', 'file'],
     }
     LOGGING['handlers']['sentry'] = {
