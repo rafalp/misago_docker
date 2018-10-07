@@ -66,6 +66,7 @@ intro() {
     echo "    ${BOLD}hostname${NORMAL}      change hostname setup."
     echo "    ${BOLD}locale${NORMAL}        change locale setup."
     echo "    ${BOLD}timezone${NORMAL}      change timezone setup."
+    echo "    ${BOLD}sentry${NORMAL}        enable or disable Sentry (sentry.io) for logging."
     echo "    ${BOLD}debug${NORMAL}         change debug mode."
     echo "    ${BOLD}secret${NORMAL}        reset secret key."
     echo
@@ -157,6 +158,12 @@ change_timezone() {
     python3 wizard/timezone.py
 }
 
+# Sentry configuration
+change_sentry() {
+    require_setup "You need to setup your site using \"setup\" option before you will be able to configure Sentry."
+    python3 wizard/sentry.py
+}
+
 # Debug configuration
 change_debug() {
     require_setup "You need to setup your site using \"setup\" option before you will be able to change debug mode."
@@ -191,6 +198,8 @@ if [[ $1 ]]; then
         change_locale
     elif [[ $1 = "timezone" ]]; then
         change_timezone
+    elif [[ $1 = "sentry" ]]; then
+        change_sentry
     elif [[ $1 = "debug" ]]; then
         change_debug
     elif [[ $1 = "secret" ]]; then
