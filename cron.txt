@@ -8,6 +8,6 @@
 #  crontab cron.txt
 #
 # Note: if you want to run additional Django management commands, edit `cron`
-# file located in the misago directory.
+# file located in the "misago" directory, and rebuild "misago" container.
 
 30 1 * * * docker-compose run --rm misago ./cron
