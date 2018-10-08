@@ -42,11 +42,11 @@ def run_logging_level_wizard(env_file):
     logging_level_prompt = [
         "Which e-mail provider do you want to use?",
         "",
-        "1 - DEBUG (not recommended)",
-        "2 - INFO (gmail.com)",
-        "3 - WARNING (mailgun.com)",
-        "4 - ERROR (mailjet.com)",
-        "5 - CRITICAL (sendinblue.com)",
+        "1 - DEBUG",
+        "2 - INFO (recommended)",
+        "3 - WARNING",
+        "4 - ERROR",
+        "5 - CRITICAL",
         "",
         "Enter choice's number",
     ]
