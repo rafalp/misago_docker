@@ -11,6 +11,9 @@ def run_misago_wizard(env_file):
     # Disable debug by default, because it's safer that way
     env_file["MISAGO_DEBUG"] = "no"
 
+    # Enable daily backup, just to be safe
+    env_file["MISAGO_DAILY_BACKUP"] = "yes"
+
     # Generate random secret key using Django's algorithm
     set_random_secret_key(env_file)
 

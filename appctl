@@ -51,25 +51,37 @@ intro() {
     echo
     echo "Setup and upgrade:"
     echo
-    echo "    ${BOLD}setup${NORMAL}         setup new Misago site."
+    echo "    ${BOLD}setup${NORMAL}             setup new Misago site."
     echo
     echo "Docker process:"
     echo
-    echo "    ${BOLD}start${NORMAL}         start all containers."
-    echo "    ${BOLD}stop${NORMAL}          stop all containers."
-    echo "    ${BOLD}restart${NORMAL}       stop and start all docker containers."
-    echo "    ${BOLD}rebuild${NORMAL}       rebuild and restart Misago container."
-    echo "    ${BOLD}stats${NORMAL}         see list and stats of running docker containers."
+    echo "    ${BOLD}start${NORMAL}             start all containers."
+    echo "    ${BOLD}stop${NORMAL}              stop all containers."
+    echo "    ${BOLD}restart${NORMAL}           stop and start all docker containers."
+    echo "    ${BOLD}rebuild${NORMAL}           rebuild and restart Misago container."
+    echo "    ${BOLD}stats${NORMAL}             see list and stats of running docker containers."
     echo
     echo "Change configuration:"
     echo
-    echo "    ${BOLD}email${NORMAL}         change email setup."
-    echo "    ${BOLD}hostname${NORMAL}      change hostname setup."
-    echo "    ${BOLD}locale${NORMAL}        change locale setup."
-    echo "    ${BOLD}timezone${NORMAL}      change timezone setup."
-    echo "    ${BOLD}sentry${NORMAL}        enable or disable Sentry (sentry.io) for logging."
-    echo "    ${BOLD}debug${NORMAL}         change debug mode."
-    echo "    ${BOLD}secret${NORMAL}        reset secret key."
+    echo "    ${BOLD}email${NORMAL}             change email setup."
+    echo "    ${BOLD}hostname${NORMAL}          change hostname setup."
+    echo "    ${BOLD}locale${NORMAL}            change locale setup."
+    echo "    ${BOLD}timezone${NORMAL}          change timezone setup."
+    echo "    ${BOLD}sentry${NORMAL}            enable or disable Sentry (sentry.io) for logging."
+    echo "    ${BOLD}dailybackup${NORMAL}       enable or disable daily backup."
+    echo "    ${BOLD}debug${NORMAL}             change debug mode."
+    echo "    ${BOLD}secret${NORMAL}            reset secret key."
+    echo
+    echo "    Note: you need to rebuild Misago container for changes made with those utils to take effect."
+    echo
+    echo "Backup:"
+    echo
+    echo "    ${BOLD}backup${NORMAL}            backup and archive database and media."
+    echo "    ${BOLD}restore BACKUP${NORMAL}    restore database and media from BACKUP archive."
+    echo
+    echo "Shortcuts:"
+    echo
+    echo "    ${BOLD}psql${NORMAL}          runs psql connected to database."
     echo
 }
 
@@ -77,6 +89,7 @@ intro() {
 invalid_argument() {
     echo -e "Invalid argument: ${RED}$1${NORMAL}"
     echo "Please run this script without any arguments to see the list of available arguments."
+    echo
     exit 1
 }
 
@@ -96,6 +109,7 @@ setup() {
     for env_path in "${env_paths[@]}"; do
         if [ ! -e $env_path ]; then
             echo "Setup canceled."
+            echo
             exit 1
         fi
     done
@@ -179,6 +193,12 @@ change_timezone() {
     python3 wizard/timezone.py
 }
 
+# Daily backup configuration
+change_daily_backup() {
+    require_setup "You need to setup your site using \"setup\" option before you will be able to setup daily backup."
+    python3 wizard/dailybackup.py
+}
+
 # Sentry configuration
 change_sentry() {
     require_setup "You need to setup your site using \"setup\" option before you will be able to configure Sentry."
@@ -195,6 +215,24 @@ change_debug() {
 reset_secret_key() {
     require_setup "You need to setup your site using \"setup\" option before you will be able to reset secret key."
     python3 wizard/secretkey.py
+}
+
+# Create new backup
+create_new_backup() {
+    require_setup "You need to setup your site using \"setup\" option before you will be able to backup data."
+    docker-compose run --rm misago ./.run backup
+}
+
+# Restore from backup
+restore_from_backup() {
+    require_setup "You need to setup your site using \"setup\" option before you will be able to backup data."
+    docker-compose run --rm misago ./.run restore "$1"
+}
+
+# Shortcut for psql
+run_psql() {
+    require_setup "You need to setup your site using \"setup\" option before you will be able to use psql."
+    docker-compose run --rm misago ./.run psql
 }
 
 # Command dispatcher
@@ -223,10 +261,18 @@ if [[ $1 ]]; then
         change_timezone
     elif [[ $1 = "sentry" ]]; then
         change_sentry
+    elif [[ $1 = "dailybackup" ]]; then
+        change_daily_backup
     elif [[ $1 = "debug" ]]; then
         change_debug
     elif [[ $1 = "secret" ]]; then
         reset_secret_key
+    elif [[ $1 = "backup" ]]; then
+        create_new_backup
+    elif [[ $1 = "restore" ]]; then
+        restore_from_backup $2
+    elif [[ $1 = "psql" ]]; then
+        run_psql
     else
         invalid_argument $1
     fi

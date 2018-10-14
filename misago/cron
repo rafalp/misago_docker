@@ -15,6 +15,11 @@
 # Make sure database is available
 ./.run wait_for_db
 
+# Create daily backup
+if [[ $MISAGO_DAILY_BACKUP = "yes" ]]; then
+    ./.run backup
+fi
+
 # Run maintenance commands
 python manage.py deletemarkedusers
 python manage.py prunecategories

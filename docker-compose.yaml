@@ -37,6 +37,7 @@ services:
     volumes:
       - misago-media:/misago/media
       - misago-static:/misago/static
+      - "./backups:/misago/backups:z"
       - "./logs:/misago/logs:z"
     tty: true
     ports:

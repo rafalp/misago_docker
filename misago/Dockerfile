@@ -4,7 +4,9 @@ ENV PYTHONUNBUFFERED 1
 ENV IN_MISAGO_DOCKER 1
 
 # Install dependencies in one single command/layer
-RUN apt-get update && \
+RUN wget -q https://www.postgresql.org/media/keys/ACCC4CF8.asc -O - | apt-key add - && \
+    sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main" >> /etc/apt/sources.list.d/pgdg.list' && \
+    apt-get update && \
     apt-get install -y \
       vim \
       libffi-dev \
@@ -13,7 +15,7 @@ RUN apt-get update && \
       libopenjp2-7-dev \
       locales \
       cron \
-      postgresql-client \
+      postgresql-client-10 \
       gettext && \
     apt-get clean
 
