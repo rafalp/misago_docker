@@ -51,30 +51,30 @@ intro() {
     echo
     echo "Setup and upgrade:"
     echo
-    echo "    ${BOLD}setup${NORMAL}         setup new Misago site."
+    echo "    ${BOLD}setup${NORMAL}             setup new Misago site."
     echo
     echo "Docker process:"
     echo
-    echo "    ${BOLD}start${NORMAL}         start all containers."
-    echo "    ${BOLD}stop${NORMAL}          stop all containers."
-    echo "    ${BOLD}restart${NORMAL}       stop and start all docker containers."
-    echo "    ${BOLD}rebuild${NORMAL}       rebuild and restart Misago container."
-    echo "    ${BOLD}stats${NORMAL}         see list and stats of running docker containers."
+    echo "    ${BOLD}start${NORMAL}             start all containers."
+    echo "    ${BOLD}stop${NORMAL}              stop all containers."
+    echo "    ${BOLD}restart${NORMAL}           stop and start all docker containers."
+    echo "    ${BOLD}rebuild${NORMAL}           rebuild and restart Misago container."
+    echo "    ${BOLD}stats${NORMAL}             see list and stats of running docker containers."
     echo
     echo "Change configuration:"
     echo
-    echo "    ${BOLD}email${NORMAL}         change email setup."
-    echo "    ${BOLD}hostname${NORMAL}      change hostname setup."
-    echo "    ${BOLD}locale${NORMAL}        change locale setup."
-    echo "    ${BOLD}timezone${NORMAL}      change timezone setup."
-    echo "    ${BOLD}sentry${NORMAL}        enable or disable Sentry (sentry.io) for logging."
-    echo "    ${BOLD}debug${NORMAL}         change debug mode."
-    echo "    ${BOLD}secret${NORMAL}        reset secret key."
+    echo "    ${BOLD}email${NORMAL}             change email setup."
+    echo "    ${BOLD}hostname${NORMAL}          change hostname setup."
+    echo "    ${BOLD}locale${NORMAL}            change locale setup."
+    echo "    ${BOLD}timezone${NORMAL}          change timezone setup."
+    echo "    ${BOLD}sentry${NORMAL}            enable or disable Sentry (sentry.io) for logging."
+    echo "    ${BOLD}debug${NORMAL}             change debug mode."
+    echo "    ${BOLD}secret${NORMAL}            reset secret key."
     echo
     echo "Backup:"
     echo
-    echo "    ${BOLD}backup${NORMAL}        backup and archive database and media."
-    echo "    ${BOLD}restore${NORMAL}       restore."
+    echo "    ${BOLD}backup${NORMAL}            backup and archive database and media."
+    echo "    ${BOLD}restore BACKUP${NORMAL}    restore database and media from BACKUP archive."
     echo
     echo "Shortcuts:"
     echo

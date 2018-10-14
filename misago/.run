@@ -16,6 +16,8 @@ fi
 # Utility functions used by action commands
 error() {
     echo -e "${RED}Error:${NORMAL} $1"
+    echo
+    exit 1
 }
 
 
@@ -82,11 +84,46 @@ create_new_backup() {
 # Restore database and media from backup archive
 restore_from_backup() {
     if [[ ! $1 ]]; then
-        error ""
+        error "You need to specify backup archive to restore from."
     fi
-
+    # Check if backup archive exists
+    backups_dir="/misago/backups/"
+    if [ ! -e "$backups_dir/$1" ]; then
+        error "Path backups/$1 doesn't exist."
+    fi
+    # Unarchive specified file to tmp directory
+    echo "Restoring from $1..."
+    tmp_dir="/misago/tmp-$(date +%Y%m%d%H%M%S)"
+    mkdir $tmp_dir
+    tar -xzf "$backups_dir/$1" -C $tmp_dir
+    # Find media and database backups in unarchived directory
+    database_sql=false
+    media_dir=false
+    for backup_dir in "$tmp_dir/*"; do
+        if [ -d $backup_dir ]; then
+            database_sql="$(echo $backup_dir/database.sql)"
+            media_dir="$(echo $backup_dir/media)"
+        fi
+    done
+    if [ ! -e $database_sql ]; then
+        rm -rf $tmp_dir
+        error "Specified archive is missing database backup."
+    fi
+    if [ ! -d $media_dir ]; then
+        rm -rf $tmp_dir
+        error "Specified archive is missing media backup."
+    fi
+    # Restore from archive
     wait_for_db
-    echo "RESTORE FROM: $1"
+    PGPASSWORD=$POSTGRES_PASSWORD
+    (psql --username $POSTGRES_USER --host $POSTGRES_HOST $POSTGRES_DB < $database_sql) > /dev/null
+    rm -rf /misago/media/*
+    mv "$media_dir"/* /misago/media/
+    # Cleanup...
+    rm -rf $tmp_dir
+    ls
+    echo "Restore completed! Remember to run \"./appctl rebuild\" to rebuild and restart your site!"
+    echo
 }
 
 # Command dispatcher
