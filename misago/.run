@@ -116,12 +116,11 @@ restore_from_backup() {
     # Restore from archive
     wait_for_db
     PGPASSWORD=$POSTGRES_PASSWORD
-    (psql --username $POSTGRES_USER --host $POSTGRES_HOST $POSTGRES_DB < $database_sql) > /dev/null
+    (psql --username $POSTGRES_USER --host $POSTGRES_HOST $POSTGRES_DB < $database_sql) > /dev/null 2>/dev/null
     rm -rf /misago/media/*
     mv "$media_dir"/* /misago/media/
     # Cleanup...
     rm -rf $tmp_dir
-    ls
     echo "Restore completed! Remember to run \"./appctl rebuild\" to rebuild and restart your site!"
     echo
 }
