@@ -36,10 +36,12 @@ Restoration will:
 After you've restored from backup, it's good idea to follow up with `./appctl rebuild` to rebuild Misago image, giving it's application container a chance to rebuild filesystem caches.
 
 
-Daily backups
--------------
+Daily backup
+------------
 
+`./appctl setup` enables daily backup by default. This backup is defined in `cron` script inside Misago container, and is ran *before* all other maintenance tasks, providing fallback point in case that maintenance deletes something you **really** didn't want to delete.
 
+You can switch daily backup on and off using `./appctl dailybackup`.
 
 
 Need help?
