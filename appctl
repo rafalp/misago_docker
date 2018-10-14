@@ -71,12 +71,22 @@ intro() {
     echo "    ${BOLD}debug${NORMAL}         change debug mode."
     echo "    ${BOLD}secret${NORMAL}        reset secret key."
     echo
+    echo "Backup:"
+    echo
+    echo "    ${BOLD}backup${NORMAL}        backup and archive database and media."
+    echo "    ${BOLD}restore${NORMAL}       restore."
+    echo
+    echo "Shortcuts:"
+    echo
+    echo "    ${BOLD}psql${NORMAL}          runs psql connected to database."
+    echo
 }
 
 # Handle invalid argument
 invalid_argument() {
     echo -e "Invalid argument: ${RED}$1${NORMAL}"
     echo "Please run this script without any arguments to see the list of available arguments."
+    echo
     exit 1
 }
 
@@ -96,6 +106,7 @@ setup() {
     for env_path in "${env_paths[@]}"; do
         if [ ! -e $env_path ]; then
             echo "Setup canceled."
+            echo
             exit 1
         fi
     done
@@ -197,6 +208,24 @@ reset_secret_key() {
     python3 wizard/secretkey.py
 }
 
+# Create new backup
+create_new_backup() {
+    require_setup "You need to setup your site using \"setup\" option before you will be able to backup data."
+    docker-compose run --rm misago ./.run backup
+}
+
+# Restore from backup
+restore_from_backup() {
+    require_setup "You need to setup your site using \"setup\" option before you will be able to backup data."
+    docker-compose run --rm misago ./.run restore "$1"
+}
+
+# Shortcut for psql
+run_psql() {
+    require_setup "You need to setup your site using \"setup\" option before you will be able to use psql."
+    docker-compose run --rm misago ./.run psql
+}
+
 # Command dispatcher
 if [[ $1 ]]; then
     if [[ $1 = "setup" ]]; then
@@ -227,6 +256,12 @@ if [[ $1 ]]; then
         change_debug
     elif [[ $1 = "secret" ]]; then
         reset_secret_key
+    elif [[ $1 = "backup" ]]; then
+        create_new_backup
+    elif [[ $1 = "restore" ]]; then
+        restore_from_backup $2
+    elif [[ $1 = "psql" ]]; then
+        run_psql
     else
         invalid_argument $1
     fi

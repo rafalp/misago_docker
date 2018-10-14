@@ -2,9 +2,14 @@
 # ".run" is an utility script that is called by main appctl
 # to run certain actions inside Misago's docker container.
 
+# Text styles
+RED='\033[0;31m'
+NORMAL=$(tput sgr0)
+
 # Check if we are inside Misago's docker container
 if [[ ! $IN_MISAGO_DOCKER = 1 ]]; then
-    error "This command can only be ran inside the running Misago docker container."
+    echo "This command can only be ran inside the running Misago docker container."
+    echo
     exit 1
 fi
 
@@ -12,6 +17,7 @@ fi
 error() {
     echo -e "${RED}Error:${NORMAL} $1"
 }
+
 
 wait_for_db() {
     export PGPASSWORD=$POSTGRES_PASSWORD
@@ -25,6 +31,7 @@ wait_for_db() {
 # Handle invalid argument
 invalid_argument() {
     echo -e "Invalid argument: ${RED}$1${NORMAL}"
+    echo
     exit 1
 }
 
@@ -40,12 +47,60 @@ initialize_default_database() {
     python manage.py createsuperuser
 }
 
+# Run psql connected to database
+run_psql() {
+    wait_for_db
+    PGPASSWORD=$POSTGRES_PASSWORD
+    psql --username $POSTGRES_USER --host $POSTGRES_HOST $POSTGRES_DB
+}
+
+# Backup database and media to archive
+create_new_backup() {
+    # create backups/year/month path if doesnt exist, and cd to it
+    backups_dir="/misago/backups/$(date +%Y)/$(date +%m)"
+    mkdir -p $backups_dir
+    cd $backups_dir
+    # create backup dir
+    backup_dir="misago-$(date +%Y%m%d%H%M%S)"
+    mkdir "./$backup_dir"
+    # backup database
+    wait_for_db
+    PGPASSWORD=$POSTGRES_PASSWORD
+    pg_dump -U $POSTGRES_USER -h $POSTGRES_HOST $POSTGRES_DB -Oxc > "./$backup_dir/database.sql"
+    # backup media
+    cp -r /misago/media "$backup_dir/media"
+    # archive backup dir
+    backup_archive="misago-$(date +%Y%m%d%H%M%S).tar.gz"
+    GZIP=-9
+    tar -zcf $backup_archive "./$backup_dir"
+    # delete backup dir as its no longer required
+    rm -rf $backup_dir
+    echo "New backup has been created at backups/$(date +%Y)/$(date +%m)/$backup_archive"
+    echo
+}
+
+# Restore database and media from backup archive
+restore_from_backup() {
+    if [[ ! $1 ]]; then
+        error ""
+    fi
+
+    wait_for_db
+    echo "RESTORE FROM: $1"
+}
+
 # Command dispatcher
 if [[ $1 ]]; then
     if [[ $1 = "initialize_default_database" ]]; then
         initialize_default_database
     elif [[ $1 = "wait_for_db" ]]; then
         wait_for_db
+    elif [[ $1 = "psql" ]]; then
+        run_psql
+    elif [[ $1 = "backup" ]]; then
+        create_new_backup
+    elif [[ $1 = "restore" ]]; then
+        restore_from_backup $2
     else
         invalid_argument $1
     fi
