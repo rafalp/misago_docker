@@ -28,3 +28,8 @@ python manage.py removeoldips
 python manage.py deleteinactiveusers
 python manage.py expireuserdatadownloads
 python manage.py prepareuserdatadownloads
+
+# Create daily backup
+if [[ $MISAGO_DAILY_BACKUP = "yes" ]]; then
+    ./.run backup
+fi

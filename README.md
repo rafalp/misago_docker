@@ -29,11 +29,17 @@ You can restore your site's data by placing the backup archive in the `backups` 
 Restoration will:
 
 - overwrite your current `media` directory with one from archive.
-- load the `database.sql` to `psql`, overwrite existing database objects with ones from file.
+- load the `database.sql` to `psql`, overwriting existing database tables with ones from file.
 
 **NOTE:** because restoration process can be considered descructive, you should backup any existing data if you are restoring the site that has data you may want to recover if something goes wrong.
 
 After you've restored from backup, it's good idea to follow up with `./appctl rebuild` to rebuild Misago image, giving it's application container a chance to rebuild filesystem caches.
+
+
+Daily backups
+-------------
+
+
 
 
 Need help?
