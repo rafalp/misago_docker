@@ -1,4 +1,4 @@
-from env import misago
+from config import misago
 from utils import (
     get_bool_display,
     input_bool,

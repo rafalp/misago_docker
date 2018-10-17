@@ -1,6 +1,6 @@
 import re
 
-from env import misago
+from config import misago
 from utils import input_bool, print_setup_changed_message
 
 LOCALE_REGEX = re.compile(r"^[a-z]{2,3}(-[a-z]+)?$", re.IGNORECASE)

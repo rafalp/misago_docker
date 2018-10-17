@@ -1,4 +1,4 @@
-from env import misago
+from config import misago
 from utils import input_bool, print_setup_changed_message, serialize_bool
 
 BOOL_TRUE = "yes"  # we are specific here because bash script bool check if simple

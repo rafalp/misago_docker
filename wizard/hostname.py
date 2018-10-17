@@ -1,6 +1,7 @@
 import re
 
-from env import misago
+from config import misago
+from nginx import run_nginx_wizard
 from utils import input_bool, print_setup_changed_message
 
 HOSTNAME_REGEX = re.compile(r"(?!-)[A-Z\d-]{1,63}(?<!-)$", re.IGNORECASE)
@@ -40,6 +41,8 @@ def run_hostname_wizard(env_file):
     env_file["VIRTUAL_HOST"] = hostname
     env_file["MISAGO_ADDRESS"] = "https://%s" % hostname
 
+    run_nginx_wizard(env_file["VIRTUAL_HOST"])
+
 
 def print_hostname_setup(env_file):
     print("Current hostname: %s" % env_file.get("VIRTUAL_HOST"))
@@ -51,6 +54,8 @@ def change_hostname_setup(env_file):
     if input_bool("Change hostname?", default=False):
         run_hostname_wizard(env_file)
         env_file.save()
+        print_setup_changed_message()
+    elif run_nginx_wizard(env_file["VIRTUAL_HOST"]):
         print_setup_changed_message()
 
 
