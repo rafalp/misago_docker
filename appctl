@@ -9,10 +9,10 @@ NORMAL=$(tput sgr0)
 
 # Define env paths
 # Those are paths to env files created by wizard
-misago_env_path="./env/misago.env"
+misago_env_path="./config/misago.env"
 env_paths=(
     $misago_env_path
-    "./env/postgres.env"
+    "./config/postgres.env"
 )
 
 # Utility functions used by action commands

@@ -1,6 +1,6 @@
 import re
 
-from env import misago
+from config import misago
 from utils import input_bool, input_choice, print_setup_changed_message
 
 SENTRY_DSN_REGEX = re.compile(r"^https://[0-9a-z]+(:[0-9a-z]+)?@sentry\.io/[0-9]+$")

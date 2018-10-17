@@ -1,4 +1,4 @@
-from env import misago
+from config import misago
 from utils import BOOL_TRUE, input_bool, print_setup_changed_message, serialize_bool
 
 

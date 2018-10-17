@@ -1,13 +1,27 @@
 version: '3.0'
 services:
 
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    restart: unless-stopped
+    networks:
+      - misago
+    ports:
+      - "8080:80"
+    volumes:
+      - misago-media:/misago/media
+      - misago-static:/misago/static
+      - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./config/vhost.d:/etc/nginx/vhost.d:ro
+      - ./logs/nginx:/var/log/nginx:z
+
   postgres:
     image: postgres:10
     restart: unless-stopped
     networks:
       - misago
     env_file:
-      - ./env/postgres.env
+      - ./config/postgres.env
     volumes:
       - misago-database:/var/lib/postgresql/data
 
@@ -28,20 +42,18 @@ services:
           - misago
     environment:
       - POSTGRES_HOST=postgres
+      - VIRTUAL_PROTO=uwsgi
     env_file:
-      - ./env/misago.env
-      - ./env/postgres.env
+      - ./config/misago.env
+      - ./config/postgres.env
     depends_on:
       - postgres
       - redis
     volumes:
       - misago-media:/misago/media
       - misago-static:/misago/static
-      - "./backups:/misago/backups:z"
-      - "./logs:/misago/logs:z"
-    tty: true
-    ports:
-      - "127.0.0.1:8080:80"
+      - ./backups:/misago/backups:Z
+      - ./logs:/misago/logs:z
 
 networks:
   misago:

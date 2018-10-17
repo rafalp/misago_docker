@@ -27,8 +27,8 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 ADD . /misago
 WORKDIR /misago
 
-# Expose port 80 from Docker
-EXPOSE 80
+# Expose port 3031 from Docker
+EXPOSE 3031
 
 # Call entrypoint script to setup 
 CMD ["uwsgi", "--ini", "uwsgi.ini"]

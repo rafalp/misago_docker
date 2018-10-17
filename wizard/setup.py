@@ -1,4 +1,4 @@
-from env import misago, postgres
+from config import misago, postgres
 from misago import run_misago_wizard
 from postgres import run_postgres_wizard
 
