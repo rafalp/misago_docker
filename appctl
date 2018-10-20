@@ -148,7 +148,7 @@ upgrade() {
     echo "Stopping containers for upgrade..."
     docker-compose stop
     create_new_backup
-    docker-compose build --pull --force-rm
+    docker-compose build --force-rm --pull
     docker-compose run --rm misago python manage.py migrate
     collectstatic
     echo "Upgrade has been completed, restarting containers..."
@@ -177,7 +177,7 @@ restart_containers() {
 # Rebuild misago container
 rebuild_misago_container() {
     require_setup
-    docker-compose build misago --force-rm
+    docker-compose build  --force-rm misago
     docker-compose stop misago
     docker-compose up --detach misago
 }
@@ -186,6 +186,12 @@ rebuild_misago_container() {
 show_stats() {
     require_setup
     docker stats
+}
+
+# Forum index configuration
+change_forumindex() {
+    require_setup
+    python3 wizard/forumindex.py
 }
 
 # E-mail configuration
@@ -299,6 +305,8 @@ if [[ $1 ]]; then
         rebuild_misago_container
     elif [[ $1 = "stats" ]]; then
         show_stats
+    elif [[ $1 = "forumindex" ]]; then
+        change_forumindex
     elif [[ $1 = "email" ]]; then
         change_email
     elif [[ $1 = "hostname" ]]; then
