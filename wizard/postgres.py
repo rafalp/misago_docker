@@ -1,7 +1,5 @@
 from utils import get_random_string
 
-FILE_HEADER = "PostgreSQL service settings"
-
 
 def run_postgres_wizard(env_file):
     if env_file.is_file():
@@ -13,7 +11,7 @@ def run_postgres_wizard(env_file):
 def generate_default_postgres_env_file(env_file):
     env_file["POSTGRES_USER"] = "misago%s" % get_random_string(16)
     env_file["POSTGRES_PASSWORD"] = "%s" % get_random_string(100)
-    env_file.save(FILE_HEADER)
+    env_file.save()
 
     print("PostgreSQL configuration has been saved to %s" % env_file.path)
 
@@ -35,6 +33,6 @@ def update_postgres_env_file(env_file):
         )
         print()
         print("\n".join(changes))
-        env_file.save(FILE_HEADER)
+        env_file.save()
     else:
         print("PostgreSQL configuration file is up to date.")
