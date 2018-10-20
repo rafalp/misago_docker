@@ -78,6 +78,26 @@ After you've restored from backup, it's good idea to follow up with `./appctl re
 You can switch daily backup on and off using `./appctl dailybackup`.
 
 
+### Creating custom backup archives
+
+You can easily prepare your own backup archives for use with `./appctl restore`.
+
+You simply need to create directory, name you however you want (`mybackup` in this example), and put two items inside of it:
+
+`database.sql` - PostgreSQL dump that can be imported with `psql`.
+`media` - your forum's media directory.
+
+Your ready backup should look like this:
+
+```
+mybackup
+  - media
+  - database.sql
+```
+
+Now run `tar -zcf mybackup.tar.gz mybackup`. This will produce `mybackup.tar.gz` file that you can put in `backups` directory and restore with `./appctl restore mybackup.tar.gz`. 
+
+
 Directories
 -----------
 
@@ -86,9 +106,9 @@ Directories
 Contains backups created by `./appctl backup` and loadable by `./appctl restore BACKUPNAME`.
 
 
-### `/env`
+### `/config`
 
-This directory contains configuration for Misago and PostgreSQL containers.
+This directory contains configuration for Misago and PostgreSQL containers as well as Nginx config.
 
 
 ### `/logs`
