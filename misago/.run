@@ -39,12 +39,11 @@ invalid_argument() {
 
 # Initialize default database
 initialize_default_database() {
-    # wait for DB to be ready
     wait_for_db
-    # migrate default database
     echo "Migrating database"
     python manage.py migrate
-    # ask user to create first admin account
+    echo "Loading default avatar gallery"
+    python manage.py loadavatargallery
     echo "Creating first superuser account"
     python manage.py createsuperuser
 }

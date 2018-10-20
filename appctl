@@ -23,11 +23,7 @@ error() {
 require_setup() {
     for env_path in "${env_paths[@]}"; do
         if [ ! -e $env_path ]; then
-            if [[ $1 ]]; then
-                error $1
-            else
-                error "You need to setup your site using \"setup\" option before you will be able to use this option."
-            fi
+            error "You need to setup your site using \"./appctl setup\" before you will be able to use this option."
             echo
             exit 1
         fi
@@ -52,8 +48,9 @@ intro() {
     echo "Setup and upgrade:"
     echo
     echo "    ${BOLD}setup${NORMAL}             setup new Misago site."
+    echo "    ${BOLD}upgrade${NORMAL}           backup, rebuild, migrate and collect static."
     echo
-    echo "Docker process:"
+    echo "Docker management:"
     echo
     echo "    ${BOLD}start${NORMAL}             start all containers."
     echo "    ${BOLD}stop${NORMAL}              stop all containers."
@@ -63,10 +60,15 @@ intro() {
     echo
     echo "Change configuration:"
     echo
+    echo "    ${BOLD}facebook${NORMAL}          change sign-in with Facebook setup."
+    echo "    ${BOLD}github${NORMAL}            change sign-in with GitHub setup."
+    echo "    ${BOLD}twitter${NORMAL}           change sign-in with twitter setup."
+    echo "    ${BOLD}forumindex${NORMAL}        switch forum index between threads and categories."
     echo "    ${BOLD}email${NORMAL}             change email setup."
     echo "    ${BOLD}hostname${NORMAL}          change hostname setup."
     echo "    ${BOLD}locale${NORMAL}            change locale setup."
     echo "    ${BOLD}timezone${NORMAL}          change timezone setup."
+    echo "    ${BOLD}avatargallery${NORMAL}     load avatar gallery."
     echo "    ${BOLD}sentry${NORMAL}            enable or disable Sentry (sentry.io) for logging."
     echo "    ${BOLD}dailybackup${NORMAL}       enable or disable daily backup."
     echo "    ${BOLD}debug${NORMAL}             change debug mode."
@@ -81,7 +83,11 @@ intro() {
     echo
     echo "Shortcuts:"
     echo
-    echo "    ${BOLD}psql${NORMAL}          runs psql connected to database."
+    echo "    ${BOLD}collectstatic${NORMAL}     collect static assets."
+    echo "    ${BOLD}manage.py${NORMAL}         runs \"python manage.py\" inside docker."
+    echo "    ${BOLD}bash${NORMAL}              starts bash session inside running Misago container."
+    echo "    ${BOLD}run${NORMAL}               runs \"docker-compose run --rm misago\"."
+    echo "    ${BOLD}psql${NORMAL}              runs psql connected to database."
     echo
 }
 
@@ -136,6 +142,19 @@ set_crontab() {
     echo "30 1 * * * cd $current_path && docker-compose run --rm misago ./cron" | crontab -
 }
 
+# Run upgrade process
+upgrade() {
+    require_setup
+    echo "Stopping containers for upgrade..."
+    docker-compose stop
+    create_new_backup
+    docker-compose build --pull --force-rm
+    docker-compose run --rm misago python manage.py migrate
+    collectstatic
+    echo "Upgrade has been completed, restarting containers..."
+    start_containers
+}
+
 # Start docker containers
 start_containers() {
     require_setup
@@ -158,7 +177,7 @@ restart_containers() {
 # Rebuild misago container
 rebuild_misago_container() {
     require_setup
-    docker-compose build misago
+    docker-compose build misago --force-rm
     docker-compose stop misago
     docker-compose up --detach misago
 }
@@ -171,67 +190,94 @@ show_stats() {
 
 # E-mail configuration
 change_email() {
-    require_setup "You need to setup your site using \"setup\" option before you will be able to change email configuration."
+    require_setup
     python3 wizard/email.py
 }
 
 # Hostname configuration
 change_hostname() {
-    require_setup "You need to setup your site using \"setup\" option before you will be able to change hostname configuration."
+    require_setup
     python3 wizard/hostname.py
 }
 
 # Locale configuration
 change_locale() {
-    require_setup "You need to setup your site using \"setup\" option before you will be able to change locale configuration."
+    require_setup
     python3 wizard/locale.py
 }
 
 # Timezone configuration
 change_timezone() {
-    require_setup "You need to setup your site using \"setup\" option before you will be able to change timezone configuration."
+    require_setup
     python3 wizard/timezone.py
 }
 
 # Daily backup configuration
 change_daily_backup() {
-    require_setup "You need to setup your site using \"setup\" option before you will be able to setup daily backup."
+    require_setup
     python3 wizard/dailybackup.py
+}
+
+# Load avatar gallery
+load_avatargallery() {
+    require_setup
+    docker-compose run --rm misago python manage.py loadavatargallery
 }
 
 # Sentry configuration
 change_sentry() {
-    require_setup "You need to setup your site using \"setup\" option before you will be able to configure Sentry."
+    require_setup
     python3 wizard/sentry.py
 }
 
 # Debug configuration
 change_debug() {
-    require_setup "You need to setup your site using \"setup\" option before you will be able to change debug mode."
+    require_setup
     python3 wizard/debug.py
 }
 
 # Reset secret key
 reset_secret_key() {
-    require_setup "You need to setup your site using \"setup\" option before you will be able to reset secret key."
+    require_setup
     python3 wizard/secretkey.py
 }
 
 # Create new backup
 create_new_backup() {
-    require_setup "You need to setup your site using \"setup\" option before you will be able to backup data."
+    require_setup
     docker-compose run --rm misago ./.run backup
 }
 
 # Restore from backup
 restore_from_backup() {
-    require_setup "You need to setup your site using \"setup\" option before you will be able to backup data."
+    require_setup
     docker-compose run --rm misago ./.run restore "$1"
+}
+
+# Collect static files
+run_collectstatic() {
+    require_setup
+    collectstatic
+}
+
+# Shortcut for starting bash session in running container
+run_bash() {
+    docker-compose exec misago bash
+}
+
+# Shortcut for docker-compose run --rm misago python manage.py
+run_managepy() {
+    docker-compose run --rm misago python manage.py "${@:2}"
+}
+
+# Shortcut for docker-compose run --rm misago...
+docker_run() {
+    docker-compose run --rm misago "${@:2}"
 }
 
 # Shortcut for psql
 run_psql() {
-    require_setup "You need to setup your site using \"setup\" option before you will be able to use psql."
+    require_setup
     docker-compose run --rm misago ./.run psql
 }
 
@@ -239,6 +285,8 @@ run_psql() {
 if [[ $1 ]]; then
     if [[ $1 = "setup" ]]; then
         setup
+    elif [[ $1 = "upgrade" ]]; then
+        upgrade
     elif [[ $1 = "up" ]]; then
         start_containers
     elif [[ $1 = "start" ]]; then
@@ -259,6 +307,8 @@ if [[ $1 ]]; then
         change_locale
     elif [[ $1 = "timezone" ]]; then
         change_timezone
+    elif [[ $1 = "avatargallery" ]]; then
+        load_avatargallery
     elif [[ $1 = "sentry" ]]; then
         change_sentry
     elif [[ $1 = "dailybackup" ]]; then
@@ -271,6 +321,14 @@ if [[ $1 ]]; then
         create_new_backup
     elif [[ $1 = "restore" ]]; then
         restore_from_backup $2
+    elif [[ $1 = "collectstatic" ]]; then
+        run_collectstatic
+    elif [[ $1 = "manage.py" ]]; then
+        run_managepy $@
+    elif [[ $1 = "bash" ]]; then
+        run_bash
+    elif [[ $1 = "run" ]]; then
+        docker_run $@
     elif [[ $1 = "psql" ]]; then
         run_psql
     else
