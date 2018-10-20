@@ -549,3 +549,25 @@ MISAGO_PROFILE_FIELDS = [
 # Display threads instead of categories on forum index?
 
 MISAGO_THREADS_ON_INDEX = os.environ.get('MISAGO_INDEX', "threads") == "threads"
+
+
+# Configure Social Auth providers
+
+if strtobool(os.environ.get('SOCIAL_AUTH_FACEBOOK_ENABLE')):
+    AUTHENTICATION_BACKENDS.append('social_core.backends.facebook.FacebookOAuth2')
+    SOCIAL_AUTH_FACEBOOK_KEY = os.environ['SOCIAL_AUTH_FACEBOOK_KEY']
+    SOCIAL_AUTH_FACEBOOK_SECRET = os.environ['SOCIAL_AUTH_FACEBOOK_SECRET']
+    SOCIAL_AUTH_FACEBOOK_SCOPE = ['email']
+
+
+if strtobool(os.environ.get('SOCIAL_AUTH_GITHUB_ENABLE')):
+    AUTHENTICATION_BACKENDS.append('social_core.backends.github.GithubOAuth2')
+    SOCIAL_AUTH_GITHUB_KEY = os.environ['SOCIAL_AUTH_GITHUB_KEY']
+    SOCIAL_AUTH_GITHUB_SECRET = os.environ['SOCIAL_AUTH_GITHUB_SECRET']
+    SOCIAL_AUTH_GITHUB_SCOPE = ['read:user', 'user:email']
+
+
+if strtobool(os.environ.get('SOCIAL_AUTH_TWITTER_ENABLE')):
+    AUTHENTICATION_BACKENDS.append('social_core.backends.twitter.TwitterOAuth')
+    SOCIAL_AUTH_TWITTER_KEY = os.environ['SOCIAL_AUTH_TWITTER_KEY']
+    SOCIAL_AUTH_TWITTER_SECRET = os.environ['SOCIAL_AUTH_TWITTER_SECRET']
