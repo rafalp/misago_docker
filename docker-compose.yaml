@@ -52,6 +52,7 @@ services:
     volumes:
       - misago-media:/misago/media
       - misago-static:/misago/static
+      - ./misago/avatargallery:/misago/avatargallery:ro
       - ./backups:/misago/backups:Z
       - ./logs:/misago/logs:z
 
