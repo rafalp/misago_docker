@@ -544,3 +544,8 @@ MISAGO_PROFILE_FIELDS = [
         ],
     },
 ]
+
+
+# Display threads instead of categories on forum index?
+
+MISAGO_THREADS_ON_INDEX = os.environ.get('MISAGO_INDEX', "threads") == "threads"
