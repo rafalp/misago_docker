@@ -6,5 +6,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG_DIR = os.path.join(BASE_DIR, "config")
 NGINX_DIR = os.path.join(CONFIG_DIR, "vhost.d")
 
-misago = EnvFile(os.path.join(CONFIG_DIR, "misago.env"))
-postgres = EnvFile(os.path.join(CONFIG_DIR, "postgres.env"))
+MISAGO_HEADER = "Misago service settings"
+misago = EnvFile(MISAGO_HEADER, os.path.join(CONFIG_DIR, "misago.env"))
+
+POSTGRES_HEADER = "PostgreSQL database settings"
+postgres = EnvFile(POSTGRES_HEADER, os.path.join(CONFIG_DIR, "postgres.env"))

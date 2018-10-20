@@ -3,7 +3,8 @@ from pathlib import Path
 
 
 class EnvFile:
-    def __init__(self, path):
+    def __init__(self, header, path):
+        self.header = header
         self.path = Path(path)
         self.variables = {}
 
@@ -17,10 +18,9 @@ class EnvFile:
         with open(self.path, "r") as f:
             return parse_env_file(f.read())
 
-    def save(self, header=None):
+    def save(self):
         lines = []
-        if header:
-            lines.append("# %s" % header)
+        lines.append("# %s" % self.header)
         lines.append("# %s\n" % datetime.now())
 
         for key in sorted(self.variables.keys()):

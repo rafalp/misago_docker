@@ -1,3 +1,4 @@
+import filecmp
 import os
 from pathlib import Path
 from shutil import copy
@@ -24,8 +25,12 @@ def create_nginx_location_config(hostname):
     config_filename = "%s_location" % hostname
     config_dst = Path(os.path.join(NGINX_DIR, config_filename))
     if config_dst.is_file():
+        if filecmp.cmp(VHOST_LOCATION_CONFIG, config_dst):
+            # Skip rest of wizard because destination file already exists
+            return True
+
         overwrite_prompt = (
-            "config/vhost.d/%s already exist, overwrite it?"
+            "config/vhost.d/%s already exists but appears to be modified, overwrite with default?"
         ) % config_filename
         if not input_bool(overwrite_prompt, default=False):
             return False
