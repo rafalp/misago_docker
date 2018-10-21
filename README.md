@@ -25,7 +25,21 @@ To start your own Misago site, you will need:
 - domain your site will run at, pointing to your server
 
 
-⚠️ This section will be filled in at later time.
+### Getting code on the server
+
+`ssh` to your server. If you are on Windows, you can use [Putty](https://www.putty.org/). Next, git clone this repo to `misago_docker` directory using this command:
+
+```
+git clone https://github.com/rafalp/Misago-Docker.git misago_docker --depth=1
+```
+
+### Running the setup
+
+Move to `misago_docker` and run `./appctl setup`. Wizard will ask you to fill in few basic settings such as your domain name, timezone or first admin account details. After that it will install all requirements, build Docker containers, setup crontab, create initial database and populate it with default.
+
+After you are done, start your site with `./appctl start` and go to your domain to see your Misago running.
+
+Lastly, go to ``https://yoursite/admincp/``and log in to admin panel using the username and password you've entered during setup.
 
 
 ### Speed up Redis
@@ -52,10 +66,10 @@ Without e-mails enabled your users will not be able to receive activation e-mail
 You can also create account on Sentry (https://sentry.io) and enable it on your side using `./appctl sentry`. Sentry provides fancy web interface browsing Misago's logs, and will send e-mail with notifications when your users experience errors or edit their profile details, which is possible source of forum spam.
 
 
-Customizing site
-----------------
+Upgrading to newer version
+--------------------------
 
-⚠️ This section will be filled in at later time.
+To upgrade to newer version, simply run `git pull` followed by `./apctl upgrade`. This will get latest code from github, rebuild Docker containers and update Misago (and other services) to latest minor releases.
 
 
 Backup and restore
@@ -106,7 +120,13 @@ mybackup
   - database.sql
 ```
 
-Now run `tar -zcf mybackup.tar.gz mybackup`. This will produce `mybackup.tar.gz` file that you can put in `backups` directory and restore with `./appctl restore mybackup.tar.gz`. 
+Now run `tar -zcf mybackup.tar.gz mybackup`. This will produce the `mybackup.tar.gz` file that you can put in `backups` directory and restore with `./appctl restore mybackup.tar.gz`. 
+
+
+Customizing site
+----------------
+
+⚠️ This section will be filled in at later time.
 
 
 Directories
