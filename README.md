@@ -16,8 +16,8 @@ To make running your site easier, special bash script named `appctl` is provided
 **Note for DevOps pros:** this repo assumes that users will `git clone` it on to their servers, run `./appctl setup` to do basic configuration, and run all services they need in Docker Compose, with all data stored on instance using Docker volumes. This approach is incompatibile with setups where everything runs in dedicated instance or service (like Amazon's S3 or RDS), but the aim of this repo is to make Misago viable option to hobbyists and small/medium communities, not enterprise deployments that will expect running at massive scale serving bazillions of active users at single time.
 
 
-Getting started
----------------
+Setup
+-----
 
 To start your own Misago site, you will need:
 
@@ -42,13 +42,6 @@ After you are done, start your site with `./appctl start` and go to your domain 
 Lastly, go to ``https://yoursite/admincp/``and log in to admin panel using the username and password you've entered during setup. Admin panel will let you set forum name, create categories and such.
 
 
-### Speed up Redis
-
-Misago uses Redis for caching and tasks queue. To get most performance out of it, you will have to make sure that you have `Transparent Huge Pages (THP)` support disabled in your kernel. To fix this issue run the command `echo never > /sys/kernel/mm/transparent_hugepage/enabled` as root, and add it to your `/etc/rc.local` in order to retain the setting after a reboot. Docker Redis container must be restarted after THP is disabled, but you can simply run `./appctl restart` for same effect.
-
-This is impossible if you are running Misago on macOS.
-
-
 ### Secure your server
 
 Depending on initial configuration of your server, you may have to take [additional steps](https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-18-04) to make it more secure. Internet is patrolled by bots searching for vulnerable servers, not above attempting to brute-force root accounts, so you should at least disable the login using root, and block IP addresses upon repeated failed authentication attempts.
@@ -64,6 +57,13 @@ Without e-mails enabled your users will not be able to receive activation e-mail
 ### Enable Sentry
 
 You can also create account on Sentry (https://sentry.io) and enable it on your side using `./appctl sentry`. Sentry provides fancy web interface browsing Misago's logs, and will send e-mail with notifications when your users experience errors or edit their profile details, which is possible source of forum spam.
+
+
+### Speed up Redis
+
+Misago uses Redis for caching and tasks queue. To get most performance out of it, you will have to make sure that you have `Transparent Huge Pages (THP)` support disabled in your kernel. To fix this issue run the command `echo never > /sys/kernel/mm/transparent_hugepage/enabled` as root, and add it to your `/etc/rc.local` in order to retain the setting after a reboot. Docker Redis container must be restarted after THP is disabled, but you can simply run `./appctl restart` for same effect.
+
+This is impossible if you are running Misago on macOS.
 
 
 Upgrading to newer version
