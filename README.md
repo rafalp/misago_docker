@@ -68,8 +68,6 @@ You can also create account on Sentry (https://sentry.io) and enable it on your 
 
 Misago uses Redis for caching and tasks queue. To get most performance out of it, you will have to make sure that you have `Transparent Huge Pages (THP)` support disabled in your kernel. To fix this issue run the command `echo never > /sys/kernel/mm/transparent_hugepage/enabled` as root, and add it to your `/etc/rc.local` in order to retain the setting after a reboot. Docker Redis container must be restarted after THP is disabled, but you can simply run `./appctl restart` for same effect.
 
-This is impossible if you are running Misago on macOS.
-
 
 Upgrading to newer version
 --------------------------
