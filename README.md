@@ -3,10 +3,10 @@ Misago Docker
 
 ⚠️ **WARNING: This repository is work in progress, don't use it yet!** ⚠️
 
-This repository aims to provide black-box production-quality setup of Misago for people who:
+This repository provides production-ready setup of Misago for people who:
 
 - Want to run their own forum using Misago
-- Have a server with Docker lying around
+- Have a server with 2 gigs of ram and Docker lying around
 - Know enough of Linux to ssh to VPS, move around, modify files, run programs and follow instructions from guides
 
 It provides Misago forum running on Python 3.6 behind Nginx reverse proxy with Https enabled via Let's Encrypt, PostgreSQL 10 database and Redis for caching.
