@@ -30,7 +30,7 @@ To start your own Misago site, you will need:
 `ssh` to your server. If you are on Windows, you can use [Putty](https://www.putty.org/). Next, git clone this repo to `misago_docker` directory using this command:
 
 ```
-git clone https://github.com/rafalp/Misago-Docker.git misago_docker --depth=1
+git clone https://github.com/rafalp/misago_docker.git --depth=1
 ```
 
 ### Running the setup
@@ -197,7 +197,7 @@ Python scripts that `./appctl` runs when it needs to create or change `.env` fil
 Need help?
 ----------
 
-If you have problems setting up your site using `Misago-Docker`, feel free to ask on [our forums](https://misago-project.org/) or [Discord Chat](https://discord.gg/fwvrZgB). Please don't use Github issues!
+If you have problems setting up your site using `misago_docker`, feel free to ask on [our forums](https://misago-project.org/) or [Discord Chat](https://discord.gg/fwvrZgB). Please don't use Github issues!
 
 
 Contributing
