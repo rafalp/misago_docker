@@ -35,11 +35,11 @@ git clone https://github.com/rafalp/Misago-Docker.git misago_docker --depth=1
 
 ### Running the setup
 
-Move to `misago_docker` and run `./appctl setup`. Wizard will ask you to fill in few basic settings such as your domain name, timezone or first admin account details. After that it will install all requirements, build Docker containers, setup crontab, create initial database and populate it with default.
+Move to `misago_docker` and run `./appctl setup`. Wizard will ask you to fill in few basic settings such as your domain name, timezone or first admin account details. After that it will install all requirements, build Docker containers, setup crontab, create initial database and populate it with default data.
 
 After you are done, start your site with `./appctl start` and go to your domain to see your Misago running.
 
-Lastly, go to ``https://yoursite/admincp/``and log in to admin panel using the username and password you've entered during setup.
+Lastly, go to ``https://yoursite/admincp/``and log in to admin panel using the username and password you've entered during setup. Admin panel will let you set forum name, create categories and such.
 
 
 ### Speed up Redis
@@ -77,7 +77,7 @@ Backup and restore
 
 ### Creating new backup
 
-Running the `./appctl backup` will result in new backup being created in `backups` directory, under the path corresponding to year and month of backup's creation (eg. 2018/10 for backups created in october 2018).
+Running the `./appctl backup` will result in new backup being created in `backups` directory, under the path corresponding to year and month of backup's creation (eg. 2018/10 for backups created in October 2018).
 
 Backup will be a `tar.gz` archive named using `misago-YYYYMMDDHHMMSS.tar.gz` format and will contain `database.sql` file with database export created using `pg_dump`, and `media` directory contained user-uploaded files.
 
@@ -126,7 +126,44 @@ Now run `tar -zcf mybackup.tar.gz mybackup`. This will produce the `mybackup.tar
 Customizing site
 ----------------
 
-⚠️ This section will be filled in at later time.
+Inside `misago/theme` directory you will find two folders that allow you to customiz your site looks:
+
+`static` for overriding/adding static files such as css, js, images or fonts.
+`templates` for overriding Django templates with custom ones.
+
+
+### Example: Replacing Misago's css with custom one
+
+Lets say you've cloned [main repo](https://github.com/rafalp/Misago) to your dev machine. Got it running and customized the CSS to make your site's theme dark instead of default. You've ran build script and got final `misago.css` file containing your changes. How do you now deploy this file to production?
+
+First, you need to find out the path of the original file relative to its `static` directory. In case of Misago this is `static/misago/css/misago.css`. This means that to make Misago use your file instead of default, it should be deployed to `theme/static/misago/css/misago.css` original.
+
+After deploying your new file, run `./appctl collectstatic` to make Misago "collect" this file and replace default with it.
+
+
+### Example: Adding Google Analytics tracking script
+
+To add custom JavaScript to your Misago site, you will need to override one of Misago's [default templates](https://github.com/rafalp/Misago/blob/master/misago/templates/). There is quite a few to pick from, but of special interest to us are two templates that Misago implements, that are purposefully empty: `scripts.html` and `jumbotron.html`.
+
+The `scripts.html` template is included after Misago's default JavaScripts, but before this JavaScript is being run.
+The `jumbotron.html` template is included right before the navbar. Its intention is to provide a place for developers to implement custom branded header or banner.
+
+Because the sooner our analytics script is executed, the better, we will use the `jumbotron.html`.
+
+Go to `misago/theme/templates`. Your template location relative to this path should be same as default template to `misago/templates`, so you will need to create file on following path:
+
+```
+misago/theme/templates/misago/jumbotron.html
+```
+
+Now you can place your tracking JavaScript inside the `jumbotron.html` you have just created!
+
+Because templates are stored in process memory once loaded, you will need to run `./appctl rebuild` to rebulid Misago container and make it load your template instead of default.
+
+
+### Sticking a fork into a repo
+
+If you are familiar with Python/Django applications or Docker images involved and wish to customize your setup further, please feel free to branch off/fork the repo - it's simple enough that merging eventual changes from upstream shouldn't be much of an issue.
 
 
 Directories
@@ -166,7 +203,7 @@ If you have problems setting up your site using `Misago-Docker`, feel free to as
 Contributing
 ------------
 
-If you found a bug, issue, or place for improvement, feel free to open an issue or pull request.
+If you found a bug, issue, or place for improvement, please open an issue or pull request.
 
 
 Copyright and license
