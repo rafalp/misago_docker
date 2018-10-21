@@ -9,6 +9,10 @@ This repository aims to provide black-box production-quality setup of Misago for
 - Have a server with Docker lying around
 - Know enough of Linux to ssh to VPS, move around, modify files, run programs and follow instructions from guides
 
+It provides Misago forum running on Python 3.6 behind Nginx reverse proxy with Https enabled via Let's Encrypt, PostgreSQL 10 database and Redis for caching.
+
+To make running your site easier, special bash script named `appctl` is provided that implements shortcuts for useful actions, and exposes wizards for changing configuration without need for editing files.
+
 **Note for DevOps pros:** this repo assumes that users will `git clone` it on to their servers, run `./appctl setup` to do basic configuration, and run all services they need in Docker Compose, with all data stored on instance using Docker volumes. This approach is incompatibile with setups where everything runs in dedicated instance or service (like Amazon's S3 or RDS), but the aim of this repo is to make Misago viable option to hobbyists and small/medium communities, not enterprise deployments that will expect running at massive scale serving bazillions of active users at single time.
 
 
@@ -17,8 +21,8 @@ Getting started
 
 To start your own Misago site, you will need:
 
-- server running Linux with Dockerm with at least 2GB of memory ([DigitalOcean droplets are safe bet.](https://m.do.co/c/a8c85735320a))
-- domain your site will run at, directed to your server
+- server running Linux with Dockerm with at least 2GB of memory ([DigitalOcean droplets are safe bet](https://m.do.co/c/a8c85735320a))
+- domain your site will run at, pointing to your server
 
 
 ⚠️ This section will be filled in at later time.
@@ -36,9 +40,16 @@ This is impossible if you are running Misago on macOS.
 Depending on initial configuration of your server, you may have to take [additional steps](https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-18-04) to make it more secure. Internet is patrolled by bots searching for vulnerable servers, not above attempting to brute-force root accounts, so you should at least disable the login using root, and block IP addresses upon repeated failed authentication attempts.
 
 
+### Setup e-mail
+
+If you haven't done so during installation, you *really* should enable e-mails on your site. Not enabling e-mails doesn't mean that Misago will fallback to some other messaging mechanism. It will simply discard all messages without attempting to connect to any e-mail sending service.
+
+Without e-mails enabled your users will not be able to receive activation e-mails, notifications, confirm password changes or reset forgotten passwords.
+
+
 ### Enable Sentry
 
-You can also create account on Sentry (https://sentry.io) and enable it on your side using `./appctl sentry` so you will receive e-mail notifications when your users experience errors or edit their profile details, which is possible source of forum spam.
+You can also create account on Sentry (https://sentry.io) and enable it on your side using `./appctl sentry`. Sentry provides fancy web interface browsing Misago's logs, and will send e-mail with notifications when your users experience errors or edit their profile details, which is possible source of forum spam.
 
 
 Customizing site
