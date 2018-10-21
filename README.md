@@ -6,12 +6,12 @@ Misago Docker
 This repository provides production-ready setup of Misago for people who:
 
 - Want to run their own forum using Misago
-- Have a server with 2 gigs of ram and Docker lying around
+- Have a server with 2GB of RAM and Docker lying around
 - Know enough of Linux to ssh to VPS, move around, modify files, run programs and follow instructions from guides
 
-It provides Misago forum running on Python 3.6 behind Nginx reverse proxy with Https enabled via Let's Encrypt, PostgreSQL 10 database and Redis for caching.
+It provides Misago forum running on Python 3.6 behind Nginx reverse proxy with Https enabled via Let's Encrypt, PostgreSQL database and Redis for caching.
 
-To make running your site easier, special bash script named `appctl` is provided that implements shortcuts for useful actions, and exposes wizards for changing configuration without need for editing files.
+To help you running your site, there is a special tool called `appctl` provided, that consists of some shortcuts for useful actions, and exposes wizards for configuration management without the need for manually editing files.
 
 **Note for DevOps pros:** this repo assumes that users will `git clone` it on to their servers, run `./appctl setup` to do basic configuration, and run all services they need in Docker Compose, with all data stored on instance using Docker volumes. This approach is incompatibile with setups where everything runs in dedicated instance or service (like Amazon's S3 or RDS), but the aim of this repo is to make Misago viable option to hobbyists and small/medium communities, not enterprise deployments that will expect running at massive scale serving bazillions of active users at single time.
 
@@ -21,7 +21,7 @@ Setup
 
 To start your own Misago site, you will need:
 
-- server running Linux with Dockerm with at least 2GB of memory ([DigitalOcean droplets are safe bet](https://m.do.co/c/a8c85735320a))
+- server running Linux with Docker with at least 2GB of memory ([DigitalOcean droplets are safe bet](https://m.do.co/c/a8c85735320a))
 - domain your site will run at, pointing to your server
 
 
@@ -35,11 +35,16 @@ git clone https://github.com/rafalp/misago_docker.git --depth=1
 
 ### Running the setup
 
-Move to `misago_docker` and run `./appctl setup`. Wizard will ask you to fill in few basic settings such as your domain name, timezone or first admin account details. After that it will install all requirements, build Docker containers, setup crontab, create initial database and populate it with default data.
+Enter the misago_docker directory and run `./appctl setup` command. The wizard will ask for some basic information, such as your domain name, timezone or first admin account details. After that it will:
 
-After you are done, start your site with `./appctl start` and go to your domain to see your Misago running.
+- install all requirements
+- build Docker containers
+- setup `crontab`
+- create database and populate it with initial data
 
-Lastly, go to ``https://yoursite/admincp/``and log in to admin panel using the username and password you've entered during setup. Admin panel will let you set forum name, create categories and such.
+Once you are done, start the application by running `./appctl start` and visit your domain in order to see your Misago forum running.
+
+Lastly, go to `https://yourdomain.com/admincp/` and log into the admin panel using the username and password you entered during the setup. There you will be able to further configure your forum. For instance: set forum name, create categories and such.
 
 
 ### Secure your server
@@ -107,7 +112,7 @@ You can switch daily backup on and off using `./appctl dailybackup`.
 
 You can easily prepare your own backup archives for use with `./appctl restore`.
 
-You simply need to create directory, name you however you want (`mybackup` in this example), and put two items inside of it:
+Start off with creating a directory, `mybackup` for instance. Create the following files and directories inside of it:
 
 `database.sql` - PostgreSQL dump that can be imported with `psql`.
 `media` - your forum's media directory.
@@ -123,10 +128,10 @@ mybackup
 Now run `tar -zcf mybackup.tar.gz mybackup`. This will produce the `mybackup.tar.gz` file that you can put in `backups` directory and restore with `./appctl restore mybackup.tar.gz`. 
 
 
-Customizing site
+Customising site
 ----------------
 
-Inside `misago/theme` directory you will find two folders that allow you to customiz your site looks:
+Inside `misago/theme` directory you will find two folders that allow you to customise your site's looks:
 
 `static` for overriding/adding static files such as css, js, images or fonts.
 `templates` for overriding Django templates with custom ones.
@@ -134,7 +139,7 @@ Inside `misago/theme` directory you will find two folders that allow you to cust
 
 ### Example: Replacing Misago's css with custom one
 
-Lets say you've cloned [main repo](https://github.com/rafalp/Misago) to your dev machine. Got it running and customized the CSS to make your site's theme dark instead of default. You've ran build script and got final `misago.css` file containing your changes. How do you now deploy this file to production?
+Let's say you've cloned [main repo](https://github.com/rafalp/Misago) to your dev machine. Got it running and customised the CSS to make your site's theme dark instead of default. You've ran build script and got final `misago.css` file containing your changes. How do you now deploy this file to production?
 
 First, you need to find out the path of the original file relative to its `static` directory. In case of Misago this is `static/misago/css/misago.css`. This means that to make Misago use your file instead of default, it should be deployed to `theme/static/misago/css/misago.css` original.
 
@@ -161,9 +166,9 @@ Now you can place your tracking JavaScript inside the `jumbotron.html` you have 
 Because templates are stored in process memory once loaded, you will need to run `./appctl rebuild` to rebulid Misago container and make it load your template instead of default.
 
 
-### Sticking a fork into a repo
+### Sticking a fork into the repo
 
-If you are familiar with Python/Django applications or Docker images involved and wish to customize your setup further, please feel free to branch off/fork the repo - it's simple enough that merging eventual changes from upstream shouldn't be much of an issue.
+If you are familiar with Python/Django applications or Docker images involved and wish to customise your setup further, please feel free to branch off/fork the repo - it's simple enough that merging eventual changes from upstream shouldn't be much of an issue.
 
 
 Directories
