@@ -1,5 +1,6 @@
 FROM python:3.6
 
+ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE 1
 ENV PYTHONUNBUFFERED 1
 ENV IN_MISAGO_DOCKER 1
 
@@ -8,6 +9,7 @@ RUN wget -q https://www.postgresql.org/media/keys/ACCC4CF8.asc -O - | apt-key ad
     sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ stretch-pgdg main" >> /etc/apt/sources.list.d/pgdg.list' && \
     apt-get update && \
     apt-get install -y \
+      apt-utils \
       vim \
       libffi-dev \
       libssl-dev \
