@@ -14,10 +14,10 @@ services:
     labels:
       com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy: "true"
     volumes:
+      - nginx-certs:/etc/nginx/certs
+      - nginx-html:/usr/share/nginx/html
       - misago-media:/misago/media
       - misago-static:/misago/static
-      - certs:/etc/nginx/certs
-      - html:/usr/share/nginx/html
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - ./config/vhost.d:/etc/nginx/vhost.d:z
       - ./logs/nginx:/var/log/nginx:z
@@ -30,8 +30,8 @@ services:
     depends_on:
       - nginx-proxy
     volumes:
-      - certs:/etc/nginx/certs
-      - html:/usr/share/nginx/html
+      - nginx-certs:/etc/nginx/certs
+      - nginx-html:/usr/share/nginx/html
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./config/vhost.d:/etc/nginx/vhost.d:z
 
@@ -82,8 +82,8 @@ networks:
   misago:
 
 volumes:
-  certs:
-  html:
+  nginx-certs:
+  nginx-html:
   misago-database:
   misago-media:
   misago-redis:
