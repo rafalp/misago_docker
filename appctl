@@ -127,7 +127,7 @@ setup() {
         docker-compose run --rm misago ./.run initialize_default_database
     fi
     collectstatic
-    setup_crontab
+    set_crontab
 }
 
 # Run collectstatic (uses misago-static volume) so site has loaded assets
