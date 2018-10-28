@@ -50,7 +50,7 @@ def run_hostname_wizard(env_file):
 
 
 def run_lets_encrypt_wizard(env_file):
-    email_prompt = "Enter contact e-mail address for Let's Encrypt:"
+    email_prompt = "Enter contact e-mail address for Let's Encrypt: "
     email = None
     while not email:
         email = input(email_prompt).strip()
