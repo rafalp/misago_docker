@@ -22,7 +22,7 @@ error() {
 
 
 wait_for_db() {
-    export PGPASSWORD=$POSTGRES_PASSWORD
+    PGPASSWORD=$POSTGRES_PASSWORD
     RETRIES=10
     until psql -h $POSTGRES_HOST -U $POSTGRES_USER -d $POSTGRES_USER -c "select 1" > /dev/null 2>&1 || [ $RETRIES -eq 0 ]; do
         ((RETRIES--))
@@ -52,7 +52,7 @@ initialize_default_database() {
 run_psql() {
     wait_for_db
     PGPASSWORD=$POSTGRES_PASSWORD
-    psql --username $POSTGRES_USER --host $POSTGRES_HOST $POSTGRES_DB
+    psql --username $POSTGRES_USER --host $POSTGRES_HOST $POSTGRES_USER
 }
 
 # Backup database and media to archive
@@ -67,7 +67,7 @@ create_new_backup() {
     # backup database
     wait_for_db
     PGPASSWORD=$POSTGRES_PASSWORD
-    pg_dump -U $POSTGRES_USER -h $POSTGRES_HOST $POSTGRES_DB -Oxc > "./$backup_dir/database.sql"
+    pg_dump -U $POSTGRES_USER -h $POSTGRES_HOST $POSTGRES_USER -Oxc > "./$backup_dir/database.sql"
     # backup media
     cp -r /misago/media "$backup_dir/media"
     # archive backup dir
@@ -115,7 +115,7 @@ restore_from_backup() {
     # Restore from archive
     wait_for_db
     PGPASSWORD=$POSTGRES_PASSWORD
-    (psql --username $POSTGRES_USER --host $POSTGRES_HOST $POSTGRES_DB < $database_sql) > /dev/null 2>/dev/null
+    (psql --username $POSTGRES_USER --host $POSTGRES_HOST $POSTGRES_USER < $database_sql) > /dev/null 2>/dev/null
     rm -rf /misago/media/*
     mv "$media_dir"/* /misago/media/
     # Cleanup...

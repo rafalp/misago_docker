@@ -124,10 +124,15 @@ setup() {
     # Run docker build
     docker-compose build --no-cache --force-rm --pull
     if [ "$initialize_default_database" != "n" ]; then
+        docker-compose up --detach misago
         docker-compose run --rm misago ./.run initialize_default_database
     fi
     collectstatic
     set_crontab
+    if [ "$initialize_default_database" != "n" ]; then
+        start_containers
+        echo "Setup complete. Your Misago installation is up and running on your domain."
+    fi
 }
 
 # Run collectstatic (uses misago-static volume) so site has loaded assets
