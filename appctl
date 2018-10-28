@@ -122,7 +122,7 @@ setup() {
     # Ask user what actions to perform
     read -p "Initialize default database? [Y/n]: " initialize_default_database
     # Run docker build
-    docker-compose build --pull
+    docker-compose build --no-cache --force-rm --pull
     if [ "$initialize_default_database" != "n" ]; then
         docker-compose run --rm misago ./.run initialize_default_database
     fi
@@ -148,7 +148,7 @@ upgrade() {
     echo "Stopping containers for upgrade..."
     docker-compose stop
     create_new_backup
-    docker-compose build --force-rm --pull
+    docker-compose build --no-cache --force-rm --pull
     docker-compose run --rm misago python manage.py migrate
     collectstatic
     echo "Upgrade has been completed, restarting containers..."
@@ -177,8 +177,8 @@ restart_containers() {
 # Rebuild misago container
 rebuild_misago_container() {
     require_setup
-    docker-compose build  --force-rm misago
     docker-compose stop misago
+    docker-compose build --force-rm misago
     docker-compose up --detach misago
 }
 

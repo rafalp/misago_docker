@@ -197,6 +197,12 @@ Defines docker container for Misago complete with UWSGI server running Misago an
 Python scripts that `./appctl` runs when it needs to create or change `.env` files with configuration.
 
 
+Conserving disk space
+---------------------
+
+Docker overhead on CPU and memory is negligible, but same can't be said about its disk usage. `./appctl` tries to cleanup whenever possible, but to be safe you will have to monitor amount of free space left on your server, and clean up once in a while using commands like `docker-compose image prune`, manually emptying older logs and backups stored in `logs` and `backups` directories.
+
+
 Need help?
 ----------
 
