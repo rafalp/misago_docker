@@ -13,12 +13,29 @@ services:
       - ENABLE_IPV6=true
     depends_on:
       - misago
+    labels:
+      - com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy
     volumes:
       - misago-media:/misago/media
       - misago-static:/misago/static
+      - /usr/share/nginx/html
       - /var/run/docker.sock:/tmp/docker.sock:ro
-      - ./config/vhost.d:/etc/nginx/vhost.d:ro
+      - ./config/certs:/etc/nginx/certs:ro
+      - ./config/vhost.d:/etc/nginx/vhost.d:z
       - ./logs/nginx:/var/log/nginx:z
+
+  nginx-lets-encrypt:
+    image: jrcs/letsencrypt-nginx-proxy-companion
+    restart: unless-stopped
+    networks:
+      - misago
+    depends_on:
+      - nginx-proxy
+    volumes:
+      - /usr/share/nginx/html
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./config/certs:/etc/nginx/certs:rw
+      - ./config/vhost.d:/etc/nginx/vhost.d:z
 
   postgres:
     image: postgres:10
