@@ -122,7 +122,7 @@ setup() {
     # Ask user what actions to perform
     read -p "Initialize default database? [Y/n]: " initialize_default_database
     # Run docker build
-    docker-compose build --pull
+    docker-compose build --force-rm --pull
     if [ "$initialize_default_database" != "n" ]; then
         docker-compose run --rm misago ./.run initialize_default_database
     fi
@@ -177,7 +177,7 @@ restart_containers() {
 # Rebuild misago container
 rebuild_misago_container() {
     require_setup
-    docker-compose build  --force-rm misago
+    docker-compose build --force-rm misago
     docker-compose stop misago
     docker-compose up --detach misago
 }
