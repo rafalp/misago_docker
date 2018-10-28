@@ -7,7 +7,12 @@ services:
     networks:
       - misago
     ports:
-      - "8080:80"
+      - "80:80"
+      - "443:443"
+    environment:
+      - ENABLE_IPV6=true
+    depends_on:
+      - misago
     volumes:
       - misago-media:/misago/media
       - misago-static:/misago/static
