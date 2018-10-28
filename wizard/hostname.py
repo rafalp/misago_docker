@@ -44,21 +44,31 @@ def run_hostname_wizard(env_file):
         env_file["VIRTUAL_HOST"] = "{0},www.{0}".format(hostname)
 
     env_file["MISAGO_ADDRESS"] = "https://%s" % hostname
-    env_file["LETSENCRYPT_HOST"] = env_file["VIRTUAL_HOST"]
 
-    letsencrypt_email_prompt = "Enter e-mail address for Let's Encrypt certificate: "
-    letsencrypt_email = None
-    while not letsencrypt_email:
-        letsencrypt_email = input(letsencrypt_email_prompt).strip()
-        if not letsencrypt_email or '@' not in letsencrypt_email:
-            print("You have to enter am e-mail address.")
-            print()
-    
+    run_lets_encrypt_wizard(env_file)
     run_nginx_wizard(hostname)
 
 
+def run_lets_encrypt_wizard(env_file):
+    email_prompt = "Enter contact e-mail address for Let's Encrypt:"
+    email = None
+    while not email:
+        email = input(email_prompt).strip()
+        if not email or "@" not in email:
+            print("You have to enter an e-mail address.")
+            print()
+
+    env_file["LETSENCRYPT_HOST"] = env_file["VIRTUAL_HOST"]
+    env_file["LETSENCRYPT_EMAIL"] = email
+
+
 def print_hostname_setup(env_file):
-    print("Current hostname: %s" % env_file.get("VIRTUAL_HOST"))
+    hostnames = [i.strip() for i in env_file.get("VIRTUAL_HOST", "").split(",")]
+    hostname, redirect = hostnames
+
+    print("Current hostname:        %s" % hostname)
+    print("Redirect from:           %s" % redirect)
+    print("Let's Encrypt e-mail:    %s" % env_file.get("email"))
 
 
 def change_hostname_setup(env_file):

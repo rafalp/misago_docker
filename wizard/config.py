@@ -4,7 +4,6 @@ from envfile import EnvFile
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 CONFIG_DIR = os.path.join(BASE_DIR, "config")
-CERTS_DIR = os.path.join(CONFIG_DIR, "certs")
 VHOSTD_DIR = os.path.join(CONFIG_DIR, "vhost.d")
 
 MISAGO_HEADER = "Misago service settings"
