@@ -11,8 +11,6 @@ services:
       - "443:443"
     environment:
       - ENABLE_IPV6=true
-    depends_on:
-      - misago
     labels:
       com.github.jrcs.letsencrypt_nginx_proxy_companion.nginx_proxy: "true"
     volumes:
@@ -69,6 +67,7 @@ services:
       - ./config/misago.env
       - ./config/postgres.env
     depends_on:
+      - nginx-lets-encrypt
       - postgres
       - redis
     volumes:

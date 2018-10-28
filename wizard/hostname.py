@@ -44,8 +44,17 @@ def run_hostname_wizard(env_file):
         env_file["VIRTUAL_HOST"] = "{0},www.{0}".format(hostname)
 
     env_file["MISAGO_ADDRESS"] = "https://%s" % hostname
+    env_file["LETSENCRYPT_HOST"] = env_file["VIRTUAL_HOST"]
 
-    run_nginx_wizard(env_file["VIRTUAL_HOST"])
+    letsencrypt_email_prompt = "Enter e-mail address for Let's Encrypt certificate: "
+    letsencrypt_email = None
+    while not letsencrypt_email:
+        letsencrypt_email = input(letsencrypt_email_prompt).strip()
+        if not letsencrypt_email or '@' not in letsencrypt_email:
+            print("You have to enter am e-mail address.")
+            print()
+    
+    run_nginx_wizard(hostname)
 
 
 def print_hostname_setup(env_file):
