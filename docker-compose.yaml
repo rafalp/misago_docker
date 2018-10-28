@@ -18,8 +18,8 @@ services:
     volumes:
       - misago-media:/misago/media
       - misago-static:/misago/static
-      - /etc/nginx/certs
-      - /usr/share/nginx/html
+      - certs:/etc/nginx/certs
+      - html:/usr/share/nginx/html
       - /var/run/docker.sock:/tmp/docker.sock:ro
       - ./config/vhost.d:/etc/nginx/vhost.d:z
       - ./logs/nginx:/var/log/nginx:z
@@ -32,8 +32,8 @@ services:
     depends_on:
       - nginx-proxy
     volumes:
-      - /etc/nginx/certs
-      - /usr/share/nginx/html
+      - certs:/etc/nginx/certs
+      - html:/usr/share/nginx/html
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./config/vhost.d:/etc/nginx/vhost.d:z
 
@@ -83,6 +83,8 @@ networks:
   misago:
 
 volumes:
+  certs:
+  html:
   misago-database:
   misago-media:
   misago-redis:
