@@ -38,7 +38,11 @@ def run_hostname_wizard(env_file):
             )
             print()
 
-    env_file["VIRTUAL_HOST"] = hostname
+    if hostname.startswith("www."):
+        env_file["VIRTUAL_HOST"] = "%s,%s" % (hostname, hostname[4:])
+    else:
+        env_file["VIRTUAL_HOST"] = "{0},www.{0}".format(hostname)
+
     env_file["MISAGO_ADDRESS"] = "https://%s" % hostname
 
     run_nginx_wizard(env_file["VIRTUAL_HOST"])
