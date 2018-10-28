@@ -21,4 +21,5 @@ def run_misago_wizard(env_file):
     run_timezone_wizard(env_file)
     run_email_wizard(env_file)
 
+    env_file.save()
     print("Misago configuration has been saved to %s" % env_file.path)
