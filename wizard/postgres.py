@@ -28,11 +28,11 @@ def update_postgres_env_file(env_file):
         changes.append("Password:   %s" % env_file["POSTGRES_PASSWORD"])
 
     if changes:
+        env_file.save()
         print(
             "PostgreSQL configuration file has been updated with following database settings:"
         )
         print()
         print("\n".join(changes))
-        env_file.save()
     else:
         print("PostgreSQL configuration file is up to date.")
