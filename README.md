@@ -189,7 +189,12 @@ Log files created by Misago container. If you are experiencing errors, see `misa
 
 ### `/misago`
 
-Defines docker container for Misago complete with UWSGI server running Misago and serving its static files.
+Defines Docker container for Misago complete with UWSGI server running Misago and serving its static files.
+
+
+### `/nginx-proxy`
+
+Extends [jwilder/nginx-proxy](https://github.com/jwilder/nginx-proxy) Docker image to disable TLSv1.0 encryption server-wide.
 
 
 ### `/wizard`

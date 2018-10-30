@@ -2,7 +2,7 @@ version: '3.0'
 services:
 
   nginx-proxy:
-    image: jwilder/nginx-proxy
+    build: nginx-proxy
     restart: always
     networks:
       - misago
@@ -62,6 +62,7 @@ services:
           - misago
     environment:
       - POSTGRES_HOST=postgres
+      - SSL_POLICY=Mozilla-Modern
       - VIRTUAL_PROTO=uwsgi
     env_file:
       - ./config/misago.env
