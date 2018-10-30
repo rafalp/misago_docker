@@ -131,7 +131,9 @@ setup() {
     set_crontab
     if [ "$initialize_default_database" != "n" ]; then
         restart_containers
-        echo "Setup complete. Your Misago installation is up and running on your domain."
+        echo "Setup completed."
+        echo "If you have already pointed a domain at this server,"
+        echo "you can now visit it to access your Misago site."
     fi
 }
 
@@ -151,8 +153,8 @@ set_crontab() {
 upgrade() {
     require_setup
     echo "Stopping containers for upgrade..."
-    create_new_backup
     docker-compose stop
+    create_new_backup
     docker-compose build --no-cache --force-rm --pull
     docker-compose run --rm misago python manage.py migrate
     collectstatic
@@ -274,7 +276,7 @@ reset_secret_key() {
 # Create new backup
 create_new_backup() {
     require_setup
-    docker-compose run --rm misago ./.run backup manual
+    docker-compose run --rm misago ./.run backup "manual"
 }
 
 # Restore from backup
