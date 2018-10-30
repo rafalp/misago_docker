@@ -22,7 +22,7 @@ error() {
 
 
 wait_for_db() {
-    PGPASSWORD=$POSTGRES_PASSWORD
+    export PGPASSWORD=$POSTGRES_PASSWORD
     RETRIES=10
     until psql -h $POSTGRES_HOST -U $POSTGRES_USER -d $POSTGRES_USER -c "select 1" > /dev/null 2>&1 || [ $RETRIES -eq 0 ]; do
         ((RETRIES--))
@@ -51,32 +51,32 @@ initialize_default_database() {
 # Run psql connected to database
 run_psql() {
     wait_for_db
-    PGPASSWORD=$POSTGRES_PASSWORD
     psql --username $POSTGRES_USER --host $POSTGRES_HOST $POSTGRES_USER
 }
 
 # Backup database and media to archive
 create_new_backup() {
-    # create backups/year/month path if doesnt exist, and cd to it
-    backups_dir="/misago/backups/$(date +%Y)/$(date +%m)"
-    mkdir -p $backups_dir
-    cd $backups_dir
-    # create backup dir
-    backup_dir="misago-$(date +%Y%m%d%H%M%S)"
+    cd "/misago/backups/"
+    if [[ $1 ]]; then
+        backup_type="$1"
+    else
+        backup_type="auto"
+    fi
+    # create tmp backup dir
+    backup_dir="$backup_type-$(date +%Y%m%d%H%M%S)"
     mkdir "./$backup_dir"
     # backup database
     wait_for_db
-    PGPASSWORD=$POSTGRES_PASSWORD
     pg_dump -U $POSTGRES_USER -h $POSTGRES_HOST $POSTGRES_USER -Oxc > "./$backup_dir/database.sql"
     # backup media
     cp -r /misago/media "$backup_dir/media"
     # archive backup dir
-    backup_archive="misago-$(date +%Y%m%d%H%M%S).tar.gz"
+    backup_archive="$backup_type-$(date +%Y%m%d%H%M%S).tar.gz"
     GZIP=-9
     tar -zcf $backup_archive "./$backup_dir"
     # delete backup dir as its no longer required
     rm -rf $backup_dir
-    echo "New backup has been created at backups/$(date +%Y)/$(date +%m)/$backup_archive"
+    echo "New backup has been created at backups/$backup_archive"
     echo
 }
 
@@ -114,7 +114,6 @@ restore_from_backup() {
     fi
     # Restore from archive
     wait_for_db
-    PGPASSWORD=$POSTGRES_PASSWORD
     (psql --username $POSTGRES_USER --host $POSTGRES_HOST $POSTGRES_USER < $database_sql) > /dev/null 2>/dev/null
     rm -rf /misago/media/*
     mv "$media_dir"/* /misago/media/
@@ -133,7 +132,7 @@ if [[ $1 ]]; then
     elif [[ $1 = "psql" ]]; then
         run_psql
     elif [[ $1 = "backup" ]]; then
-        create_new_backup
+        create_new_backup $2
     elif [[ $1 = "restore" ]]; then
         restore_from_backup $2
     else
