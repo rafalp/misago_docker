@@ -2,7 +2,7 @@ version: '3.0'
 services:
 
   nginx-proxy:
-    image: jwilder/nginx-proxy
+    build: nginx-proxy
     restart: always
     networks:
       - misago

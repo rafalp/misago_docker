@@ -1,0 +1,1 @@
+FROM jwilder/nginx-proxy
