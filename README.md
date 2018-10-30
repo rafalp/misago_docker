@@ -202,6 +202,8 @@ Conserving disk space
 
 Docker overhead on CPU and memory is negligible, but same can't be said about its disk usage. `./appctl` tries to cleanup whenever possible, but to be safe you will have to monitor amount of free space left on your server, and clean up once in a while using commands like `docker-compose image prune`, manually emptying older logs and backups stored in `logs` and `backups` directories.
 
+Default cron task will also try to delete log files older than 60 days, and backup files that are older than 21 days, and have filename starting with `auto-`.
+
 
 Need help?
 ----------
