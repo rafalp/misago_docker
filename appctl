@@ -151,8 +151,8 @@ set_crontab() {
 upgrade() {
     require_setup
     echo "Stopping containers for upgrade..."
-    docker-compose stop
     create_new_backup
+    docker-compose stop
     docker-compose build --no-cache --force-rm --pull
     docker-compose run --rm misago python manage.py migrate
     collectstatic
