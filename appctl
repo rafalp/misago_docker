@@ -274,7 +274,7 @@ reset_secret_key() {
 # Create new backup
 create_new_backup() {
     require_setup
-    docker-compose run --rm misago ./.run backup
+    docker-compose run --rm misago ./.run backup manual
 }
 
 # Restore from backup

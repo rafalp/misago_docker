@@ -15,6 +15,12 @@
 # Make sure database is available
 ./.run wait_for_db
 
+# Remove logs older than 60 days
+find /misago/logs/ -mindepth 1 -type f -mtime +60 -delete
+
+# Remove backups older than 21 days
+find /misago/backups/ -name auto-* -type f -mtime +21 -delete
+
 # Create daily backup
 if [[ $MISAGO_DAILY_BACKUP = "yes" ]]; then
     ./.run backup
