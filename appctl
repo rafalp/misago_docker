@@ -119,22 +119,22 @@ setup() {
             exit 1
         fi
     done
-    # Ask user what actions to perform
     read -p "Initialize default database? [Y/n]: " initialize_default_database
     # Run docker build
     docker-compose build --no-cache --force-rm --pull
+    start_containers
     if [ "$initialize_default_database" != "n" ]; then
-        start_containers
         docker-compose run --rm misago ./.run initialize_default_database
     fi
     collectstatic
     set_crontab
+    echo "Setup completed."
     if [ "$initialize_default_database" != "n" ]; then
-        echo "Restarting containers..."
-        restart_containers
-        echo "Setup completed."
         echo "If you have already pointed a domain at this server,"
         echo "you can now visit it to access your Misago site."
+    else
+        echo "Database was not initialized. Restore from backup or load custom db dump to psql"
+        echo "and use \"./appctl start\" to start Misago server."
     fi
 }
 
