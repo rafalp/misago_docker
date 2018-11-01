@@ -131,7 +131,7 @@ setup() {
     echo "Setup completed."
     if [ "$initialize_default_database" != "n" ]; then
         echo "If you have already pointed a domain at this server, you can now visit it to access your Misago site."
-        echo "Please note that it may take up to few minutes for HTTPS configuration to complete."
+        echo "Please note that it may take up to few minutes for HTTPS to activate."
     else
         echo "Database was not initialized. Restore from backup or load custom db dump to psql and use \"./appctl start\" to start Misago server."
     fi
