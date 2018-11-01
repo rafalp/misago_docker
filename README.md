@@ -11,7 +11,7 @@ This repository provides production-ready setup of Misago for people who:
 
 It provides Misago forum running on Python 3.6 behind Nginx reverse proxy with Https enabled via Let's Encrypt, PostgreSQL database and Redis for caching.
 
-To help you running your site, there is a special tool called `appctl` provided, that consists of some shortcuts for useful actions, and exposes wizards for configuration management without the need for manually editing files.
+To help you running your site, there is a special tool called `appctl` provided, that consists of shortcuts for useful actions, and exposes wizards for configuration management without the need for manually editing files.
 
 **Note for DevOps pros:** this repo assumes that users will `git clone` it on to their servers, run `./appctl setup` to do basic configuration, and run all services they need in Docker Compose, with all data stored on instance using Docker volumes. This approach is incompatibile with setups where everything runs in dedicated instance or service (like Amazon's S3 or RDS), but the aim of this repo is to make Misago viable option to hobbyists and small/medium communities, not enterprise deployments that will expect running at massive scale serving bazillions of active users at single time.
 
@@ -21,35 +21,42 @@ Setup
 
 To start your own Misago site, you will need:
 
-- server running Linux with Docker with at least 2GB of memory ([DigitalOcean droplets are safe bet](https://m.do.co/c/a8c85735320a))
-- domain your site will run at, pointing to your server
+- server running Linux with Docker and 2GB of memory ([DigitalOcean droplets are safe bet](https://m.do.co/c/a8c85735320a))
+- domain your site will run at, configured to point at your server
 
 
 ### Getting code on the server
 
-`ssh` to your server. If you are on Windows, you can use [Putty](https://www.putty.org/). Next, git clone this repo to `misago_docker` directory using this command:
+`ssh` to your server. If you are on Windows, you can use [Putty](https://www.putty.org/). Next, git clone this repo to using this command:
 
 ```
 git clone https://github.com/rafalp/misago_docker.git --depth=1
 ```
 
+This will create `misago_docker` directory that you can then `cd` to, to continue site setup.
+
+
 ### Running the setup
 
-Enter the misago_docker directory and run `./appctl setup` command. The wizard will ask for some basic information, such as your domain name, timezone or first admin account details. After that it will:
+Enter the misago_docker directory and run `./appctl setup` command. The wizard will let you set basic settings for your site: your domain name, timezone or first admin account details. After that it will:
 
 - install all requirements
 - build Docker containers
-- setup `crontab`
+- setup `crontab` that will run daily maintenance
 - create database and populate it with initial data
 
-Once you are done, start the application by running `./appctl start` and visit your domain in order to see your Misago forum running.
+When `setup` finishes, visit your domain in order to see your Misago forum running.
 
 Lastly, go to `https://yourdomain.com/admincp/` and log into the admin panel using the username and password you entered during the setup. There you will be able to further configure your forum. For instance: set forum name, create categories and such.
 
 
 ### Secure your server
 
-Depending on initial configuration of your server, you may have to take [additional steps](https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-18-04) to make it more secure. Internet is patrolled by bots searching for vulnerable servers, not above attempting to brute-force root accounts, so you should at least disable the login using root, and block IP addresses upon repeated failed authentication attempts.
+Depending on initial configuration of your server, you may have to take [additional steps](https://www.digitalocean.com/community/tutorials/initial-server-setup-with-ubuntu-18-04) to make it more secure. Internet is patrolled by bots searching for vulnerable servers attempting to brute-force root accounts so you should disable the root login, block IP addresses upon repeated failed authentication attempts, or both. You can easilly enable 10-minute ban for 3 failed sign-in entries by installing `fail2ban`:
+
+```
+apt-get install fail2ban
+```
 
 
 ### Setup e-mail
@@ -61,18 +68,20 @@ Without e-mails enabled your users will not be able to receive activation e-mail
 
 ### Enable Sentry
 
-You can also create account on Sentry (https://sentry.io) and enable it on your side using `./appctl sentry`. Sentry provides fancy web interface browsing Misago's logs, and will send e-mail with notifications when your users experience errors or edit their profile details, which is possible source of forum spam.
+You can also create account on Sentry (https://sentry.io) and enable it on your site using `./appctl sentry`. Sentry provides fancy web interface for browsing Misago's logs, and will send you e-mail with notifications when your users experience errors or edit their profile details, which is possible source of forum spam.
 
 
 ### Speed up Redis
 
-Misago uses Redis for caching and tasks queue. To get most performance out of it, you will have to make sure that you have `Transparent Huge Pages (THP)` support disabled in your kernel. To fix this issue run the command `echo never > /sys/kernel/mm/transparent_hugepage/enabled` as root, and add it to your `/etc/rc.local` in order to retain the setting after a reboot. Docker Redis container must be restarted after THP is disabled, but you can simply run `./appctl restart` for same effect.
+Misago uses Redis for caching and tasks queue. To get most performance out of it, you will have to make sure that you have `Transparent Huge Pages (THP)` support disabled in your kernel. To do that run the command `echo never > /sys/kernel/mm/transparent_hugepage/enabled` as root, and add it to your `/etc/rc.local` in order to retain the setting after a reboot. Docker Redis container must be restarted after THP is disabled, but you can simply run `./appctl restart` for same effect.
 
 
 Upgrading to newer version
 --------------------------
 
-To upgrade to newer version, simply run `git pull` followed by `./apctl upgrade`. This will get latest code from github, rebuild Docker containers and update Misago (and other services) to latest minor releases.
+To upgrade to newer version, go to `misago_docker` directory and run `git pull` and followed by `./apctl upgrade`. This will get latest code from github, rebuild Docker containers and update Misago (and other services) to latest minor releases.
+
+You may have to setup git credentials on your machine for `git pull` to work, but entering git password is not required.
 
 
 Backup and restore
@@ -80,9 +89,9 @@ Backup and restore
 
 ### Creating new backup
 
-Running the `./appctl backup` will result in new backup being created in `backups` directory, under the path corresponding to year and month of backup's creation (eg. 2018/10 for backups created in October 2018).
+Running the `./appctl backup` will result in new backup being created in `backups` directory.
 
-Backup will be a `tar.gz` archive named using `misago-YYYYMMDDHHMMSS.tar.gz` format and will contain `database.sql` file with database export created using `pg_dump`, and `media` directory contained user-uploaded files.
+Backup will be a `tar.gz` archive named following the `manual-YYYYMMDDHHMMSS.tar.gz` format and will contain `database.sql` file with database export created using `pg_dump`, and `media` directory containing user-uploaded files.
 
 
 ### Restoring from backup
@@ -94,21 +103,21 @@ Restoration will:
 - overwrite your current `media` directory with one from archive.
 - load the `database.sql` to `psql`, overwriting existing database tables with ones from file.
 
-**NOTE:** because restoration process can be considered descructive, you should backup any existing data if you are restoring the site that has data you may want to recover if something goes wrong.
+**NOTE:** because restoration process can be considered descructive, you should backup existing data if you are restoring the site that has any data you may want to recover if something goes wrong.
 
 After you've restored from backup, it's good idea to follow up with `./appctl rebuild` to rebuild Misago image, giving it's application container a chance to rebuild filesystem caches.
 
 
 ### Daily backup
 
-`./appctl setup` enables daily backup by default. This backup is defined in `cron` script inside Misago container, and is ran *before* all other maintenance tasks, providing fallback point in case that maintenance deletes something you **really** didn't want to delete.
+`./appctl setup` enables daily backup by default. This backup is defined in `cron` script inside Misago container, and is ran *before* all other maintenance tasks, providing fallback point in case that maintenance deletes something you **really** didn't want to delete. Automatic backup files names start with `auto-` and are deleted automatically after 21 days.
 
 You can switch daily backup on and off using `./appctl dailybackup`.
 
 
 ### Creating custom backup archives
 
-You can easily prepare your own backup archives for use with `./appctl restore`.
+You can create your own backup archives for use with `./appctl restore`.
 
 Start off with creating a directory, `mybackup` for instance. Create the following files and directories inside of it:
 
@@ -194,7 +203,7 @@ Defines Docker container for Misago complete with UWSGI server running Misago an
 
 ### `/nginx-proxy`
 
-Extends [jwilder/nginx-proxy](https://github.com/jwilder/nginx-proxy) Docker image to disable TLSv1.0 encryption server-wide.
+Extends [jwilder/nginx-proxy](https://github.com/jwilder/nginx-proxy) Docker image to disable TLSv1.0 https encryption on your site, improving it's security rating.
 
 
 ### `/wizard`
@@ -207,7 +216,7 @@ Conserving disk space
 
 Docker overhead on CPU and memory is negligible, but same can't be said about its disk usage. `./appctl` tries to cleanup whenever possible, but to be safe you will have to monitor amount of free space left on your server, and clean up once in a while using commands like `docker-compose image prune`, manually emptying older logs and backups stored in `logs` and `backups` directories.
 
-Default cron task will also try to delete log files older than 60 days, and backup files that are older than 21 days, and have filename starting with `auto-`.
+Default cron task will also try to delete log files older than 60 days, and backup files that are older than 21 days and have filename starting with `auto-`.
 
 
 Need help?
