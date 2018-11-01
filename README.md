@@ -33,7 +33,7 @@ To start your own Misago site, you will need:
 git clone https://github.com/rafalp/misago_docker.git --depth=1
 ```
 
-This will create `misago_docker` directory that you can then `cd` to, to continue site setup.
+This will create `misago_docker` directory that you can then `cd` to and continue site setup.
 
 
 ### Running the setup
