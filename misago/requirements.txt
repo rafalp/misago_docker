@@ -9,7 +9,7 @@ bleach==2.1.4             # via misago
 certifi==2018.8.24        # via misago, requests
 chardet==3.0.4            # via misago, requests
 contextlib2==0.5.5        # via raven
-django-anymail==4.2
+django-anymail==4.3
 django-crispy-forms==1.6.1  # via misago
 django-debug-toolbar==1.8  # via misago
 django-htmlmin==0.10.0    # via misago
@@ -23,7 +23,7 @@ idna==2.7                 # via misago, requests
 ipaddress==1.0.22         # via faker, misago
 markdown==2.6.11          # via misago
 misago-social-auth-app-django==2.1.0  # via misago
-misago==0.19.3
+misago==0.19.4
 oauthlib==2.1.0           # via misago, requests-oauthlib, social-auth-core
 olefile==0.45.1           # via misago, pillow
 path.py==10.3.1           # via misago
@@ -35,7 +35,7 @@ pytz==2018.5              # via django, misago
 raven==6.9.0
 redis==2.10.6             # via django-redis
 requests-oauthlib==1.0.0  # via misago, social-auth-core
-requests==2.19.1          # via django-anymail, misago, requests-oauthlib, social-auth-core
+requests==2.20.0          # via django-anymail, misago, requests-oauthlib, social-auth-core
 six==1.11.0               # via bleach, django-anymail, faker, html5lib, misago, misago-social-auth-app-django, python-dateutil, social-auth-core
 social-auth-core==1.7.0   # via misago, misago-social-auth-app-django
 sqlparse==0.2.4           # via django-debug-toolbar, misago
