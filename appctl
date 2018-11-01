@@ -130,6 +130,7 @@ setup() {
     collectstatic
     set_crontab
     if [ "$initialize_default_database" != "n" ]; then
+        echo "Restarting containers..."
         restart_containers
         echo "Setup completed."
         echo "If you have already pointed a domain at this server,"
