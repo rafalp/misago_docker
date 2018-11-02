@@ -202,6 +202,9 @@ AUTHENTICATION_BACKENDS = [
     'misago.users.authbackends.MisagoBackend',
 ]
 
+CSRF_COOKIE_NAME = 'misagocsrftoken'
+CSRF_COOKIE_SECURE = True
+
 CSRF_FAILURE_VIEW = 'misago.core.errorpages.csrf_failure'
 
 INSTALLED_APPS = [
@@ -245,6 +248,8 @@ INTERNAL_IPS = [
     '127.0.0.1'
 ]
 
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
 LOGIN_REDIRECT_URL = 'misago:index'
 
 LOGIN_URL = 'misago:login'
@@ -274,6 +279,9 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'misagodocker.urls'
+
+SESSION_COOKIE_NAME = 'misagosessionid'
+SESSION_COOKIE_SECURE = True
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 
