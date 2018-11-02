@@ -1,8 +1,6 @@
 Misago Docker
 =============
 
-⚠️ **WARNING: This repository is work in progress, don't use it yet!** ⚠️
-
 This repository provides production-ready setup of Misago for people who:
 
 - Want to run their own forum using Misago
