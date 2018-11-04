@@ -38,7 +38,7 @@ def create_nginx_location_config(hostname):
         if not input_bool(overwrite_prompt, default=False):
             return False
         config_dst.unlink()
-    copy(VHOST_LOCATION_CONFIG, config_dst)
+    copy(str(VHOST_LOCATION_CONFIG), str(config_dst))
     return True
 
 
