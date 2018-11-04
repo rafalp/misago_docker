@@ -1,10 +1,9 @@
 import filecmp
 import os
 from pathlib import Path
-from shutil import copy
 
 from config import VHOSTD_DIR
-from utils import input_bool
+from utils import input_bool, save_cmp, safe_copy, safe_open
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 VHOST_LOCATION_CONFIG = os.path.join(BASE_DIR, "nginx", "vhost_location")
@@ -38,7 +37,7 @@ def create_nginx_location_config(hostname):
         if not input_bool(overwrite_prompt, default=False):
             return False
         config_dst.unlink()
-    safe_open(VHOST_LOCATION_CONFIG, config_dst)
+    safe_copy(VHOST_LOCATION_CONFIG, config_dst)
     return True
 
 
@@ -64,20 +63,3 @@ def create_nginx_redirect_config(hostname):
         f.write(redirect_config)
 
     return True
-
-
-def save_cmp(src, dst):
-    src_str = str(src)
-    dst_str = str(dst)
-    return filecmp.cmp(src_str, dst_str)
-
-
-def safe_copy(src, dst):
-    src_str = str(src)
-    dst_str = str(dst)
-    return copy(src_str, dst_str)
-    
-
-def safe_open(file, mode):
-    file_str = str(file)
-    return open(file_str, mode)

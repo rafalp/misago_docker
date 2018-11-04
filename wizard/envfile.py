@@ -1,5 +1,6 @@
 from datetime import datetime
 from pathlib import Path
+from utils import safe_open
 
 
 class EnvFile:
@@ -15,7 +16,7 @@ class EnvFile:
         return self.path.is_file()
 
     def read(self):
-        with open(self.path, "r") as f:
+        with safe_open(self.path, "r") as f:
             return parse_env_file(f.read())
 
     def save(self):
@@ -27,7 +28,7 @@ class EnvFile:
             value = self.variables[key]
             lines.append("%s=%s" % (key, value))
 
-        with open(self.path, "w") as f:
+        with safe_open(self.path, "w") as f:
             f.write("\n".join(lines))
 
     def __setitem__(self, key, item):
