@@ -28,7 +28,7 @@ def create_nginx_location_config(hostname):
     config_filename = "%s_location" % hostname
     config_dst = Path(os.path.join(VHOSTD_DIR, config_filename))
     if config_dst.is_file():
-        if filecmp.cmp(VHOST_LOCATION_CONFIG, config_dst):
+        if save_cmp(VHOST_LOCATION_CONFIG, config_dst):
             # Skip rest of wizard because destination file already exists
             return True
 
@@ -38,7 +38,7 @@ def create_nginx_location_config(hostname):
         if not input_bool(overwrite_prompt, default=False):
             return False
         config_dst.unlink()
-    copy(str(VHOST_LOCATION_CONFIG), str(config_dst))
+    safe_open(VHOST_LOCATION_CONFIG, config_dst)
     return True
 
 
@@ -56,11 +56,28 @@ def create_nginx_redirect_config(hostname):
         if not input_bool(overwrite_prompt, default=False):
             return False
 
-    with open(REDIRECT_CONFIG, "r") as f:
+    with safe_open(REDIRECT_CONFIG, "r") as f:
         tpl = f.read()
     redirect_config = tpl.replace("domain.com", hostname)
 
-    with open(config_dst, "w") as f:
+    with safe_open(config_dst, "w") as f:
         f.write(redirect_config)
 
     return True
+
+
+def save_cmp(src, dst):
+    src_str = str(src)
+    dst_str = str(dst)
+    return filecmp.cmp(src_str, dst_str)
+
+
+def safe_copy(src, dst):
+    src_str = str(src)
+    dst_str = str(dst)
+    return copy(src_str, dst_str)
+    
+
+def safe_open(file, mode):
+    file_str = str(file)
+    return open(file_str, mode)
