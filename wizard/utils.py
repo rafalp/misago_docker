@@ -17,10 +17,10 @@ def input_bool(prompt, default=True):
         result = result.strip().lower()
         if result == "":
             return default
-        if result not in ["y", "n"]:
+        if result not in ["y", "n", "yes", "no"]:
             result = None
             print("Invalid choice.")
-    return result == "y"
+    return result in BOOL_TRUE
 
 
 def input_choice(prompt, choices, coerce_to=str):
