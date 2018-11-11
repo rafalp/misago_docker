@@ -1,6 +1,8 @@
+import os
 import re
+from pathlib import Path
 
-from config import misago
+from config import VHOSTD_DIR, misago
 from nginx import run_nginx_wizard
 from utils import input_bool, print_setup_changed_message
 
@@ -66,8 +68,10 @@ def print_hostname_setup(env_file):
     hostnames = [i.strip() for i in env_file.get("VIRTUAL_HOST", "").split(",")]
     hostname, redirect = hostnames
 
+    redirect_set = Path(os.path.join(VHOSTD_DIR, redirect)).is_file()
+
     print("Current hostname:        %s" % hostname)
-    print("Redirect from:           %s" % redirect)
+    print("Redirect from:           %s" % (redirect if redirect_set else "not set"))
     print("Let's Encrypt e-mail:    %s" % env_file.get("LETSENCRYPT_EMAIL"))
 
 

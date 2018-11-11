@@ -13,7 +13,9 @@ REDIRECT_CONFIG = os.path.join(BASE_DIR, "nginx", "redirect")
 def run_nginx_wizard(hostname):
     create_nginx_vhostd_if_not_exists()
     config_set = create_nginx_location_config(hostname)
-    redirect_set = create_nginx_redirect_config(hostname)
+    if config_set:
+        clear_old_nginx_config(hostname)
+        redirect_set = create_nginx_redirect_config(hostname)
     return config_set or redirect_set
 
 
@@ -24,6 +26,8 @@ def create_nginx_vhostd_if_not_exists():
 
 
 def create_nginx_location_config(hostname):
+    hostname = hostname.split(",")[0]
+
     config_filename = "%s_location" % hostname
     config_dst = Path(os.path.join(VHOSTD_DIR, config_filename))
     if config_dst.is_file():
@@ -37,23 +41,44 @@ def create_nginx_location_config(hostname):
         if not input_bool(overwrite_prompt, default=False):
             return False
         config_dst.unlink()
+
     safe_copy(VHOST_LOCATION_CONFIG, config_dst)
     return True
 
 
+def clear_old_nginx_config(hostname):
+    hostname = hostname.split(",")[0]
+    if hostname.startswith("www."):
+        redirect_from = hostname[4:]
+    else:
+        redirect_from = "www.%s" % hostname
+
+    old_redirect = Path(os.path.join(VHOSTD_DIR, hostname))
+    if old_redirect.is_file():
+        old_redirect.unlink()
+
+    old_location_filename = "%s_location" % redirect_from
+    old_location = Path(os.path.join(VHOSTD_DIR, old_location_filename))
+    if old_location.is_file():
+        old_location.unlink()
+
+
 def create_nginx_redirect_config(hostname):
+    hostname = hostname.split(",")[0]
     if hostname.startswith("www."):
         redirect_from = hostname[4:]
     else:
         redirect_from = "www.%s" % hostname
 
     config_dst = Path(os.path.join(VHOSTD_DIR, redirect_from))
-    if config_dst.is_file():
-        overwrite_prompt = (
-            "config/vhost.d/%s already exists, overwrite with new one?"
-        ) % redirect_from
-        if not input_bool(overwrite_prompt, default=False):
-            return False
+
+    redirect_prompt = (
+        "Do you want to set 301 redirect from %s to %s? (requires domain to be already configured)"
+    ) % (redirect_from, hostname)
+    if not input_bool(redirect_prompt):
+        if config_dst.is_file():
+            config_dst.unlink()
+        return False
 
     with safe_open(REDIRECT_CONFIG, "r") as f:
         tpl = f.read()
