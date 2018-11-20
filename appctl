@@ -30,12 +30,22 @@ require_setup() {
     done
 }
 
-# Check if user has docker-compose
-if ! command -v docker-compose >/dev/null 2>&1; then
+# Check if user has docker and docker-compose
+if ! command -v docker >/dev/null 2>&1; then
     error "You need to have Docker installed to use this tool."
     echo
     echo "Docker release for your system can be downloaded for free from this page:"
     echo "https://www.docker.com/get-started"
+    echo
+    echo "If you are on Linux, you will also have to install Docker Compose:"
+    echo "https://docs.docker.com/compose/install/"
+    echo
+    exit 1
+elif ! command -v docker-compose >/dev/null 2>&1; then
+    error "You need to have Docker Compose installed to use this tool."
+    echo
+    echo "Docker Compose release for your system can be downloaded for free from this page:"
+    echo "https://docs.docker.com/compose/install/"
     echo
     exit 1
 fi
