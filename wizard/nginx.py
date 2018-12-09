@@ -10,12 +10,12 @@ VHOST_LOCATION_CONFIG = os.path.join(BASE_DIR, "nginx", "vhost_location")
 REDIRECT_CONFIG = os.path.join(BASE_DIR, "nginx", "redirect")
 
 
-def run_nginx_wizard(hostname):
+def run_nginx_wizard(env_file, hostname):
     create_nginx_vhostd_if_not_exists()
     config_set = create_nginx_location_config(hostname)
     if config_set:
         clear_old_nginx_config(hostname)
-        redirect_set = create_nginx_redirect_config(hostname)
+        redirect_set = create_nginx_redirect_config(env_file, hostname)
     return config_set or redirect_set
 
 
@@ -36,7 +36,8 @@ def create_nginx_location_config(hostname):
             return True
 
         overwrite_prompt = (
-            "config/vhost.d/%s already exists but appears to be modified, overwrite with default?"
+            "config/vhost.d/%s already exists but appears to be modified, "
+            "overwrite with default?"
         ) % config_filename
         if not input_bool(overwrite_prompt, default=False):
             return False
@@ -63,7 +64,7 @@ def clear_old_nginx_config(hostname):
         old_location.unlink()
 
 
-def create_nginx_redirect_config(hostname):
+def create_nginx_redirect_config(env_file, hostname):
     hostname = hostname.split(",")[0]
     if hostname.startswith("www."):
         redirect_from = hostname[4:]
@@ -73,9 +74,12 @@ def create_nginx_redirect_config(hostname):
     config_dst = Path(os.path.join(VHOSTD_DIR, redirect_from))
 
     redirect_prompt = (
-        "Do you want to set 301 redirect from %s to %s? (requires domain to be already configured)"
+        "Do you want to set 301 redirect from %s to %s? "
+        "(requires domain to be already configured)"
     ) % (redirect_from, hostname)
     if not input_bool(redirect_prompt):
+        env_file["VIRTUAL_HOST"] = hostname
+        env_file.save()
         if config_dst.is_file():
             config_dst.unlink()
         return False

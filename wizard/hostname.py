@@ -47,8 +47,8 @@ def run_hostname_wizard(env_file):
 
     env_file["MISAGO_ADDRESS"] = "https://%s/" % hostname
 
+    run_nginx_wizard(env_file, hostname)
     run_lets_encrypt_wizard(env_file)
-    run_nginx_wizard(hostname)
 
 
 def run_lets_encrypt_wizard(env_file):
