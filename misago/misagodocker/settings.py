@@ -28,30 +28,30 @@ _ = lambda s: s
 # See https://docs.djangoproject.com/en/1.11/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.environ.get("MISAGO_SECRET_KEY")
+SECRET_KEY = os.environ.get('MISAGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = strtobool(os.environ.get("MISAGO_DEBUG"))
+DEBUG = strtobool(os.environ.get('MISAGO_DEBUG'))
 
 
 # A list of strings representing the host/domain names that this Django site can serve.
 # If you are unsure, just enter here your domain name, eg. ['mysite.com', 'www.mysite.com']
 
-ALLOWED_HOSTS = strtolist(os.environ.get("VIRTUAL_HOST"))
+ALLOWED_HOSTS = strtolist(os.environ.get('VIRTUAL_HOST'))
 
 
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
 DATABASES = {
-    "default": {
+    'default': {
         # Misago requires PostgreSQL to run
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.environ.get("POSTGRES_USER"),
-        "USER": os.environ.get("POSTGRES_USER"),
-        "PASSWORD": os.environ.get("POSTGRES_PASSWORD"),
-        "HOST": os.environ.get("POSTGRES_HOST"),
-        "PORT": 5432,
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': os.environ.get('POSTGRES_USER'),
+        'USER': os.environ.get('POSTGRES_USER'),
+        'PASSWORD': os.environ.get('POSTGRES_PASSWORD'),
+        'HOST': os.environ.get('POSTGRES_HOST'),
+        'PORT': 5432,
     }
 }
 
@@ -63,7 +63,9 @@ CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
         "LOCATION": "redis://redis/1",
-        "OPTIONS": {"CLIENT_CLASS": "django_redis.client.DefaultClient"},
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
     }
 }
 
@@ -73,24 +75,32 @@ CACHES = {
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
-        "OPTIONS": {"user_attributes": ["username", "email"]},
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+        'OPTIONS': {
+            'user_attributes': ['username', 'email'],
+        }
     },
     {
-        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
-        "OPTIONS": {"min_length": 7},
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+        'OPTIONS': {
+            'min_length': 7,
+        }
     },
-    {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator"},
-    {"NAME": "django.contrib.auth.password_validation.NumericPasswordValidator"},
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
 ]
 
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.11/topics/i18n/
 
-LANGUAGE_CODE = os.environ.get("MISAGO_LANGUAGE_CODE", "en-us")
+LANGUAGE_CODE = os.environ.get('MISAGO_LANGUAGE_CODE', 'en-us')
 
-TIME_ZONE = os.environ.get("MISAGO_TIME_ZONE", "UTC")
+TIME_ZONE = os.environ.get('MISAGO_TIME_ZONE', 'UTC')
 
 USE_I18N = True
 
@@ -102,39 +112,41 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
-STATIC_URL = "/static/"
+STATIC_URL = '/static/'
 
 
 # User uploads (Avatars, Attachments, files uploaded in other Django apps, ect.)
 # https://docs.djangoproject.com/en/1.11/howto/static-files/
 
-MEDIA_URL = "/media/"
+MEDIA_URL = '/media/'
 
 
 # The absolute path to the directory where collectstatic will collect static files for deployment.
 # https://docs.djangoproject.com/en/1.11/ref/settings/#static-root
 
-STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # https://docs.djangoproject.com/en/1.11/ref/settings/#media-root
 
-MEDIA_ROOT = os.path.join(BASE_DIR, "media")
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 
 # This setting defines the additional locations the staticfiles app will traverse if the FileSystemFinder finder
 # is enabled, e.g. if you use the collectstatic or findstatic management command or use the static file serving view.
 # https://docs.djangoproject.com/en/1.10/ref/settings/#staticfiles-dirs
 
-STATICFILES_DIRS = [os.path.join(BASE_DIR, "theme", "static")]
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'theme', 'static'),
+]
 
 
 # Fingerprint static files
 # Includes small version checksum at end of every static file,
 # forcing browser to download new version when file contents change.
 
-STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesStorage"
+STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.ManifestStaticFilesStorage'
 
 
 # Email configuration
@@ -142,211 +154,238 @@ STATICFILES_STORAGE = "django.contrib.staticfiles.storage.ManifestStaticFilesSto
 
 # Misago Docker autoconfigures the email provider based on user preferences
 
-if os.environ.get("MISAGO_EMAIL_PROVIDER") == "smtp":
-    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-    EMAIL_USE_SSL = strtobool(os.environ["MISAGO_EMAIL_USE_SSL"])
-    EMAIL_USE_TLS = strtobool(os.environ["MISAGO_EMAIL_USE_TLS"])
-    EMAIL_HOST = os.environ["MISAGO_EMAIL_HOST"]
-    EMAIL_HOST_PASSWORD = os.environ["MISAGO_EMAIL_PASSWORD"]
-    EMAIL_HOST_USER = os.environ["MISAGO_EMAIL_USER"]
-    EMAIL_PORT = os.environ["MISAGO_EMAIL_PORT"]
-elif os.environ.get("MISAGO_EMAIL_PROVIDER") == "gmail":
-    EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
+if os.environ.get('MISAGO_EMAIL_PROVIDER') == "smtp":
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+    EMAIL_USE_SSL = strtobool(os.environ['MISAGO_EMAIL_USE_SSL'])
+    EMAIL_USE_TLS = strtobool(os.environ['MISAGO_EMAIL_USE_TLS'])
+    EMAIL_HOST = os.environ['MISAGO_EMAIL_HOST']
+    EMAIL_HOST_PASSWORD = os.environ['MISAGO_EMAIL_PASSWORD']
+    EMAIL_HOST_USER = os.environ['MISAGO_EMAIL_USER']
+    EMAIL_PORT =  os.environ['MISAGO_EMAIL_PORT']
+elif os.environ.get('MISAGO_EMAIL_PROVIDER') == "gmail":
+    EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
     EMAIL_USE_TLS = True
-    EMAIL_HOST = "smtp.gmail.com"
-    EMAIL_HOST_PASSWORD = os.environ["MISAGO_GMAIL_PASSWORD"]
-    EMAIL_HOST_USER = os.environ["MISAGO_GMAIL_USER"]
+    EMAIL_HOST = 'smtp.gmail.com'
+    EMAIL_HOST_PASSWORD = os.environ['MISAGO_GMAIL_PASSWORD']
+    EMAIL_HOST_USER = os.environ['MISAGO_GMAIL_USER']
     EMAIL_PORT = 587
-elif os.environ.get("MISAGO_EMAIL_PROVIDER") == "mailgun":
-    EMAIL_BACKEND = "anymail.backends.mailgun.EmailBackend"
-    ANYMAIL = {"MAILGUN_API_KEY": os.environ["MISAGO_MAILGUN_API_KEY"]}
-elif os.environ.get("MISAGO_EMAIL_PROVIDER") == "mailjet":
-    EMAIL_BACKEND = "anymail.backends.mailjet.EmailBackend"
+elif os.environ.get('MISAGO_EMAIL_PROVIDER') == "mailgun":
+    EMAIL_BACKEND = 'anymail.backends.mailgun.EmailBackend'
     ANYMAIL = {
-        "MAILJET_API_KEY": os.environ["MISAGO_MAILJET_API_KEY_PUBLIC"],
-        "MAILJET_SECRET_KEY": os.environ["MISAGO_MAILJET_API_KEY_PRIVATE"],
+        'MAILGUN_API_KEY': os.environ['MISAGO_MAILGUN_API_KEY'],
     }
-elif os.environ.get("MISAGO_EMAIL_PROVIDER") == "sendinblue":
-    EMAIL_BACKEND = "anymail.backends.sendinblue.EmailBackend"
-    ANYMAIL = {"SENDINBLUE_API_KEY": os.environ["MISAGO_SENDINBLUE_API_KEY"]}
+elif os.environ.get('MISAGO_EMAIL_PROVIDER') == "mailjet":
+    EMAIL_BACKEND = 'anymail.backends.mailjet.EmailBackend'
+    ANYMAIL = {
+        'MAILJET_API_KEY': os.environ['MISAGO_MAILJET_API_KEY_PUBLIC'],
+        'MAILJET_SECRET_KEY': os.environ['MISAGO_MAILJET_API_KEY_PRIVATE'],
+    }
+elif os.environ.get('MISAGO_EMAIL_PROVIDER') == "sendinblue":
+    EMAIL_BACKEND = 'anymail.backends.sendinblue.EmailBackend'
+    ANYMAIL = {
+        'SENDINBLUE_API_KEY': os.environ['MISAGO_SENDINBLUE_API_KEY'],
+    }
 else:
-    EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+    EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 
 # Default email address to use for various automated correspondence from the site manager(s).
 
-DEFAULT_FROM_EMAIL = os.environ.get("MISAGO_DEFAULT_FROM_EMAIL", "")
+DEFAULT_FROM_EMAIL = os.environ.get('MISAGO_DEFAULT_FROM_EMAIL', '')
 
 
 # Application definition
 
-AUTH_USER_MODEL = "misago_users.User"
+AUTH_USER_MODEL = 'misago_users.User'
 
-AUTHENTICATION_BACKENDS = ["misago.users.authbackends.MisagoBackend"]
+AUTHENTICATION_BACKENDS = [
+    'misago.users.authbackends.MisagoBackend',
+]
 
-CSRF_COOKIE_NAME = "misagocsrftoken"
+CSRF_COOKIE_NAME = 'misagocsrftoken'
 CSRF_COOKIE_SECURE = True
 
-CSRF_FAILURE_VIEW = "misago.core.errorpages.csrf_failure"
+CSRF_FAILURE_VIEW = 'misago.core.errorpages.csrf_failure'
 
 INSTALLED_APPS = [
     # Misago overrides for Django core feature
-    "misago",
-    "misago.users",
+    'misago',
+    'misago.users',
+
     # Django apps
-    "django.contrib.admin",
-    "django.contrib.auth",
-    "django.contrib.contenttypes",
-    "django.contrib.postgres",
-    "django.contrib.humanize",
-    "django.contrib.sessions",
-    "django.contrib.messages",
-    "django.contrib.staticfiles",
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.postgres',
+    'django.contrib.humanize',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+
     # 3rd party apps used by Misago
-    "debug_toolbar",
-    "crispy_forms",
-    "mptt",
-    "rest_framework",
-    "social_django",
-    "raven.contrib.django.raven_compat",
+    'debug_toolbar',
+    'crispy_forms',
+    'mptt',
+    'rest_framework',
+    'social_django',
+    'raven.contrib.django.raven_compat',
+
     # Misago apps
-    "misago.admin",
-    "misago.acl",
-    "misago.core",
-    "misago.conf",
-    "misago.markup",
-    "misago.legal",
-    "misago.categories",
-    "misago.threads",
-    "misago.readtracker",
-    "misago.search",
-    "misago.faker",
+    'misago.admin',
+    'misago.acl',
+    'misago.core',
+    'misago.conf',
+    'misago.markup',
+    'misago.legal',
+    'misago.categories',
+    'misago.threads',
+    'misago.readtracker',
+    'misago.search',
+    'misago.faker',
 ]
 
-INTERNAL_IPS = ["127.0.0.1"]
+INTERNAL_IPS = [
+    '127.0.0.1'
+]
 
-SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
-LOGIN_REDIRECT_URL = "misago:index"
+LOGIN_REDIRECT_URL = 'misago:index'
 
-LOGIN_URL = "misago:login"
+LOGIN_URL = 'misago:login'
 
-LOGOUT_URL = "misago:logout"
+LOGOUT_URL = 'misago:logout'
 
 MIDDLEWARE = [
-    "debug_toolbar.middleware.DebugToolbarMiddleware",
-    "misago.users.middleware.RealIPMiddleware",
-    "misago.core.middleware.frontendcontext.FrontendContextMiddleware",
-    "django.middleware.security.SecurityMiddleware",
-    "django.contrib.sessions.middleware.SessionMiddleware",
-    "django.middleware.common.CommonMiddleware",
-    "django.middleware.csrf.CsrfViewMiddleware",
-    "django.contrib.auth.middleware.AuthenticationMiddleware",
-    "django.contrib.messages.middleware.MessageMiddleware",
-    "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "misago.users.middleware.UserMiddleware",
-    "misago.core.middleware.exceptionhandler.ExceptionHandlerMiddleware",
-    "misago.users.middleware.OnlineTrackerMiddleware",
-    "misago.admin.middleware.AdminAuthMiddleware",
-    "misago.threads.middleware.UnreadThreadsCountMiddleware",
-    "misago.core.middleware.threadstore.ThreadStoreMiddleware",
+    'debug_toolbar.middleware.DebugToolbarMiddleware',
+
+    'misago.users.middleware.RealIPMiddleware',
+    'misago.core.middleware.frontendcontext.FrontendContextMiddleware',
+
+    'django.middleware.security.SecurityMiddleware',
+    'django.contrib.sessions.middleware.SessionMiddleware',
+    'django.middleware.common.CommonMiddleware',
+    'django.middleware.csrf.CsrfViewMiddleware',
+    'django.contrib.auth.middleware.AuthenticationMiddleware',
+    'django.contrib.messages.middleware.MessageMiddleware',
+    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+    'misago.users.middleware.UserMiddleware',
+    'misago.core.middleware.exceptionhandler.ExceptionHandlerMiddleware',
+    'misago.users.middleware.OnlineTrackerMiddleware',
+    'misago.admin.middleware.AdminAuthMiddleware',
+    'misago.threads.middleware.UnreadThreadsCountMiddleware',
+    'misago.core.middleware.threadstore.ThreadStoreMiddleware',
 ]
 
-ROOT_URLCONF = "misagodocker.urls"
+ROOT_URLCONF = 'misagodocker.urls'
 
-SESSION_COOKIE_NAME = "misagosessionid"
+SESSION_COOKIE_NAME = 'misagosessionid'
 SESSION_COOKIE_SECURE = True
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 
 SOCIAL_AUTH_PIPELINE = (
     # Steps required by social pipeline to work - don't delete those!
-    "social_core.pipeline.social_auth.social_details",
-    "social_core.pipeline.social_auth.social_uid",
-    "social_core.pipeline.social_auth.social_user",
+    'social_core.pipeline.social_auth.social_details',
+    'social_core.pipeline.social_auth.social_uid',
+    'social_core.pipeline.social_auth.social_user',
+
     # Uncomment next line to let your users to associate their old forum account with social one.
     # 'misago.users.social.pipeline.associate_by_email',
+
     # Those steps make sure banned users may not join your site or use banned name or email.
-    "misago.users.social.pipeline.validate_ip_not_banned",
-    "misago.users.social.pipeline.validate_user_not_banned",
+    'misago.users.social.pipeline.validate_ip_not_banned',
+    'misago.users.social.pipeline.validate_user_not_banned',
+
     # Reads user data received from social site and tries to create valid and available username
     # Required if you want automatic account creation to work. Otherwhise optional.
-    "misago.users.social.pipeline.get_username",
+    'misago.users.social.pipeline.get_username',
+
     # Uncomment next line to enable automatic account creation if data from social site is valid
     # and get_username found valid name for new user account:
     # 'misago.users.social.pipeline.create_user',
+
     # This step asks user to complete simple, pre filled registration form containing username,
     # email, legal note if you remove it without adding custom one, users will have no fallback
     # for joining your site using their social account.
-    "misago.users.social.pipeline.create_user_with_form",
+    'misago.users.social.pipeline.create_user_with_form',
+
     # Steps finalizing social authentication flow - don't delete those!
-    "social_core.pipeline.social_auth.associate_user",
-    "social_core.pipeline.social_auth.load_extra_data",
-    "misago.users.social.pipeline.require_activation",
+    'social_core.pipeline.social_auth.associate_user',
+    'social_core.pipeline.social_auth.load_extra_data',
+    'misago.users.social.pipeline.require_activation',
 )
 
 SOCIAL_AUTH_POSTGRES_JSONFIELD = True
 
 TEMPLATES = [
     {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [os.path.join(BASE_DIR, "theme", "templates")],
-        "APP_DIRS": True,
-        "OPTIONS": {
-            "context_processors": [
-                "django.template.context_processors.debug",
-                "django.template.context_processors.i18n",
-                "django.template.context_processors.media",
-                "django.template.context_processors.request",
-                "django.template.context_processors.static",
-                "django.template.context_processors.tz",
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
-                "misago.core.context_processors.site_address",
-                "misago.core.context_processors.momentjs_locale",
-                "misago.conf.context_processors.settings",
-                "misago.search.context_processors.search_providers",
-                "misago.users.context_processors.user_links",
-                "misago.legal.context_processors.legal_links",
+        'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [
+            os.path.join(BASE_DIR, 'theme', 'templates'),
+        ],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.i18n',
+                'django.template.context_processors.media',
+                'django.template.context_processors.request',
+                'django.template.context_processors.static',
+                'django.template.context_processors.tz',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+
+                'misago.core.context_processors.site_address',
+                'misago.core.context_processors.momentjs_locale',
+                'misago.conf.context_processors.settings',
+                'misago.search.context_processors.search_providers',
+                'misago.users.context_processors.user_links',
+                'misago.legal.context_processors.legal_links',
+
                 # Data preloaders
-                "misago.conf.context_processors.preload_settings_json",
-                "misago.core.context_processors.current_link",
-                "misago.markup.context_processors.preload_api_url",
-                "misago.threads.context_processors.preload_threads_urls",
-                "misago.users.context_processors.preload_user_json",
+                'misago.conf.context_processors.preload_settings_json',
+                'misago.core.context_processors.current_link',
+                'misago.markup.context_processors.preload_api_url',
+                'misago.threads.context_processors.preload_threads_urls',
+                'misago.users.context_processors.preload_user_json',
+
                 # Note: keep frontend_context processor last for previous processors
                 # to be able to expose data UI app via request.frontend_context
-                "misago.core.context_processors.frontend_context",
-            ]
+                'misago.core.context_processors.frontend_context',
+            ],
         },
-    }
+    },
 ]
 
-WSGI_APPLICATION = "misagodocker.wsgi.application"
+WSGI_APPLICATION = 'misagodocker.wsgi.application'
 
 
 # Django Crispy Forms
-# http://django-crispy-forms.readthedocs.io/en/latest/install.html
+#http://django-crispy-forms.readthedocs.io/en/latest/install.html
 
-CRISPY_TEMPLATE_PACK = "bootstrap3"
+CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
 
 # Django Debug Toolbar
 # http://django-debug-toolbar.readthedocs.io/en/stable/configuration.html
 
 DEBUG_TOOLBAR_PANELS = [
-    "debug_toolbar.panels.versions.VersionsPanel",
-    "debug_toolbar.panels.timer.TimerPanel",
-    "debug_toolbar.panels.settings.SettingsPanel",
-    "debug_toolbar.panels.headers.HeadersPanel",
-    "debug_toolbar.panels.request.RequestPanel",
-    "debug_toolbar.panels.sql.SQLPanel",
-    "misago.acl.panels.MisagoACLPanel",
-    "debug_toolbar.panels.staticfiles.StaticFilesPanel",
-    "debug_toolbar.panels.templates.TemplatesPanel",
-    "debug_toolbar.panels.cache.CachePanel",
-    "debug_toolbar.panels.signals.SignalsPanel",
-    "debug_toolbar.panels.logging.LoggingPanel",
+    'debug_toolbar.panels.versions.VersionsPanel',
+    'debug_toolbar.panels.timer.TimerPanel',
+    'debug_toolbar.panels.settings.SettingsPanel',
+    'debug_toolbar.panels.headers.HeadersPanel',
+    'debug_toolbar.panels.request.RequestPanel',
+    'debug_toolbar.panels.sql.SQLPanel',
+
+    'misago.acl.panels.MisagoACLPanel',
+
+    'debug_toolbar.panels.staticfiles.StaticFilesPanel',
+    'debug_toolbar.panels.templates.TemplatesPanel',
+    'debug_toolbar.panels.cache.CachePanel',
+    'debug_toolbar.panels.signals.SignalsPanel',
+    'debug_toolbar.panels.logging.LoggingPanel',
 ]
 
 
@@ -354,13 +393,15 @@ DEBUG_TOOLBAR_PANELS = [
 # http://www.django-rest-framework.org/api-guide/settings/
 
 REST_FRAMEWORK = {
-    "DEFAULT_PERMISSION_CLASSES": [
-        "misago.core.rest_permissions.IsAuthenticatedOrReadOnly"
+    'DEFAULT_PERMISSION_CLASSES': [
+        'misago.core.rest_permissions.IsAuthenticatedOrReadOnly',
     ],
-    "DEFAULT_RENDERER_CLASSES": ["rest_framework.renderers.JSONRenderer"],
-    "EXCEPTION_HANDLER": "misago.core.exceptionhandler.handle_api_exception",
-    "UNAUTHENTICATED_USER": "misago.users.models.AnonymousUser",
-    "URL_FORMAT_OVERRIDE": None,
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',
+    ],
+    'EXCEPTION_HANDLER': 'misago.core.exceptionhandler.handle_api_exception',
+    'UNAUTHENTICATED_USER': 'misago.users.models.AnonymousUser',
+    'URL_FORMAT_OVERRIDE': None,
 }
 
 
@@ -368,37 +409,49 @@ REST_FRAMEWORK = {
 # Logs errors to /logs/misago.log, rotates them every week
 
 LOGGING = {
-    "version": 1,
-    "disable_existing_loggers": False,
-    "formatters": {
-        "verbose": {
-            "format": "{levelname} {asctime} {module} {process} {thread} {message}",
-            "style": "{",
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'verbose': {
+            'format': '{levelname} {asctime} {module} {process} {thread} {message}',
+            'style': '{',
         },
-        "simple": {"format": "[{asctime}] {levelname} {message}", "style": "{"},
+        'simple': {
+            'format': '[{asctime}] {levelname} {message}',
+            'style': '{',
+        },
     },
-    "handlers": {
-        "file": {
-            "level": "ERROR",
-            "class": "logging.handlers.TimedRotatingFileHandler",
-            "formatter": "simple",
-            "filename": os.path.join(BASE_DIR, "logs", "misago.log"),
-            "when": "W0",  # Rotate logs on mondays
-        }
+    'handlers': {
+        'file': {
+            'level': 'ERROR',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'formatter': 'simple',
+            'filename': os.path.join(BASE_DIR, 'logs', 'misago.log'),
+            'when': 'W0', # Rotate logs on mondays
+        },
     },
-    "loggers": {"django": {"handlers": ["file"], "level": "INFO"}},
+    'loggers': {
+        'django': {
+            'handlers': ['file'],
+            'level': 'INFO',
+        },
+    },
 }
 
 
 # Enable sentry for logging, if Sentry DNS is specified
-if os.environ.get("SENTRY_DSN"):
-    RAVEN_CONFIG = {"dsn": os.environ["SENTRY_DSN"], "include_versions": False}
-    LOGGING["root"] = {"level": "DEBUG", "handlers": ["sentry", "file"]}
-    LOGGING["handlers"]["sentry"] = {
-        "level": os.environ.get(
-            "SENTRY_LEVEL", "ERROR"
-        ),  # Change to ERROR, WARNING, INFO, etc.
-        "class": "raven.contrib.django.raven_compat.handlers.SentryHandler",
+if os.environ.get('SENTRY_DSN'):
+    RAVEN_CONFIG = {
+        'dsn': os.environ['SENTRY_DSN'],
+        'include_versions': False,
+    }
+    LOGGING['root'] = {
+        'level': 'DEBUG',
+        'handlers': ['sentry', 'file'],
+    }
+    LOGGING['handlers']['sentry'] = {
+        'level': os.environ.get('SENTRY_LEVEL', 'ERROR'), # Change to ERROR, WARNING, INFO, etc.
+        'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
     }
 
 
@@ -410,7 +463,7 @@ if os.environ.get("SENTRY_DSN"):
 # On Misago admin panel home page you will find a message telling you if you have entered the
 # correct value, or what value is correct in case you've didn't.
 
-MISAGO_ADDRESS = os.environ.get("MISAGO_ADDRESS")
+MISAGO_ADDRESS = os.environ.get('MISAGO_ADDRESS')
 
 
 # PostgreSQL text search configuration to use in searches
@@ -420,7 +473,7 @@ MISAGO_ADDRESS = os.environ.get("MISAGO_ADDRESS")
 # spanish, swedish and turkish
 # Example on adding custom language can be found here: https://github.com/lemonskyjwt/plpstgrssearch
 
-MISAGO_SEARCH_CONFIG = os.environ.get("MISAGO_SEARCH_CONFIG", "simple")
+MISAGO_SEARCH_CONFIG = os.environ.get('MISAGO_SEARCH_CONFIG', 'simple')
 
 
 # Allow users to download their personal data
@@ -428,13 +481,13 @@ MISAGO_SEARCH_CONFIG = os.environ.get("MISAGO_SEARCH_CONFIG", "simple")
 # site's administrators.
 
 MISAGO_ENABLE_DOWNLOAD_OWN_DATA = strtobool(
-    os.environ.get("MISAGO_ENABLE_DOWNLOAD_OWN_DATA", "yes")
+    os.environ.get('MISAGO_ENABLE_DOWNLOAD_OWN_DATA', 'yes')
 )
 
 # Path to the directory that Misago should use to prepare user data downloads.
 # Should not be accessible from internet.
 
-MISAGO_USER_DATA_DOWNLOADS_WORKING_DIR = os.path.join(BASE_DIR, "userdata")
+MISAGO_USER_DATA_DOWNLOADS_WORKING_DIR = os.path.join(BASE_DIR, 'userdata')
 
 
 # Allow users to delete their accounts
@@ -443,7 +496,7 @@ MISAGO_USER_DATA_DOWNLOADS_WORKING_DIR = os.path.join(BASE_DIR, "userdata")
 # data about user left behind after user is deleted.
 
 MISAGO_ENABLE_DELETE_OWN_ACCOUNT = strtobool(
-    os.environ.get("MISAGO_ENABLE_DELETE_OWN_ACCOUNT", "yes")
+    os.environ.get('MISAGO_ENABLE_DELETE_OWN_ACCOUNT', 'yes')
 )
 
 
@@ -453,71 +506,75 @@ MISAGO_ENABLE_DELETE_OWN_ACCOUNT = strtobool(
 # keep it short to give users a chance to retry on their own after few days pass.
 
 MISAGO_DELETE_NEW_INACTIVE_USERS_OLDER_THAN_DAYS = int(
-    os.environ.get("MISAGO_DELETE_NEW_INACTIVE_USERS_OLDER_THAN_DAYS", 2)
+    os.environ.get('MISAGO_DELETE_NEW_INACTIVE_USERS_OLDER_THAN_DAYS', 2)
 )
 
 
 # Path to directory containing avatar galleries
 # Those galleries can be loaded by running loadavatargallery command
 
-MISAGO_AVATAR_GALLERY = os.path.join(BASE_DIR, "avatargallery")
+MISAGO_AVATAR_GALLERY = os.path.join(BASE_DIR, 'avatargallery')
 
 
 # Specifies the number of days that IP addresses are stored in the database before removing.
 # Change this setting to None to never remove old IP addresses.
 
-MISAGO_IP_STORE_TIME = int(os.environ.get("MISAGO_IP_STORE_TIME", 50))
+MISAGO_IP_STORE_TIME = int(
+    os.environ.get('MISAGO_IP_STORE_TIME', 50)
+)
 
 
 # Profile fields
 
 MISAGO_PROFILE_FIELDS = [
     {
-        "name": _("Personal"),
-        "fields": [
-            "misago.users.profilefields.default.RealNameField",
-            "misago.users.profilefields.default.GenderField",
-            "misago.users.profilefields.default.BioField",
-            "misago.users.profilefields.default.LocationField",
+        'name': _("Personal"),
+        'fields': [
+            'misago.users.profilefields.default.RealNameField',
+            'misago.users.profilefields.default.GenderField',
+            'misago.users.profilefields.default.BioField',
+            'misago.users.profilefields.default.LocationField',
         ],
     },
     {
-        "name": _("Contact"),
-        "fields": [
-            "misago.users.profilefields.default.TwitterHandleField",
-            "misago.users.profilefields.default.SkypeIdField",
-            "misago.users.profilefields.default.WebsiteField",
+        'name': _("Contact"),
+        'fields': [
+            'misago.users.profilefields.default.TwitterHandleField',
+            'misago.users.profilefields.default.SkypeIdField',
+            'misago.users.profilefields.default.WebsiteField',
         ],
     },
     {
-        "name": _("IP address"),
-        "fields": ["misago.users.profilefields.default.JoinIpField"],
+        'name': _("IP address"),
+        'fields': [
+            'misago.users.profilefields.default.JoinIpField',
+        ],
     },
 ]
 
 
 # Display threads instead of categories on forum index?
 
-MISAGO_THREADS_ON_INDEX = os.environ.get("MISAGO_INDEX", "threads") == "threads"
+MISAGO_THREADS_ON_INDEX = os.environ.get('MISAGO_INDEX', "threads") == "threads"
 
 
 # Configure Social Auth providers
 
-if strtobool(os.environ.get("SOCIAL_AUTH_FACEBOOK_ENABLE")):
-    AUTHENTICATION_BACKENDS.append("social_core.backends.facebook.FacebookOAuth2")
-    SOCIAL_AUTH_FACEBOOK_KEY = os.environ["SOCIAL_AUTH_FACEBOOK_KEY"]
-    SOCIAL_AUTH_FACEBOOK_SECRET = os.environ["SOCIAL_AUTH_FACEBOOK_SECRET"]
-    SOCIAL_AUTH_FACEBOOK_SCOPE = ["email"]
+if strtobool(os.environ.get('SOCIAL_AUTH_FACEBOOK_ENABLE')):
+    AUTHENTICATION_BACKENDS.append('social_core.backends.facebook.FacebookOAuth2')
+    SOCIAL_AUTH_FACEBOOK_KEY = os.environ['SOCIAL_AUTH_FACEBOOK_KEY']
+    SOCIAL_AUTH_FACEBOOK_SECRET = os.environ['SOCIAL_AUTH_FACEBOOK_SECRET']
+    SOCIAL_AUTH_FACEBOOK_SCOPE = ['email']
 
 
-if strtobool(os.environ.get("SOCIAL_AUTH_GITHUB_ENABLE")):
-    AUTHENTICATION_BACKENDS.append("social_core.backends.github.GithubOAuth2")
-    SOCIAL_AUTH_GITHUB_KEY = os.environ["SOCIAL_AUTH_GITHUB_KEY"]
-    SOCIAL_AUTH_GITHUB_SECRET = os.environ["SOCIAL_AUTH_GITHUB_SECRET"]
-    SOCIAL_AUTH_GITHUB_SCOPE = ["read:user", "user:email"]
+if strtobool(os.environ.get('SOCIAL_AUTH_GITHUB_ENABLE')):
+    AUTHENTICATION_BACKENDS.append('social_core.backends.github.GithubOAuth2')
+    SOCIAL_AUTH_GITHUB_KEY = os.environ['SOCIAL_AUTH_GITHUB_KEY']
+    SOCIAL_AUTH_GITHUB_SECRET = os.environ['SOCIAL_AUTH_GITHUB_SECRET']
+    SOCIAL_AUTH_GITHUB_SCOPE = ['read:user', 'user:email']
 
 
-if strtobool(os.environ.get("SOCIAL_AUTH_TWITTER_ENABLE")):
-    AUTHENTICATION_BACKENDS.append("social_core.backends.twitter.TwitterOAuth")
-    SOCIAL_AUTH_TWITTER_KEY = os.environ["SOCIAL_AUTH_TWITTER_KEY"]
-    SOCIAL_AUTH_TWITTER_SECRET = os.environ["SOCIAL_AUTH_TWITTER_SECRET"]
+if strtobool(os.environ.get('SOCIAL_AUTH_TWITTER_ENABLE')):
+    AUTHENTICATION_BACKENDS.append('social_core.backends.twitter.TwitterOAuth')
+    SOCIAL_AUTH_TWITTER_KEY = os.environ['SOCIAL_AUTH_TWITTER_KEY']
+    SOCIAL_AUTH_TWITTER_SECRET = os.environ['SOCIAL_AUTH_TWITTER_SECRET']
