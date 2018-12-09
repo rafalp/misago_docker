@@ -71,7 +71,7 @@ def safe_copy(src, dst):
     src_str = str(src)
     dst_str = str(dst)
     return copy(src_str, dst_str)
-    
+
 
 def safe_open(file, mode):
     file_str = str(file)
