@@ -10,8 +10,9 @@ VHOST_LOCATION_CONFIG = os.path.join(BASE_DIR, "nginx", "vhost_location")
 REDIRECT_CONFIG = os.path.join(BASE_DIR, "nginx", "redirect")
 
 
-def run_nginx_wizard(env_file, hostname):
+def run_nginx_wizard(env_file):
     create_nginx_vhostd_if_not_exists()
+    hostname = env_file["VIRTUAL_HOST"].split(",")[0]
     config_set = create_nginx_location_config(hostname)
     if config_set:
         clear_old_nginx_config(hostname)
@@ -26,8 +27,6 @@ def create_nginx_vhostd_if_not_exists():
 
 
 def create_nginx_location_config(hostname):
-    hostname = hostname.split(",")[0]
-
     config_filename = "%s_location" % hostname
     config_dst = Path(os.path.join(VHOSTD_DIR, config_filename))
     if config_dst.is_file():
@@ -48,7 +47,6 @@ def create_nginx_location_config(hostname):
 
 
 def clear_old_nginx_config(hostname):
-    hostname = hostname.split(",")[0]
     if hostname.startswith("www."):
         redirect_from = hostname[4:]
     else:
@@ -65,7 +63,6 @@ def clear_old_nginx_config(hostname):
 
 
 def create_nginx_redirect_config(env_file, hostname):
-    hostname = hostname.split(",")[0]
     if hostname.startswith("www."):
         redirect_from = hostname[4:]
     else:
@@ -81,7 +78,6 @@ def create_nginx_redirect_config(env_file, hostname):
         env_file["LETSENCRYPT_HOST"] = env_file["VIRTUAL_HOST"]
         env_file.save()
     else:
-        print(hostname)
         env_file["LETSENCRYPT_HOST"] = hostname
         env_file.save()
         if config_dst.is_file():
