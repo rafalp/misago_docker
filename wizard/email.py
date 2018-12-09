@@ -125,7 +125,28 @@ def run_gmail_wizard(env_file):
             print("You have to enter an e-mail address.")
             print()
 
-    password_prompt = "Enter your Gmail password: "
+    print()
+    print(
+        "Gmail requires that each application connecting to its servers "
+        "uses dedicated password."
+    )
+    print(
+        "Your gmail.com or google account password WILL NOT WORK. "
+        "Use one of following options to generate dedicated password for "
+        "your Misago site to use when sending e-mails:"
+    )
+    print()
+    print(
+        "If you have 2-Step Verification enabled:         "
+        "https://security.google.com/settings/security/apppasswords"
+    )
+    print(
+        "If you DON'T have 2-Step Verification enabled:   "
+        "https://myaccount.google.com/lesssecureapps"
+    )
+    print()
+
+    password_prompt = "Enter your Gmail application password: "
     password = None
 
     while not password:
