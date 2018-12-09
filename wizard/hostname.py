@@ -47,8 +47,8 @@ def run_hostname_wizard(env_file):
 
     env_file["MISAGO_ADDRESS"] = "https://%s/" % hostname
 
+    run_nginx_wizard(env_file)
     run_lets_encrypt_wizard(env_file)
-    run_nginx_wizard(hostname)
 
 
 def run_lets_encrypt_wizard(env_file):
@@ -60,7 +60,6 @@ def run_lets_encrypt_wizard(env_file):
             print("You have to enter an e-mail address.")
             print()
 
-    env_file["LETSENCRYPT_HOST"] = env_file["VIRTUAL_HOST"]
     env_file["LETSENCRYPT_EMAIL"] = email
 
 
@@ -82,7 +81,7 @@ def change_hostname_setup(env_file):
         run_hostname_wizard(env_file)
         env_file.save()
         print_setup_changed_message()
-    elif run_nginx_wizard(env_file["VIRTUAL_HOST"]):
+    elif run_nginx_wizard(env_file):
         print_setup_changed_message()
 
 
