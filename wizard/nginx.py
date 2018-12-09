@@ -77,8 +77,12 @@ def create_nginx_redirect_config(env_file, hostname):
         "Do you want to set 301 redirect from %s to %s? "
         "(requires domain to be already configured)"
     ) % (redirect_from, hostname)
-    if not input_bool(redirect_prompt):
-        env_file["VIRTUAL_HOST"] = hostname
+    if input_bool(redirect_prompt):
+        env_file["LETSENCRYPT_HOST"] = env_file["VIRTUAL_HOST"]
+        env_file.save()
+    else:
+        print(hostname)
+        env_file["LETSENCRYPT_HOST"] = hostname
         env_file.save()
         if config_dst.is_file():
             config_dst.unlink()
