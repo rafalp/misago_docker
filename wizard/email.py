@@ -127,18 +127,22 @@ def run_gmail_wizard(env_file):
 
     print()
     print(
-        "Gmail requires that each application connecting to its servers uses dedicated password."
+        "Gmail requires that each application connecting to its servers "
+        "uses dedicated password."
     )
     print(
         "Your gmail.com or google account password WILL NOT WORK. "
-        "Use one of following options to generate dedicated password for your Misago site to use when sending e-mails:"
+        "Use one of following options to generate dedicated password for "
+        "your Misago site to use when sending e-mails:"
     )
     print()
     print(
-        "If you have 2-Step Verification enabled:         https://security.google.com/settings/security/apppasswords"
+        "If you have 2-Step Verification enabled:         "
+        "https://security.google.com/settings/security/apppasswords"
     )
     print(
-        "If you DON'T have 2-Step Verification enabled:   https://myaccount.google.com/lesssecureapps"
+        "If you DON'T have 2-Step Verification enabled:   "
+        "https://myaccount.google.com/lesssecureapps"
     )
     print()
 
