@@ -166,14 +166,16 @@ upgrade() {
     git_commit=$(git rev-parse HEAD)
     git_commit=${git_commit:0:8}
 
-    echo "You are going to upgrade your Misago site to new version."
-    echo "All running docker containers will be stopped for the duration of upgrade."
+    echo "You are going to upgrade your Misago site to the new version."
+    echo "All running docker containers will be stopped for the duration of the upgrade."
     echo "Your site's data will be backed up to the \"backups\" directory."
     echo "New version of misago-docker will be pulled from github.com"
     echo
-    echo "In case of any issues, use this command to return to the current version:"
+    echo "In case of any issues, run this command to return to the current version:"
     echo
     echo "git reset --hard $git_commit && docker-compose build --no-cache --force-rm --pull"
+    echo
+    echo "Note: remember to also restore your backup in case you are rolling back!"
     echo
 
     read -p "Start upgrade process? [Y/n]: " start_upgrade
