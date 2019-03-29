@@ -23,7 +23,7 @@ idna==2.7                 # via misago, requests
 ipaddress==1.0.22         # via faker, misago
 markdown==2.6.11          # via misago
 misago-social-auth-app-django==2.1.0  # via misago
-misago==0.19.4
+misago==0.19.5
 oauthlib==2.1.0           # via misago, requests-oauthlib, social-auth-core
 olefile==0.45.1           # via misago, pillow
 path.py==10.3.1           # via misago
