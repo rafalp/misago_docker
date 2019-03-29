@@ -173,7 +173,7 @@ upgrade() {
     echo
     echo "In case of any issues, use this command to return to the current version:"
     echo
-    echo "git reset --hard $git_commit"
+    echo "git reset --hard $git_commit && docker-compose build --no-cache --force-rm --pull"
     echo
 
     read -p "Start upgrade process? [Y/n]: " start_upgrade
