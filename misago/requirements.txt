@@ -8,22 +8,22 @@ beautifulsoup4==4.6.3     # via django-htmlmin, misago
 bleach==2.1.4             # via misago
 certifi==2018.8.24        # via misago, requests
 chardet==3.0.4            # via misago, requests
-contextlib2==0.5.5        # via raven
-django-anymail==4.3
+defusedxml==0.5.0         # via python3-openid, social-auth-core
+django-anymail==6.0
 django-crispy-forms==1.6.1  # via misago
 django-debug-toolbar==1.8  # via misago
 django-htmlmin==0.10.0    # via misago
 django-mptt==0.8.7        # via misago
-django-redis==4.9.0
+django-redis==4.10.0
 django==1.11.15           # via django-anymail, django-debug-toolbar, django-redis, misago
 djangorestframework==3.6.4  # via misago
 faker==0.8.18             # via misago
 html5lib==0.999999999     # via bleach, django-htmlmin, misago
 idna==2.7                 # via misago, requests
-ipaddress==1.0.22         # via faker, misago
+ipaddress==1.0.22         # via misago
 markdown==2.6.11          # via misago
 misago-social-auth-app-django==2.1.0  # via misago
-misago==0.19.4
+misago==0.19.5
 oauthlib==2.1.0           # via misago, requests-oauthlib, social-auth-core
 olefile==0.45.1           # via misago, pillow
 path.py==10.3.1           # via misago
@@ -31,9 +31,10 @@ pillow==4.1.1             # via misago
 psycopg2-binary==2.7.5    # via misago
 pyjwt==1.6.4              # via misago, social-auth-core
 python-dateutil==2.7.3    # via faker, misago
+python3-openid==3.1.0     # via social-auth-core
 pytz==2018.5              # via django, misago
-raven==6.9.0
-redis==2.10.6             # via django-redis
+raven==6.10.0
+redis==3.2.1              # via django-redis
 requests-oauthlib==1.0.0  # via misago, social-auth-core
 requests==2.20.0          # via django-anymail, misago, requests-oauthlib, social-auth-core
 six==1.11.0               # via bleach, django-anymail, faker, html5lib, misago, misago-social-auth-app-django, python-dateutil, social-auth-core
@@ -42,5 +43,5 @@ sqlparse==0.2.4           # via django-debug-toolbar, misago
 text-unidecode==1.2       # via faker, misago
 unidecode==0.4.21         # via misago
 urllib3==1.23             # via misago, requests
-uwsgi==2.0.17.1
+uwsgi==2.0.18
 webencodings==0.5.1       # via html5lib, misago
