@@ -129,11 +129,11 @@ setup() {
     read -p "Initialize default database? [Y/n]: " initialize_default_database
     # Run docker build
     docker-compose build --no-cache --force-rm --pull
-    start_containers
     if [ "$initialize_default_database" != "n" ]; then
         docker-compose run --rm misago ./.run initialize_default_database
     fi
     collectstatic
+    start_containers
     set_crontab
     echo "Setup completed."
     if [ "$initialize_default_database" != "n" ]; then
