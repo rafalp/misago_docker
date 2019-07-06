@@ -223,12 +223,12 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
 
     # 3rd party apps used by Misago
-    'debug_toolbar',
-    'crispy_forms',
-    'mptt',
-    'rest_framework',
-    'social_django',
-    'raven.contrib.django.raven_compat',
+    "ariadne.contrib.django",
+    "celery",
+    "debug_toolbar",
+    "mptt",
+    "rest_framework",
+    "social_django",
 
     # Misago apps
     "misago.admin",
