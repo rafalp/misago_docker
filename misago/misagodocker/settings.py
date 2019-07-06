@@ -380,12 +380,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'misagodocker.wsgi.application'
 
 
-# Django Crispy Forms
-#http://django-crispy-forms.readthedocs.io/en/latest/install.html
-
-CRISPY_TEMPLATE_PACK = 'bootstrap3'
-
-
 # Django Debug Toolbar
 # http://django-debug-toolbar.readthedocs.io/en/stable/configuration.html
 
