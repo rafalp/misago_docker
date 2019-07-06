@@ -423,6 +423,20 @@ REST_FRAMEWORK = {
 }
 
 
+# Celery - Distributed Task Queue
+# http://docs.celeryproject.org/en/latest/userguide/configuration.html
+
+# Configure Celery to use Redis as message broker.
+
+CELERY_BROKER_URL = "redis://redis:6379/0"
+
+# Celery workers may leak the memory, eventually depriving the instance of resources.
+# This setting forces celery to stop worker, clean after it and create new one
+# after worker has processed 10 tasks.
+
+CELERY_WORKER_MAX_TASKS_PER_CHILD = 10
+
+
 # Default logging configuration
 # Logs errors to /logs/misago.log, rotates them every week
 
