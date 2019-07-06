@@ -70,9 +70,6 @@ intro() {
     echo
     echo "Change configuration:"
     echo
-    echo "    ${BOLD}facebook${NORMAL}          change sign-in with Facebook setup."
-    echo "    ${BOLD}github${NORMAL}            change sign-in with GitHub setup."
-    echo "    ${BOLD}twitter${NORMAL}           change sign-in with twitter setup."
     echo "    ${BOLD}forumindex${NORMAL}        switch forum index between threads and categories."
     echo "    ${BOLD}email${NORMAL}             change email setup."
     echo "    ${BOLD}hostname${NORMAL}          change hostname setup."
@@ -229,24 +226,6 @@ show_stats() {
     docker stats
 }
 
-# Sign-in with facebook configuration
-change_facebook_signin() {
-    require_setup
-    python3 wizard/facebook.py
-}
-
-# Sign-in with github configuration
-change_github_signin() {
-    require_setup
-    python3 wizard/github.py
-}
-
-# Sign-in with twitter configuration
-change_twitter_signin() {
-    require_setup
-    python3 wizard/twitter.py
-}
-
 # Forum index configuration
 change_forumindex() {
     require_setup
@@ -364,12 +343,6 @@ if [[ $1 ]]; then
         rebuild_misago_container
     elif [[ $1 = "stats" ]]; then
         show_stats
-    elif [[ $1 = "facebook" ]]; then
-        change_facebook_signin
-    elif [[ $1 = "github" ]]; then
-        change_github_signin
-    elif [[ $1 = "twitter" ]]; then
-        change_twitter_signin
     elif [[ $1 = "forumindex" ]]; then
         change_forumindex
     elif [[ $1 = "email" ]]; then
