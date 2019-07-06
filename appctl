@@ -187,9 +187,9 @@ upgrade() {
     docker-compose stop
     git pull
     docker-compose build --no-cache --force-rm --pull
+    collectstatic
     docker-compose run --rm misago python manage.py migrate
     docker-compose run --rm misago python manage.py invalidateversionedcaches
-    collectstatic
     echo "Upgrade has been completed, restarting containers..."
     start_containers
 }
