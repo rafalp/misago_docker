@@ -181,9 +181,10 @@ upgrade() {
         exit
     fi
 
+    echo "Creating backup..."
+    create_new_backup
     echo "Stopping containers for upgrade..."
     docker-compose stop
-    create_new_backup
     git pull
     docker-compose build --no-cache --force-rm --pull
     docker-compose run --rm misago python manage.py migrate
