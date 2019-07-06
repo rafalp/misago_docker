@@ -79,6 +79,33 @@ services:
       - ./backups:/misago/backups:Z
       - ./logs:/misago/logs:z
 
+  misago-celery:
+    build: misago
+    command: celery -A misagodocker worker --loglevel=info
+    restart: unless-stopped
+    networks:
+      misago:
+        aliases:
+          - misago
+    environment:
+      - POSTGRES_HOST=postgres
+      - SSL_POLICY=Mozilla-Modern
+      - VIRTUAL_PROTO=uwsgi
+    env_file:
+      - ./config/misago.env
+      - ./config/postgres.env
+    depends_on:
+      - nginx-lets-encrypt
+      - postgres
+      - redis
+    volumes:
+      - misago-media:/misago/media
+      - misago-static:/misago/static
+      - ./misago/avatargallery:/misago/avatargallery:ro
+      - ./misago/theme:/misago/theme:ro
+      - ./backups:/misago/backups:Z
+      - ./logs:/misago/logs:z
+
 networks:
   misago:
 
