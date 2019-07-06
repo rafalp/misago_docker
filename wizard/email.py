@@ -22,9 +22,8 @@ def run_email_wizard(env_file):
         "0 - None (disables sending e-mails)",
         "1 - SMTP",
         "2 - Gmail (gmail.com)",
-        "3 - Mailgun (mailgun.com)",
-        "4 - Mailjet (mailjet.com)",
-        "5 - SendinBlue (sendinblue.com)",
+        "3 - Mailjet (mailjet.com)",
+        "4 - SendinBlue (sendinblue.com)",
         "",
         "Enter choice's number",
     ]
@@ -37,9 +36,8 @@ def run_email_wizard(env_file):
         0: disable_sending_emails,
         1: run_smtp_wizard,
         2: run_gmail_wizard,
-        3: run_mailgun_wizard,
-        4: run_mailjet_wizard,
-        5: run_sendinblue_wizard,
+        3: run_mailjet_wizard,
+        4: run_sendinblue_wizard,
     }
 
     email_provider_wizard = choices_values[email_provider]
@@ -167,22 +165,6 @@ def run_gmail_wizard(env_file):
         env_file["MISAGO_DEFAULT_FROM_EMAIL"] = "%s <%s>" % (email_from, email_address)
     else:
         env_file["MISAGO_DEFAULT_FROM_EMAIL"] = email_address
-
-
-def run_mailgun_wizard(env_file):
-    api_key_prompt = "Enter your Mailgun API key: "
-    api_key = None
-
-    while not api_key:
-        api_key = input(api_key_prompt).strip()
-        if not api_key:
-            api_key = None
-            print("You have to enter an API key.")
-            print()
-
-    env_file["MISAGO_EMAIL_PROVIDER"] = PROVIDER_MAILGUN
-    env_file["MISAGO_MAILGUN_API_KEY"] = api_key
-    env_file["MISAGO_DEFAULT_FROM_EMAIL"] = ""
 
 
 def run_mailjet_wizard(env_file):

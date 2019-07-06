@@ -169,11 +169,6 @@ elif os.environ.get('MISAGO_EMAIL_PROVIDER') == "gmail":
     EMAIL_HOST_PASSWORD = os.environ['MISAGO_GMAIL_PASSWORD']
     EMAIL_HOST_USER = os.environ['MISAGO_GMAIL_USER']
     EMAIL_PORT = 587
-elif os.environ.get('MISAGO_EMAIL_PROVIDER') == "mailgun":
-    EMAIL_BACKEND = 'anymail.backends.mailgun.EmailBackend'
-    ANYMAIL = {
-        'MAILGUN_API_KEY': os.environ['MISAGO_MAILGUN_API_KEY'],
-    }
 elif os.environ.get('MISAGO_EMAIL_PROVIDER') == "mailjet":
     EMAIL_BACKEND = 'anymail.backends.mailjet.EmailBackend'
     ANYMAIL = {
