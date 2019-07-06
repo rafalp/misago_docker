@@ -16,9 +16,9 @@ services:
     volumes:
       - nginx-certs:/etc/nginx/certs
       - nginx-html:/usr/share/nginx/html
-      - misago-media:/misago/media
-      - misago-static:/misago/static
       - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./misago/media:/misago/media:z
+      - ./misago/static:/misago/static:z
       - ./config/vhost.d:/etc/nginx/vhost.d:z
       - ./logs/nginx:/var/log/nginx:z
 
