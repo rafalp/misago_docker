@@ -72,8 +72,8 @@ services:
       - postgres
       - redis
     volumes:
-      - misago-media:/misago/media
-      - misago-static:/misago/static
+      - ./misago/media:/misago/media:z
+      - ./misago/static:/misago/static:z
       - ./misago/avatargallery:/misago/avatargallery:ro
       - ./misago/theme:/misago/theme:ro
       - ./backups:/misago/backups:Z
@@ -99,8 +99,8 @@ services:
       - postgres
       - redis
     volumes:
-      - misago-media:/misago/media
-      - misago-static:/misago/static
+      - ./misago/media:/misago/media:z
+      - ./misago/static:/misago/static:z
       - ./misago/avatargallery:/misago/avatargallery:ro
       - ./misago/theme:/misago/theme:ro
       - ./backups:/misago/backups:Z
@@ -113,6 +113,4 @@ volumes:
   nginx-certs:
   nginx-html:
   misago-database:
-  misago-media:
   misago-redis:
-  misago-static:
