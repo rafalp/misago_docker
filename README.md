@@ -77,7 +77,7 @@ Misago uses Redis for caching and tasks queue. To get most performance out of it
 Upgrading to newer version
 --------------------------
 
-To upgrade to newer version, go to `misago_docker` directory and run `git pull` and followed by `./apctl upgrade`. This will get latest code from github, rebuild Docker containers and update Misago (and other services) to latest minor releases.
+To upgrade to newer version, go to `misago_docker` directory and run `./apctl upgrade`. This will backup your data, get latest code from github, rebuild Docker containers and update Misago (and other services) to latest minor releases.
 
 You may have to setup git credentials on your machine for `git pull` to work, but entering git password is not required.
 
@@ -101,16 +101,14 @@ Restoration will:
 - overwrite your current `media` directory with one from archive.
 - load the `database.sql` to `psql`, overwriting existing database tables with ones from file.
 
-**NOTE:** because restoration process can be considered descructive, you should backup existing data if you are restoring the site that has any data you may want to recover if something goes wrong.
+**NOTE:** because restoration process can be considered destructive, you should backup existing data if you are restoring the site that has any data you may want to recover if something goes wrong.
 
 After you've restored from backup, it's good idea to follow up with `./appctl rebuild` to rebuild Misago image, giving it's application container a chance to rebuild filesystem caches.
 
 
 ### Daily backup
 
-`./appctl setup` enables daily backup by default. This backup is defined in `cron` script inside Misago container, and is ran *before* all other maintenance tasks, providing fallback point in case that maintenance deletes something you **really** didn't want to delete. Automatic backup files names start with `auto-` and are deleted automatically after 21 days.
-
-You can switch daily backup on and off using `./appctl dailybackup`.
+`./appctl` adds daily backup to system cron. This backup is ran *before* all other maintenance tasks, providing fallback point in case that maintenance deletes something you **really** didn't want to delete. Automatic backup files names start with `auto-` and are deleted automatically after 21 days.
 
 
 ### Creating custom backup archives
@@ -144,31 +142,13 @@ Inside `misago/theme` directory you will find two folders that allow you to cust
 
 ### Example: Replacing Misago's css with custom one
 
+> You may want to use *themes* feature available in admin control panel instead.
+
 Let's say you've cloned [main repo](https://github.com/rafalp/Misago) to your dev machine. Got it running and customised the CSS to make your site's theme dark instead of default. You've ran build script and got final `misago.css` file containing your changes. How do you now deploy this file to production?
 
 First, you need to find out the path of the original file relative to its `static` directory. In case of Misago this is `static/misago/css/misago.css`. This means that to make Misago use your file instead of default, it should be deployed to `theme/static/misago/css/misago.css` original.
 
 After deploying your new file, run `./appctl collectstatic` to make Misago "collect" this file and replace default with it.
-
-
-### Example: Adding Google Analytics tracking script
-
-To add custom JavaScript to your Misago site, you will need to override one of Misago's [default templates](https://github.com/rafalp/Misago/blob/master/misago/templates/). There is quite a few to pick from, but of special interest to us are two templates that Misago implements, that are purposefully empty: `scripts.html` and `jumbotron.html`.
-
-The `scripts.html` template is included after Misago's default JavaScripts, but before this JavaScript is being run.
-The `jumbotron.html` template is included right before the navbar. Its intention is to provide a place for developers to implement custom branded header or banner.
-
-Because the sooner our analytics script is executed, the better, we will use the `jumbotron.html`.
-
-Go to `misago/theme/templates`. Your template location relative to this path should be same as default template to `misago/templates`, so you will need to create file on following path:
-
-```
-misago/theme/templates/misago/jumbotron.html
-```
-
-Now you can place your tracking JavaScript inside the `jumbotron.html` you have just created!
-
-Because templates are stored in process memory once loaded, you will need to run `./appctl rebuild` to rebulid Misago container and make it load your template instead of default.
 
 
 ### Sticking a fork into the repo
@@ -214,7 +194,7 @@ Conserving disk space
 
 Docker overhead on CPU and memory is negligible, but same can't be said about its disk usage. `./appctl` tries to cleanup whenever possible, but to be safe you will have to monitor amount of free space left on your server, and clean up once in a while using commands like `docker-compose image prune`, manually emptying older logs and backups stored in `logs` and `backups` directories.
 
-Default cron task will also try to delete log files older than 60 days, and backup files that are older than 21 days and have filename starting with `auto-`.
+Default cron task will also try to delete log files older than 60 days.
 
 
 Need help?
@@ -226,7 +206,7 @@ If you have problems setting up your site using `misago_docker`, feel free to as
 Contributing
 ------------
 
-If you found a bug, issue, or place for improvement, please open an issue or pull request.
+If you've found a bug, issue, or place for improvement, please open an issue or pull request.
 
 
 Copyright and license
