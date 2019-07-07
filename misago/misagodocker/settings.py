@@ -443,7 +443,7 @@ LOGGING = {
         },
     },
     'handlers': {
-        'misago': {
+        'file': {
             'level': 'ERROR',
             'class': 'logging.handlers.TimedRotatingFileHandler',
             'formatter': 'simple',
@@ -460,7 +460,7 @@ LOGGING = {
     },
     'loggers': {
         'django': {
-            'handlers': ['misago'],
+            'handlers': ['file'],
             'level': 'INFO',
         },
         'celery': {
