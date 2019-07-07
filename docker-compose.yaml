@@ -98,7 +98,6 @@ services:
     volumes:
       - ./misago/media:/misago/media:z
       - ./misago/static:/misago/static:z
-      - ./misago/avatargallery:/misago/avatargallery:ro
       - ./misago/theme:/misago/theme:ro
       - ./logs:/misago/logs:z
 
