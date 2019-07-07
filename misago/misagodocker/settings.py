@@ -443,17 +443,28 @@ LOGGING = {
         },
     },
     'handlers': {
-        'file': {
+        'misago': {
             'level': 'ERROR',
             'class': 'logging.handlers.TimedRotatingFileHandler',
             'formatter': 'simple',
             'filename': os.path.join(BASE_DIR, 'logs', 'misago.log'),
             'when': 'W0', # Rotate logs on mondays
         },
+        'celery': {
+            'level': 'ERROR',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'formatter': 'simple',
+            'filename': os.path.join(BASE_DIR, 'logs', 'celery.log'),
+            'when': 'W0', # Rotate logs on mondays
+        },
     },
     'loggers': {
         'django': {
-            'handlers': ['file'],
+            'handlers': ['misago'],
+            'level': 'INFO',
+        },
+        'celery': {
+            'handlers': ['celery'],
             'level': 'INFO',
         },
     },
