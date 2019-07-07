@@ -54,73 +54,10 @@ run_psql() {
     psql --username $POSTGRES_USER --host $POSTGRES_HOST $POSTGRES_USER
 }
 
-# Backup database and media to archive
-create_new_backup() {
-    cd "/misago/backups/"
-    if [[ $1 ]]; then
-        backup_type="$1"
-    else
-        backup_type="auto"
-    fi
-    # create tmp backup dir
-    backup_dir="$backup_type-$(date +%Y%m%d%H%M%S)"
-    mkdir "./$backup_dir"
-    # backup database
+# Backup database
+backup_db() {
     wait_for_db
-    pg_dump -U $POSTGRES_USER -h $POSTGRES_HOST $POSTGRES_USER -Oxc > "./$backup_dir/database.sql"
-    # backup media
-    cp -r /misago/media "$backup_dir/media"
-    # archive backup dir
-    backup_archive="$backup_type-$(date +%Y%m%d%H%M%S).tar.gz"
-    GZIP=-9
-    tar -zcf $backup_archive "./$backup_dir"
-    # delete backup dir as its no longer required
-    rm -rf $backup_dir
-    echo "New backup has been created at backups/$backup_archive"
-    echo
-}
-
-# Restore database and media from backup archive
-restore_from_backup() {
-    if [[ ! $1 ]]; then
-        error "You need to specify backup archive to restore from."
-    fi
-    # Check if backup archive exists
-    backups_dir="/misago/backups/"
-    if [ ! -e "$backups_dir/$1" ]; then
-        error "Path backups/$1 doesn't exist."
-    fi
-    # Unarchive specified file to tmp directory
-    echo "Restoring from $1..."
-    tmp_dir="/misago/tmp-$(date +%Y%m%d%H%M%S)"
-    mkdir $tmp_dir
-    tar -xzf "$backups_dir/$1" -C $tmp_dir
-    # Find media and database backups in unarchived directory
-    database_sql=false
-    media_dir=false
-    for backup_dir in "$tmp_dir/*"; do
-        if [ -d $backup_dir ]; then
-            database_sql="$(echo $backup_dir/database.sql)"
-            media_dir="$(echo $backup_dir/media)"
-        fi
-    done
-    if [ ! -e $database_sql ]; then
-        rm -rf $tmp_dir
-        error "Specified archive is missing database backup."
-    fi
-    if [ ! -d $media_dir ]; then
-        rm -rf $tmp_dir
-        error "Specified archive is missing media backup."
-    fi
-    # Restore from archive
-    wait_for_db
-    (psql --username $POSTGRES_USER --host $POSTGRES_HOST $POSTGRES_USER < $database_sql) > /dev/null 2>/dev/null
-    rm -rf /misago/media/*
-    mv "$media_dir"/* /misago/media/
-    # Cleanup...
-    rm -rf $tmp_dir
-    echo "Restore completed! Remember to run \"./appctl rebuild\" to rebuild and restart your site!"
-    echo
+    pg_dump -U $POSTGRES_USER -h $POSTGRES_HOST $POSTGRES_USER -Oxc > "/misago/backups/$2/database.sql"
 }
 
 # Command dispatcher
@@ -131,10 +68,8 @@ if [[ $1 ]]; then
         wait_for_db
     elif [[ $1 = "psql" ]]; then
         run_psql
-    elif [[ $1 = "backup" ]]; then
-        create_new_backup $2
-    elif [[ $1 = "restore" ]]; then
-        restore_from_backup $2
+    elif [[ $1 = "backup_db" ]]; then
+        pg_dump $2
     else
         invalid_argument $1
     fi

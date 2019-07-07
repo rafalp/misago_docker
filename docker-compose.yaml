@@ -89,13 +89,10 @@ services:
           - misago
     environment:
       - POSTGRES_HOST=postgres
-      - SSL_POLICY=Mozilla-Modern
-      - VIRTUAL_PROTO=uwsgi
     env_file:
       - ./config/misago.env
       - ./config/postgres.env
     depends_on:
-      - nginx-lets-encrypt
       - postgres
       - redis
     volumes:
@@ -103,7 +100,6 @@ services:
       - ./misago/static:/misago/static:z
       - ./misago/avatargallery:/misago/avatargallery:ro
       - ./misago/theme:/misago/theme:ro
-      - ./backups:/misago/backups:Z
       - ./logs:/misago/logs:z
 
 networks:

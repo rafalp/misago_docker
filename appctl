@@ -290,13 +290,71 @@ reset_secret_key() {
 # Create new backup
 create_new_backup() {
     require_setup
-    docker-compose run --rm misago ./.run backup "manual"
+    if [[ $1 ]]; then
+        backup_type="$1"
+    else
+        backup_type="manual"
+    fi
+    # create tmp backup dir
+    backup_dir="$backup_type-$(date +%Y%m%d%H%M%S)"
+    mkdir "./backups/$backup_dir"
+    # backup database
+    docker-compose run --rm misago ./.run backup_db $backup_dir
+    # backup media
+    cp -r ./misago/media "./backups/$backup_dir/media"
+    cd ./backups/
+    # archive backup dir
+    backup_archive="$backup_type-$(date +%Y%m%d%H%M%S).tar.gz"
+    GZIP=-9
+    tar -zcf $backup_archive "$backup_dir"
+    # delete backup dir as its no longer required
+    rm -rf $backup_dir
+    echo "New backup has been created at backups/$backup_archive"
+    echo
 }
 
 # Restore from backup
 restore_from_backup() {
     require_setup
-    docker-compose run --rm misago ./.run restore "$1"
+    if [[ ! $1 ]]; then
+        error "You need to specify backup archive to restore from."
+    fi
+    # Check if backup archive exists
+    backups_dir="./backups"
+    if [ ! -e "$backups_dir/$1" ]; then
+        error "Path backups/$1 doesn't exist."
+    fi
+    # Unarchive specified file to tmp directory
+    echo "Restoring from $1..."
+    tmp_dir="$backups_dir/tmp-$(date +%Y%m%d%H%M%S)"
+    mkdir $tmp_dir
+    tar -xzf "$backups_dir/$1" -C $tmp_dir
+    # Find media and database backups in unarchived directory
+    database_sql=false
+    media_dir=false
+    for backup_dir in "$tmp_dir/*"; do
+        if [ -d $backup_dir ]; then
+            database_sql="$(echo $backup_dir/database.sql)"
+            media_dir="$(echo $backup_dir/media)"
+        fi
+    done
+    if [ ! -e $database_sql ]; then
+        rm -rf $tmp_dir
+        error "Specified archive is missing database backup."
+    fi
+    if [ ! -d $media_dir ]; then
+        rm -rf $tmp_dir
+        error "Specified archive is missing media backup."
+    fi
+    # Restore from archive
+    docker-compose run --rm misago ./.run pqsl < $database_sql
+    rm -rf ./misago/media/*
+    mv "$media_dir"/* ./misago/media/
+    # Cleanup...
+    echo $tmp_dir
+    #rm -rf $tmp_dir
+    echo "Restore completed! Remember to run \"./appctl rebuild\" to rebuild and restart your site!"
+    echo
 }
 
 # Collect static files
