@@ -219,7 +219,7 @@ rebuild_misago_container() {
     require_setup
     docker-compose stop misago misago-celery
     docker-compose build --force-rm misago misago-celery
-    docker-compose up --detach misago misago-celery
+    docker-compose up --detach
 }
 
 # Show stats for running docker containers
