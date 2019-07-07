@@ -154,6 +154,7 @@ set_crontab() {
     current_path=$(pwd)
     docker_compose=$(which docker-compose)
     echo "30 1 * * * cd $current_path && $docker_compose run --rm misago ./cron" | crontab -
+    (crontab -l ; echo "0 1 * * * cd $current_path && ./appctl backup auto") | crontab -
 }
 
 # Run upgrade process
@@ -182,7 +183,7 @@ upgrade() {
     fi
 
     echo "Creating backup..."
-    create_new_backup
+    create_new_backup "upgrade"
     echo "Stopping containers for upgrade..."
     docker-compose stop
     git pull
@@ -192,6 +193,7 @@ upgrade() {
     docker-compose run --rm misago python manage.py invalidateversionedcaches
     echo "Upgrade has been completed, restarting containers..."
     start_containers
+    set_crontab
 }
 
 # Start docker containers
@@ -347,12 +349,11 @@ restore_from_backup() {
         error "Specified archive is missing media backup."
     fi
     # Restore from archive
-    docker-compose run --rm misago ./.run pqsl < $database_sql
+    docker-compose run --rm misago ./.run psql < $database_sql
     rm -rf ./misago/media/*
     mv "$media_dir"/* ./misago/media/
     # Cleanup...
-    echo $tmp_dir
-    #rm -rf $tmp_dir
+    rm -rf $tmp_dir
     echo "Restore completed! Remember to run \"./appctl rebuild\" to rebuild and restart your site!"
     echo
 }

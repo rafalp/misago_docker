@@ -57,7 +57,7 @@ run_psql() {
 # Backup database
 backup_db() {
     wait_for_db
-    pg_dump -U $POSTGRES_USER -h $POSTGRES_HOST $POSTGRES_USER -Oxc > "/misago/backups/$2/database.sql"
+    pg_dump -U $POSTGRES_USER -h $POSTGRES_HOST $POSTGRES_USER -Oxc > "/misago/backups/$1/database.sql"
 }
 
 # Command dispatcher
@@ -69,7 +69,7 @@ if [[ $1 ]]; then
     elif [[ $1 = "psql" ]]; then
         run_psql
     elif [[ $1 = "backup_db" ]]; then
-        pg_dump $2
+        backup_db $2
     else
         invalid_argument $1
     fi
