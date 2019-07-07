@@ -1,4 +1,4 @@
-misago==0.20.b3
+misago==0.20.0b3
 django-anymail
 django-redis
 raven
