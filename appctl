@@ -294,8 +294,10 @@ create_new_backup() {
     backup_dir="$backup_type-$(date +%Y%m%d%H%M%S)"
     mkdir "./backups/$backup_dir"
     # backup database
+    echo "Backing up database..."
     docker-compose run --rm misago ./.run backup_db $backup_dir
     # backup media
+    echo "Backing up media..."
     cp -r ./misago/media "./backups/$backup_dir/media"
     cd ./backups/
     # archive backup dir
@@ -304,6 +306,7 @@ create_new_backup() {
     tar -zcf $backup_archive "$backup_dir"
     # delete backup dir as its no longer required
     rm -rf $backup_dir
+    cd ..
     echo "New backup has been created at backups/$backup_archive"
     echo
 }
