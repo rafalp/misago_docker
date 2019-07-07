@@ -77,7 +77,6 @@ intro() {
     echo "    ${BOLD}timezone${NORMAL}          change timezone setup."
     echo "    ${BOLD}avatargallery${NORMAL}     load avatar gallery."
     echo "    ${BOLD}sentry${NORMAL}            enable or disable Sentry (sentry.io) for logging."
-    echo "    ${BOLD}dailybackup${NORMAL}       enable or disable daily backup."
     echo "    ${BOLD}debug${NORMAL}             change debug mode."
     echo "    ${BOLD}secret${NORMAL}            reset secret key."
     echo
@@ -259,12 +258,6 @@ change_timezone() {
     python3 wizard/timezone.py
 }
 
-# Daily backup configuration
-change_daily_backup() {
-    require_setup
-    python3 wizard/dailybackup.py
-}
-
 # Load avatar gallery
 load_avatargallery() {
     require_setup
@@ -417,8 +410,6 @@ if [[ $1 ]]; then
         load_avatargallery
     elif [[ $1 = "sentry" ]]; then
         change_sentry
-    elif [[ $1 = "dailybackup" ]]; then
-        change_daily_backup
     elif [[ $1 = "debug" ]]; then
         change_debug
     elif [[ $1 = "secret" ]]; then
