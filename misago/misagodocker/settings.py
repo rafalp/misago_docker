@@ -473,18 +473,13 @@ LOGGING = {
 
 # Enable sentry for logging, if Sentry DNS is specified
 if os.environ.get('SENTRY_DSN'):
-    RAVEN_CONFIG = {
-        'dsn': os.environ['SENTRY_DSN'],
-        'include_versions': False,
-    }
-    LOGGING['root'] = {
-        'level': 'DEBUG',
-        'handlers': ['sentry', 'file'],
-    }
-    LOGGING['handlers']['sentry'] = {
-        'level': os.environ.get('SENTRY_LEVEL', 'ERROR'), # Change to ERROR, WARNING, INFO, etc.
-        'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
-    }
+    import sentry_sdk
+    from sentry_sdk.integrations.django import DjangoIntegration
+
+    sentry_sdk.init(
+        dsn=os.environ['SENTRY_DSN'],
+        integrations=[DjangoIntegration()]
+    )
 
 
 # Misago specific settings

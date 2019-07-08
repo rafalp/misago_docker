@@ -1,5 +1,5 @@
 misago==0.20.0b8
 django-anymail
 django-redis
-raven
+sentry-sdk
 uwsgi
