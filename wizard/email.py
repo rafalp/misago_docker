@@ -9,7 +9,6 @@ from utils import (
 
 PROVIDER_CONSOLE = "console"
 PROVIDER_GMAIL = "gmail"
-PROVIDER_MAILGUN = "mailgun"
 PROVIDER_MAILJET = "mailjet"
 PROVIDER_SENDINBLUE = "sendinblue"
 PROVIDER_SMTP = "smtp"
@@ -220,9 +219,6 @@ def print_email_setup(env_file):
     if env_file.get("MISAGO_EMAIL_PROVIDER") == PROVIDER_GMAIL:
         print_gmail_setup(env_file)
 
-    if env_file.get("MISAGO_EMAIL_PROVIDER") == PROVIDER_MAILGUN:
-        print_mailgun_setup(env_file)
-
     if env_file.get("MISAGO_EMAIL_PROVIDER") == PROVIDER_MAILJET:
         print_mailjet_setup(env_file)
 
@@ -248,12 +244,6 @@ def print_gmail_setup(env_file):
     print("From:        %s" % env_file.get("MISAGO_DEFAULT_FROM_EMAIL"))
     print("User:        %s" % env_file.get("MISAGO_GMAIL_USER", ""))
     print("Password:    %s" % env_file.get("MISAGO_GMAIL_PASSWORD", ""))
-
-
-def print_mailgun_setup(env_file):
-    print("Using Mailgun to send e-mails:")
-    print()
-    print("API key:     %s" % env_file.get("MISAGO_MAILGUN_API_KEY"))
 
 
 def print_mailjet_setup(env_file):
