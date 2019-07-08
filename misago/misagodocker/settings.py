@@ -475,10 +475,14 @@ LOGGING = {
 if os.environ.get('SENTRY_DSN'):
     import sentry_sdk
     from sentry_sdk.integrations.django import DjangoIntegration
+    from sentry_sdk.integrations.logging import LoggingIntegration
 
     sentry_sdk.init(
         dsn=os.environ['SENTRY_DSN'],
-        integrations=[DjangoIntegration()]
+        integrations=[
+            DjangoIntegration(),
+            LoggingIntegration(level=os.environ['SENTRY_LEVEL']),
+        ]
     )
 
 
