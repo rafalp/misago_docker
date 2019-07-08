@@ -481,7 +481,10 @@ if os.environ.get('SENTRY_DSN'):
         dsn=os.environ['SENTRY_DSN'],
         integrations=[
             DjangoIntegration(),
-            LoggingIntegration(level=os.environ['SENTRY_LEVEL']),
+            LoggingIntegration(
+                level=os.environ['SENTRY_LEVEL'],
+                event_level=os.environ['SENTRY_LEVEL'],
+            ),
         ]
     )
 
