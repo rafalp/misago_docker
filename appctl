@@ -153,7 +153,7 @@ set_crontab() {
     current_path=$(pwd)
     docker_compose=$(which docker-compose)
     echo "30 1 * * * cd $current_path && $docker_compose run --rm misago ./cron" | crontab -
-    (crontab -l ; echo "0 1 * * * cd $current_path && ./appctl backup auto") | crontab -
+    (crontab -l ; echo "0 1 * * * cd $current_path && ./appctl daily_backup") | crontab -
 }
 
 # Run upgrade process
@@ -421,6 +421,8 @@ if [[ $1 ]]; then
         create_new_backup
     elif [[ $1 = "restore" ]]; then
         restore_from_backup $2
+    elif [[ $1 = "daily_backup" ]]; then
+        create_new_backup "auto"
     elif [[ $1 = "collectstatic" ]]; then
         run_collectstatic
     elif [[ $1 = "manage.py" ]]; then
