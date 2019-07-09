@@ -295,7 +295,8 @@ create_new_backup() {
     mkdir "./backups/$backup_dir"
     # backup database
     echo "Backing up database..."
-    docker-compose run --rm misago ./.run backup_db $backup_dir
+    docker_compose=$(which docker-compose)
+    $docker_compose run --rm misago ./.run backup_db $backup_dir
     # backup media
     echo "Backing up media..."
     cp -r ./misago/media "./backups/$backup_dir/media"
