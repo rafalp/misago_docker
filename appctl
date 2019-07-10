@@ -15,6 +15,9 @@ env_paths=(
     "./config/postgres.env"
 )
 
+# Find docker compose path
+docker_compose=/usr/local/bin/docker-compose
+
 # Utility functions used by action commands
 error() {
     echo -e "${RED}Error:${NORMAL} $1"
@@ -41,7 +44,7 @@ if ! command -v docker >/dev/null 2>&1; then
     echo "https://docs.docker.com/compose/install/"
     echo
     exit 1
-elif ! command -v docker-compose >/dev/null 2>&1; then
+elif ! command -v $docker_compose >/dev/null 2>&1; then
     error "You need to have Docker Compose installed to use this tool."
     echo
     echo "Guide for installing Docker Compose on your system can be found on this page:"
@@ -151,9 +154,9 @@ collectstatic() {
 # Setup crontab to run `cron` script within Misago container using docker-compose
 set_crontab() {
     current_path=$(pwd)
-    docker_compose=$(which docker-compose)
     echo "30 1 * * * cd $current_path && $docker_compose run --rm misago ./cron" | crontab -
     (crontab -l ; echo "0 1 * * * cd $current_path && ./appctl daily_backup") | crontab -
+    (crontab -l ; echo "0 1 * * * find $current_path/backups/ -name auto-* -type f -mtime +10 -delete") | crontab -
 }
 
 # Run upgrade process
@@ -295,7 +298,6 @@ create_new_backup() {
     mkdir "./backups/$backup_dir"
     # backup database
     echo "Backing up database..."
-    docker_compose=$(which docker-compose)
     $docker_compose run --rm misago ./.run backup_db $backup_dir
     # backup media
     echo "Backing up media..."
