@@ -108,7 +108,7 @@ After you've restored from backup, it's good idea to follow up with `./appctl re
 
 ### Daily backup
 
-`./appctl` adds daily backup to system cron. This backup is ran *before* all other maintenance tasks, providing fallback point in case that maintenance deletes something you **really** didn't want to delete. Automatic backup files names start with `auto-` and are deleted automatically after 21 days.
+`./appctl` adds daily backup to system cron. This backup is ran *before* all other maintenance tasks, providing fallback point in case that maintenance deletes something you **really** didn't want to delete. Automatic backup files start with `auto-` and are deleted automatically after 10 days.
 
 
 ### Creating custom backup archives
