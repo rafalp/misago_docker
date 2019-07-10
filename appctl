@@ -154,9 +154,12 @@ collectstatic() {
 # Setup crontab to run `cron` script within Misago container using docker-compose
 set_crontab() {
     current_path=$(pwd)
-    echo "30 1 * * * cd $current_path && $docker_compose run --rm misago ./cron" | crontab -
-    (crontab -l ; echo "0 1 * * * cd $current_path && ./appctl daily_backup") | crontab -
-    (crontab -l ; echo "0 1 * * * find $current_path/backups/ -name auto-* -type f -mtime +10 -delete") | crontab -
+    rm -f cron_tmp
+    echo "30 1 * * * cd $current_path && $docker_compose run --rm misago ./cron" > cron_tmp
+    echo "0 1 * * * cd $current_path && ./appctl daily_backup" > cron_tmp
+    echo "0 1 * * * find $current_path/backups/ -name auto-* -type f -mtime +10 -delete" > cron_tmp
+    crontab cron_tmp
+    rm -f cron_tmp
 }
 
 # Run upgrade process
