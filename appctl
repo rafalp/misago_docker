@@ -15,6 +15,9 @@ env_paths=(
     "./config/postgres.env"
 )
 
+# Find docker compose path
+docker_compose=/usr/local/bin/docker-compose
+
 # Utility functions used by action commands
 error() {
     echo -e "${RED}Error:${NORMAL} $1"
@@ -41,7 +44,7 @@ if ! command -v docker >/dev/null 2>&1; then
     echo "https://docs.docker.com/compose/install/"
     echo
     exit 1
-elif ! command -v docker-compose >/dev/null 2>&1; then
+elif ! command -v $docker_compose >/dev/null 2>&1; then
     error "You need to have Docker Compose installed to use this tool."
     echo
     echo "Guide for installing Docker Compose on your system can be found on this page:"
@@ -70,9 +73,6 @@ intro() {
     echo
     echo "Change configuration:"
     echo
-    echo "    ${BOLD}facebook${NORMAL}          change sign-in with Facebook setup."
-    echo "    ${BOLD}github${NORMAL}            change sign-in with GitHub setup."
-    echo "    ${BOLD}twitter${NORMAL}           change sign-in with twitter setup."
     echo "    ${BOLD}forumindex${NORMAL}        switch forum index between threads and categories."
     echo "    ${BOLD}email${NORMAL}             change email setup."
     echo "    ${BOLD}hostname${NORMAL}          change hostname setup."
@@ -80,7 +80,6 @@ intro() {
     echo "    ${BOLD}timezone${NORMAL}          change timezone setup."
     echo "    ${BOLD}avatargallery${NORMAL}     load avatar gallery."
     echo "    ${BOLD}sentry${NORMAL}            enable or disable Sentry (sentry.io) for logging."
-    echo "    ${BOLD}dailybackup${NORMAL}       enable or disable daily backup."
     echo "    ${BOLD}debug${NORMAL}             change debug mode."
     echo "    ${BOLD}secret${NORMAL}            reset secret key."
     echo
@@ -132,11 +131,11 @@ setup() {
     read -p "Initialize default database? [Y/n]: " initialize_default_database
     # Run docker build
     docker-compose build --no-cache --force-rm --pull
-    start_containers
+    collectstatic
     if [ "$initialize_default_database" != "n" ]; then
         docker-compose run --rm misago ./.run initialize_default_database
     fi
-    collectstatic
+    start_containers
     set_crontab
     echo "Setup completed."
     if [ "$initialize_default_database" != "n" ]; then
@@ -155,8 +154,14 @@ collectstatic() {
 # Setup crontab to run `cron` script within Misago container using docker-compose
 set_crontab() {
     current_path=$(pwd)
-    docker_compose=$(which docker-compose)
-    echo "30 1 * * * cd $current_path && $docker_compose run --rm misago ./cron" | crontab -
+    rm -f cron_tmp
+    touch cron_tmp
+    echo "30 1 * * * cd $current_path && $docker_compose run --rm misago ./cron" >> cron_tmp
+    echo "0 1 * * * cd $current_path && ./appctl daily_backup" >> cron_tmp
+    echo "0 1 * * * find $current_path/backups/ -name auto-* -type f -mtime +10 -delete" >> cron_tmp
+    echo "" >> cron_tmp
+    crontab cron_tmp
+    rm -f cron_tmp
 }
 
 # Run upgrade process
@@ -184,16 +189,18 @@ upgrade() {
         exit
     fi
 
+    echo "Creating backup..."
+    create_new_backup "upgrade"
     echo "Stopping containers for upgrade..."
     docker-compose stop
-    create_new_backup
     git pull
     docker-compose build --no-cache --force-rm --pull
+    collectstatic
     docker-compose run --rm misago python manage.py migrate
     docker-compose run --rm misago python manage.py invalidateversionedcaches
-    collectstatic
     echo "Upgrade has been completed, restarting containers..."
     start_containers
+    set_crontab
 }
 
 # Start docker containers
@@ -218,33 +225,15 @@ restart_containers() {
 # Rebuild misago container
 rebuild_misago_container() {
     require_setup
-    docker-compose stop misago
-    docker-compose build --force-rm misago
-    docker-compose up --detach misago
+    docker-compose stop misago misago-celery
+    docker-compose build --force-rm misago misago-celery
+    docker-compose up --detach
 }
 
 # Show stats for running docker containers
 show_stats() {
     require_setup
     docker stats
-}
-
-# Sign-in with facebook configuration
-change_facebook_signin() {
-    require_setup
-    python3 wizard/facebook.py
-}
-
-# Sign-in with github configuration
-change_github_signin() {
-    require_setup
-    python3 wizard/github.py
-}
-
-# Sign-in with twitter configuration
-change_twitter_signin() {
-    require_setup
-    python3 wizard/twitter.py
 }
 
 # Forum index configuration
@@ -277,12 +266,6 @@ change_timezone() {
     python3 wizard/timezone.py
 }
 
-# Daily backup configuration
-change_daily_backup() {
-    require_setup
-    python3 wizard/dailybackup.py
-}
-
 # Load avatar gallery
 load_avatargallery() {
     require_setup
@@ -310,13 +293,73 @@ reset_secret_key() {
 # Create new backup
 create_new_backup() {
     require_setup
-    docker-compose run --rm misago ./.run backup "manual"
+    if [[ $1 ]]; then
+        backup_type="$1"
+    else
+        backup_type="manual"
+    fi
+    # create tmp backup dir
+    backup_dir="$backup_type-$(date +%Y%m%d%H%M%S)"
+    mkdir "./backups/$backup_dir"
+    # backup database
+    echo "Backing up database..."
+    $docker_compose run --rm misago ./.run backup_db $backup_dir
+    # backup media
+    echo "Backing up media..."
+    cp -r ./misago/media "./backups/$backup_dir/media"
+    cd ./backups/
+    # archive backup dir
+    backup_archive="$backup_type-$(date +%Y%m%d%H%M%S).tar.gz"
+    GZIP=-9
+    tar -zcf $backup_archive "$backup_dir"
+    # delete backup dir as its no longer required
+    rm -rf $backup_dir
+    cd ..
+    echo "New backup has been created at backups/$backup_archive"
+    echo
 }
 
 # Restore from backup
 restore_from_backup() {
     require_setup
-    docker-compose run --rm misago ./.run restore "$1"
+    if [[ ! $1 ]]; then
+        error "You need to specify backup archive to restore from."
+    fi
+    # Check if backup archive exists
+    backups_dir="./backups"
+    if [ ! -e "$backups_dir/$1" ]; then
+        error "Path backups/$1 doesn't exist."
+    fi
+    # Unarchive specified file to tmp directory
+    echo "Restoring from $1..."
+    tmp_dir="$backups_dir/tmp-$(date +%Y%m%d%H%M%S)"
+    mkdir $tmp_dir
+    tar -xzf "$backups_dir/$1" -C $tmp_dir
+    # Find media and database backups in unarchived directory
+    database_sql=false
+    media_dir=false
+    for backup_dir in "$tmp_dir/*"; do
+        if [ -d $backup_dir ]; then
+            database_sql="$(echo $backup_dir/database.sql)"
+            media_dir="$(echo $backup_dir/media)"
+        fi
+    done
+    if [ ! -e $database_sql ]; then
+        rm -rf $tmp_dir
+        error "Specified archive is missing database backup."
+    fi
+    if [ ! -d $media_dir ]; then
+        rm -rf $tmp_dir
+        error "Specified archive is missing media backup."
+    fi
+    # Restore from archive
+    docker-compose run --rm misago ./.run psql < $database_sql
+    rm -rf ./misago/media/*
+    mv "$media_dir"/* ./misago/media/
+    # Cleanup...
+    rm -rf $tmp_dir
+    echo "Restore completed! Remember to run \"./appctl rebuild\" to rebuild and restart your site!"
+    echo
 }
 
 # Collect static files
@@ -364,12 +407,6 @@ if [[ $1 ]]; then
         rebuild_misago_container
     elif [[ $1 = "stats" ]]; then
         show_stats
-    elif [[ $1 = "facebook" ]]; then
-        change_facebook_signin
-    elif [[ $1 = "github" ]]; then
-        change_github_signin
-    elif [[ $1 = "twitter" ]]; then
-        change_twitter_signin
     elif [[ $1 = "forumindex" ]]; then
         change_forumindex
     elif [[ $1 = "email" ]]; then
@@ -384,8 +421,6 @@ if [[ $1 ]]; then
         load_avatargallery
     elif [[ $1 = "sentry" ]]; then
         change_sentry
-    elif [[ $1 = "dailybackup" ]]; then
-        change_daily_backup
     elif [[ $1 = "debug" ]]; then
         change_debug
     elif [[ $1 = "secret" ]]; then
@@ -394,6 +429,8 @@ if [[ $1 ]]; then
         create_new_backup
     elif [[ $1 = "restore" ]]; then
         restore_from_backup $2
+    elif [[ $1 = "daily_backup" ]]; then
+        create_new_backup "auto"
     elif [[ $1 = "collectstatic" ]]; then
         run_collectstatic
     elif [[ $1 = "manage.py" ]]; then

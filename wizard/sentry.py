@@ -9,14 +9,12 @@ SENTRY_DSN_REGEX = re.compile(r"^https://[0-9a-z]+(:[0-9a-z]+)?@sentry\.io/[0-9]
 def run_sentry_wizard(env_file):
     if input_bool("Enable Sentry logging?"):
         run_dsn_wizard(env_file)
-        run_logging_level_wizard(env_file)
     else:
         disable_sentry(env_file)
 
 
 def disable_sentry(env_file):
     env_file["SENTRY_DSN"] = ""
-    env_file["SENTRY_LEVEL"] = ""
 
 
 def run_dsn_wizard(env_file):
@@ -38,34 +36,11 @@ def run_dsn_wizard(env_file):
     env_file["SENTRY_DSN"] = sentry_dsn
 
 
-def run_logging_level_wizard(env_file):
-    logging_level_prompt = [
-        "Which e-mail provider do you want to use?",
-        "",
-        "1 - DEBUG",
-        "2 - INFO (recommended)",
-        "3 - WARNING",
-        "4 - ERROR",
-        "5 - CRITICAL",
-        "",
-        "Enter choice's number",
-    ]
-
-    logging_level = input_choice(
-        "\n".join(logging_level_prompt), "12345", coerce_to=int
-    )
-
-    choices_values = {1: "DEBUG", 2: "INFO", 3: "WARNING", 4: "ERROR", 5: "CRITICAL"}
-
-    env_file["SENTRY_LEVEL"] = choices_values[logging_level]
-
-
 def print_sentry_setup(env_file):
     if env_file.get("SENTRY_DSN"):
         print("Logging to Sentry is enabled:")
         print()
         print("DSN:     %s" % env_file.get("SENTRY_DSN"))
-        print("Level:   %s" % env_file.get("SENTRY_LEVEL", "ERROR"))
     else:
         print("Logging to Sentry is disabled.")
 

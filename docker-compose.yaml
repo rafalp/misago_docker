@@ -16,9 +16,9 @@ services:
     volumes:
       - nginx-certs:/etc/nginx/certs
       - nginx-html:/usr/share/nginx/html
-      - misago-media:/misago/media
-      - misago-static:/misago/static
       - /var/run/docker.sock:/tmp/docker.sock:ro
+      - ./misago/media:/misago/media:z
+      - ./misago/static:/misago/static:z
       - ./config/vhost.d:/etc/nginx/vhost.d:z
       - ./logs/nginx:/var/log/nginx:z
 
@@ -72,11 +72,33 @@ services:
       - postgres
       - redis
     volumes:
-      - misago-media:/misago/media
-      - misago-static:/misago/static
+      - ./misago/media:/misago/media:z
+      - ./misago/static:/misago/static:z
       - ./misago/avatargallery:/misago/avatargallery:ro
       - ./misago/theme:/misago/theme:ro
       - ./backups:/misago/backups:Z
+      - ./logs:/misago/logs:z
+
+  misago-celery:
+    build: misago
+    command: celery -A misagodocker worker --loglevel=info
+    restart: unless-stopped
+    networks:
+      misago:
+        aliases:
+          - misago
+    environment:
+      - POSTGRES_HOST=postgres
+    env_file:
+      - ./config/misago.env
+      - ./config/postgres.env
+    depends_on:
+      - postgres
+      - redis
+    volumes:
+      - ./misago/media:/misago/media:z
+      - ./misago/static:/misago/static:z
+      - ./misago/theme:/misago/theme:ro
       - ./logs:/misago/logs:z
 
 networks:
@@ -86,6 +108,4 @@ volumes:
   nginx-certs:
   nginx-html:
   misago-database:
-  misago-media:
   misago-redis:
-  misago-static:

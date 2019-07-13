@@ -169,11 +169,6 @@ elif os.environ.get('MISAGO_EMAIL_PROVIDER') == "gmail":
     EMAIL_HOST_PASSWORD = os.environ['MISAGO_GMAIL_PASSWORD']
     EMAIL_HOST_USER = os.environ['MISAGO_GMAIL_USER']
     EMAIL_PORT = 587
-elif os.environ.get('MISAGO_EMAIL_PROVIDER') == "mailgun":
-    EMAIL_BACKEND = 'anymail.backends.mailgun.EmailBackend'
-    ANYMAIL = {
-        'MAILGUN_API_KEY': os.environ['MISAGO_MAILGUN_API_KEY'],
-    }
 elif os.environ.get('MISAGO_EMAIL_PROVIDER') == "mailjet":
     EMAIL_BACKEND = 'anymail.backends.mailjet.EmailBackend'
     ANYMAIL = {
@@ -213,35 +208,41 @@ INSTALLED_APPS = [
     'misago.users',
 
     # Django apps
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.postgres',
-    'django.contrib.humanize',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
+    "django.contrib.admin",
+    "django.contrib.auth",
+    "django.contrib.contenttypes",
+    "django.contrib.postgres",
+    "django.contrib.humanize",
+    "django.contrib.sessions",
+    "django.contrib.messages",
+    "django.contrib.staticfiles",
 
     # 3rd party apps used by Misago
-    'debug_toolbar',
-    'crispy_forms',
-    'mptt',
-    'rest_framework',
-    'social_django',
-    'raven.contrib.django.raven_compat',
+    "ariadne.contrib.django",
+    "celery",
+    "debug_toolbar",
+    "mptt",
+    "rest_framework",
+    "social_django",
 
     # Misago apps
-    'misago.admin',
-    'misago.acl',
-    'misago.core',
-    'misago.conf',
-    'misago.markup',
-    'misago.legal',
-    'misago.categories',
-    'misago.threads',
-    'misago.readtracker',
-    'misago.search',
-    'misago.faker',
+    "misago.admin",
+    "misago.acl",
+    "misago.analytics",
+    "misago.cache",
+    "misago.core",
+    "misago.conf",
+    "misago.icons",
+    "misago.themes",
+    "misago.markup",
+    "misago.legal",
+    "misago.categories",
+    "misago.threads",
+    "misago.readtracker",
+    "misago.search",
+    "misago.socialauth",
+    "misago.graphql",
+    "misago.faker",
 ]
 
 INTERNAL_IPS = [
@@ -257,25 +258,28 @@ LOGIN_URL = 'misago:login'
 LOGOUT_URL = 'misago:logout'
 
 MIDDLEWARE = [
-    'debug_toolbar.middleware.DebugToolbarMiddleware',
+    "debug_toolbar.middleware.DebugToolbarMiddleware",
 
-    'misago.users.middleware.RealIPMiddleware',
-    'misago.core.middleware.frontendcontext.FrontendContextMiddleware',
+    "misago.users.middleware.RealIPMiddleware",
+    "misago.core.middleware.FrontendContextMiddleware",
 
-    'django.middleware.security.SecurityMiddleware',
-    'django.contrib.sessions.middleware.SessionMiddleware',
-    'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
-    'django.contrib.auth.middleware.AuthenticationMiddleware',
-    'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    "django.middleware.security.SecurityMiddleware",
+    "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.common.CommonMiddleware",
+    "django.middleware.csrf.CsrfViewMiddleware",
+    "django.contrib.auth.middleware.AuthenticationMiddleware",
+    "django.contrib.messages.middleware.MessageMiddleware",
+    "django.middleware.clickjacking.XFrameOptionsMiddleware",
 
-    'misago.users.middleware.UserMiddleware',
-    'misago.core.middleware.exceptionhandler.ExceptionHandlerMiddleware',
-    'misago.users.middleware.OnlineTrackerMiddleware',
-    'misago.admin.middleware.AdminAuthMiddleware',
-    'misago.threads.middleware.UnreadThreadsCountMiddleware',
-    'misago.core.middleware.threadstore.ThreadStoreMiddleware',
+    "misago.cache.middleware.cache_versions_middleware",
+    "misago.conf.middleware.dynamic_settings_middleware",
+    "misago.socialauth.middleware.socialauth_providers_middleware",
+    "misago.users.middleware.UserMiddleware",
+    "misago.acl.middleware.user_acl_middleware",
+    "misago.core.middleware.ExceptionHandlerMiddleware",
+    "misago.users.middleware.OnlineTrackerMiddleware",
+    "misago.admin.middleware.AdminAuthMiddleware",
+    "misago.threads.middleware.UnreadThreadsCountMiddleware",
 ]
 
 ROOT_URLCONF = 'misagodocker.urls'
@@ -285,36 +289,39 @@ SESSION_COOKIE_SECURE = True
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 
+SOCIAL_AUTH_STRATEGY = "misago.socialauth.strategy.MisagoStrategy"
+
 SOCIAL_AUTH_PIPELINE = (
     # Steps required by social pipeline to work - don't delete those!
     'social_core.pipeline.social_auth.social_details',
     'social_core.pipeline.social_auth.social_uid',
     'social_core.pipeline.social_auth.social_user',
 
-    # Uncomment next line to let your users to associate their old forum account with social one.
-    # 'misago.users.social.pipeline.associate_by_email',
+    # If enabled in admin panel, lets your users to associate their old forum account
+    # with social one, if both have same e-mail address.
+    "misago.socialauth.pipeline.associate_by_email",
 
     # Those steps make sure banned users may not join your site or use banned name or email.
-    'misago.users.social.pipeline.validate_ip_not_banned',
-    'misago.users.social.pipeline.validate_user_not_banned',
+    'misago.socialauth.pipeline.validate_ip_not_banned',
+    'misago.socialauth.pipeline.validate_user_not_banned',
 
     # Reads user data received from social site and tries to create valid and available username
     # Required if you want automatic account creation to work. Otherwhise optional.
-    'misago.users.social.pipeline.get_username',
+    'misago.socialauth.pipeline.get_username',
 
     # Uncomment next line to enable automatic account creation if data from social site is valid
     # and get_username found valid name for new user account:
-    # 'misago.users.social.pipeline.create_user',
+    # 'misago.socialauth.pipeline.create_user',
 
     # This step asks user to complete simple, pre filled registration form containing username,
     # email, legal note if you remove it without adding custom one, users will have no fallback
     # for joining your site using their social account.
-    'misago.users.social.pipeline.create_user_with_form',
+    'misago.socialauth.pipeline.create_user_with_form',
 
     # Steps finalizing social authentication flow - don't delete those!
     'social_core.pipeline.social_auth.associate_user',
     'social_core.pipeline.social_auth.load_extra_data',
-    'misago.users.social.pipeline.require_activation',
+    'misago.socialauth.pipeline.require_activation',
 )
 
 SOCIAL_AUTH_POSTGRES_JSONFIELD = True
@@ -328,28 +335,34 @@ TEMPLATES = [
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
-                'django.template.context_processors.debug',
-                'django.template.context_processors.i18n',
-                'django.template.context_processors.media',
-                'django.template.context_processors.request',
-                'django.template.context_processors.static',
-                'django.template.context_processors.tz',
-                'django.contrib.auth.context_processors.auth',
-                'django.contrib.messages.context_processors.messages',
+                "django.template.context_processors.debug",
+                "django.template.context_processors.i18n",
+                "django.template.context_processors.media",
+                "django.template.context_processors.request",
+                "django.template.context_processors.static",
+                "django.template.context_processors.tz",
+                "django.contrib.auth.context_processors.auth",
+                "django.contrib.messages.context_processors.messages",
 
-                'misago.core.context_processors.site_address',
-                'misago.core.context_processors.momentjs_locale',
-                'misago.conf.context_processors.settings',
-                'misago.search.context_processors.search_providers',
-                'misago.users.context_processors.user_links',
-                'misago.legal.context_processors.legal_links',
+                "misago.acl.context_processors.user_acl",
+                "misago.conf.context_processors.conf",
+                "misago.conf.context_processors.og_image",
+                "misago.core.context_processors.misago_version",
+                "misago.core.context_processors.request_path",
+                "misago.core.context_processors.momentjs_locale",
+                "misago.icons.context_processors.icons",
+                "misago.search.context_processors.search_providers",
+                "misago.themes.context_processors.theme",
+                "misago.legal.context_processors.legal_links",
+                "misago.users.context_processors.user_links",
 
                 # Data preloaders
-                'misago.conf.context_processors.preload_settings_json',
-                'misago.core.context_processors.current_link',
-                'misago.markup.context_processors.preload_api_url',
-                'misago.threads.context_processors.preload_threads_urls',
-                'misago.users.context_processors.preload_user_json',
+                "misago.conf.context_processors.preload_settings_json",
+                "misago.core.context_processors.current_link",
+                "misago.markup.context_processors.preload_api_url",
+                "misago.threads.context_processors.preload_threads_urls",
+                "misago.users.context_processors.preload_user_json",
+                "misago.socialauth.context_processors.preload_socialauth_json",
 
                 # Note: keep frontend_context processor last for previous processors
                 # to be able to expose data UI app via request.frontend_context
@@ -360,12 +373,6 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'misagodocker.wsgi.application'
-
-
-# Django Crispy Forms
-#http://django-crispy-forms.readthedocs.io/en/latest/install.html
-
-CRISPY_TEMPLATE_PACK = 'bootstrap3'
 
 
 # Django Debug Toolbar
@@ -405,6 +412,20 @@ REST_FRAMEWORK = {
 }
 
 
+# Celery - Distributed Task Queue
+# http://docs.celeryproject.org/en/latest/userguide/configuration.html
+
+# Configure Celery to use Redis as message broker.
+
+CELERY_BROKER_URL = "redis://redis/0"
+
+# Celery workers may leak the memory, eventually depriving the instance of resources.
+# This setting forces celery to stop worker, clean after it and create new one
+# after worker has processed 10 tasks.
+
+CELERY_WORKER_MAX_TASKS_PER_CHILD = 10
+
+
 # Default logging configuration
 # Logs errors to /logs/misago.log, rotates them every week
 
@@ -429,10 +450,21 @@ LOGGING = {
             'filename': os.path.join(BASE_DIR, 'logs', 'misago.log'),
             'when': 'W0', # Rotate logs on mondays
         },
+        'celery': {
+            'level': 'ERROR',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'formatter': 'simple',
+            'filename': os.path.join(BASE_DIR, 'logs', 'celery.log'),
+            'when': 'W0', # Rotate logs on mondays
+        },
     },
     'loggers': {
         'django': {
             'handlers': ['file'],
+            'level': 'INFO',
+        },
+        'celery': {
+            'handlers': ['celery'],
             'level': 'INFO',
         },
     },
@@ -441,29 +473,17 @@ LOGGING = {
 
 # Enable sentry for logging, if Sentry DNS is specified
 if os.environ.get('SENTRY_DSN'):
-    RAVEN_CONFIG = {
-        'dsn': os.environ['SENTRY_DSN'],
-        'include_versions': False,
-    }
-    LOGGING['root'] = {
-        'level': 'DEBUG',
-        'handlers': ['sentry', 'file'],
-    }
-    LOGGING['handlers']['sentry'] = {
-        'level': os.environ.get('SENTRY_LEVEL', 'ERROR'), # Change to ERROR, WARNING, INFO, etc.
-        'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
-    }
+    import sentry_sdk
+    from sentry_sdk.integrations.django import DjangoIntegration
+
+    sentry_sdk.init(
+        dsn=os.environ['SENTRY_DSN'],
+        integrations=[DjangoIntegration()]
+    )
 
 
 # Misago specific settings
 # https://misago.readthedocs.io/en/latest/developers/settings.html
-
-# Complete HTTP address to your Misago site homepage. Misago relies on this address to create
-# links in e-mails that are sent to site users.
-# On Misago admin panel home page you will find a message telling you if you have entered the
-# correct value, or what value is correct in case you've didn't.
-
-MISAGO_ADDRESS = os.environ.get('MISAGO_ADDRESS')
 
 
 # PostgreSQL text search configuration to use in searches
@@ -476,52 +496,16 @@ MISAGO_ADDRESS = os.environ.get('MISAGO_ADDRESS')
 MISAGO_SEARCH_CONFIG = os.environ.get('MISAGO_SEARCH_CONFIG', 'simple')
 
 
-# Allow users to download their personal data
-# Enables users to learn what data about them is being held by the site without having to contact
-# site's administrators.
-
-MISAGO_ENABLE_DOWNLOAD_OWN_DATA = strtobool(
-    os.environ.get('MISAGO_ENABLE_DOWNLOAD_OWN_DATA', 'yes')
-)
-
 # Path to the directory that Misago should use to prepare user data downloads.
 # Should not be accessible from internet.
 
 MISAGO_USER_DATA_DOWNLOADS_WORKING_DIR = os.path.join(BASE_DIR, 'userdata')
 
 
-# Allow users to delete their accounts
-# Lets users delete their own account on the site without having to contact site administrators.
-# This mechanism doesn't delete user posts, polls or attachments, but attempts to anonymize any
-# data about user left behind after user is deleted.
-
-MISAGO_ENABLE_DELETE_OWN_ACCOUNT = strtobool(
-    os.environ.get('MISAGO_ENABLE_DELETE_OWN_ACCOUNT', 'yes')
-)
-
-
-# Automatically delete new user accounts that weren't activated in specified time
-# If you rely on admin review of new registrations, make this period long, disable
-# the "deleteinactiveusers" management command, or change this value to zero. Otherwise
-# keep it short to give users a chance to retry on their own after few days pass.
-
-MISAGO_DELETE_NEW_INACTIVE_USERS_OLDER_THAN_DAYS = int(
-    os.environ.get('MISAGO_DELETE_NEW_INACTIVE_USERS_OLDER_THAN_DAYS', 2)
-)
-
-
 # Path to directory containing avatar galleries
 # Those galleries can be loaded by running loadavatargallery command
 
 MISAGO_AVATAR_GALLERY = os.path.join(BASE_DIR, 'avatargallery')
-
-
-# Specifies the number of days that IP addresses are stored in the database before removing.
-# Change this setting to None to never remove old IP addresses.
-
-MISAGO_IP_STORE_TIME = int(
-    os.environ.get('MISAGO_IP_STORE_TIME', 50)
-)
 
 
 # Profile fields
@@ -556,25 +540,3 @@ MISAGO_PROFILE_FIELDS = [
 # Display threads instead of categories on forum index?
 
 MISAGO_THREADS_ON_INDEX = os.environ.get('MISAGO_INDEX', "threads") == "threads"
-
-
-# Configure Social Auth providers
-
-if strtobool(os.environ.get('SOCIAL_AUTH_FACEBOOK_ENABLE')):
-    AUTHENTICATION_BACKENDS.append('social_core.backends.facebook.FacebookOAuth2')
-    SOCIAL_AUTH_FACEBOOK_KEY = os.environ['SOCIAL_AUTH_FACEBOOK_KEY']
-    SOCIAL_AUTH_FACEBOOK_SECRET = os.environ['SOCIAL_AUTH_FACEBOOK_SECRET']
-    SOCIAL_AUTH_FACEBOOK_SCOPE = ['email']
-
-
-if strtobool(os.environ.get('SOCIAL_AUTH_GITHUB_ENABLE')):
-    AUTHENTICATION_BACKENDS.append('social_core.backends.github.GithubOAuth2')
-    SOCIAL_AUTH_GITHUB_KEY = os.environ['SOCIAL_AUTH_GITHUB_KEY']
-    SOCIAL_AUTH_GITHUB_SECRET = os.environ['SOCIAL_AUTH_GITHUB_SECRET']
-    SOCIAL_AUTH_GITHUB_SCOPE = ['read:user', 'user:email']
-
-
-if strtobool(os.environ.get('SOCIAL_AUTH_TWITTER_ENABLE')):
-    AUTHENTICATION_BACKENDS.append('social_core.backends.twitter.TwitterOAuth')
-    SOCIAL_AUTH_TWITTER_KEY = os.environ['SOCIAL_AUTH_TWITTER_KEY']
-    SOCIAL_AUTH_TWITTER_SECRET = os.environ['SOCIAL_AUTH_TWITTER_SECRET']
