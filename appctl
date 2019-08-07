@@ -16,7 +16,7 @@ env_paths=(
 )
 
 # Find docker compose path
-docker_compose=/usr/local/bin/docker-compose
+docker_compose=$(which docker-compose)
 
 # Utility functions used by action commands
 error() {
