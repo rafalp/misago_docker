@@ -32,6 +32,9 @@ admin.site.login_form = AdminAuthenticationForm
 urlpatterns = [
     url(r'^', include('misago.urls', namespace='misago')),
 
+    # django-simple-sso doesn't have namespaces, we can't use namespace here
+    url(r"^sso/", include("misago.sso.urls")),
+
     # Javascript translations
     url(
         r'^django-i18n.js$',

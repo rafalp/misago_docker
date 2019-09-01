@@ -243,6 +243,7 @@ INSTALLED_APPS = [
     "misago.socialauth",
     "misago.graphql",
     "misago.faker",
+    "misago.sso",
 ]
 
 INTERNAL_IPS = [
