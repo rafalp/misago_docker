@@ -131,7 +131,7 @@ mybackup
 Now run `tar -zcf mybackup.tar.gz mybackup`. This will produce the `mybackup.tar.gz` file that you can put in `backups` directory and restore with `./appctl restore mybackup.tar.gz`. 
 
 
-Customising site
+Customizing site
 ----------------
 
 Inside `misago/theme` directory you will find two folders that allow you to customise your site's looks:
@@ -154,6 +154,41 @@ After deploying your new file, run `./appctl collectstatic` to make Misago "coll
 ### Sticking a fork into the repo
 
 If you are familiar with Python/Django applications or Docker images involved and wish to customise your setup further, please feel free to branch off/fork the repo - it's simple enough that merging eventual changes from upstream shouldn't be much of an issue.
+
+
+Overriding configuration
+------------------------
+
+You can override default configuration by creating dedicated file:
+
+To override configuration in `docker-compose.yml`, create `docker-compose.override.yml` file next to it, and re-define selected parts in it. For example, to change default HTTP for NGINX proxy from 80 to 8080, you can include following configuration in your override:
+
+```yml
+version: '3.0'
+services:
+
+  nginx-proxy:
+    ports:
+      - "8080:80"
+```
+
+To add or change settings defined in `settings.py` that don't support change via environment variable, you can create additional file `settings_override.py` next to it:
+
+```python
+SESSION_COOKIE_NAME = "myforumsid"
+```
+
+To add custom urls to the site, create `urls_override.py` file that contains custom `urlpatterns`:
+
+```python
+from django.conf.urls import include
+
+urlpatterns = [
+    url(r"^my-app/", include("myapp.urls")),
+]
+```
+
+Because `urlpatterns` defined in override are checked before default ones, this approach supports overriding already-existing urls.
 
 
 Directories
