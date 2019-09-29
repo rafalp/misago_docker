@@ -16,20 +16,21 @@ Including another URLconf
 from django.conf import settings
 from django.conf.urls import include, url
 from django.conf.urls.static import static
-from django.contrib import admin
 from django.utils import timezone
 from django.views.decorators.cache import cache_page
 from django.views.decorators.http import last_modified
 from django.views.i18n import JavaScriptCatalog
 
-from misago.users.forms.auth import AdminAuthenticationForm
+
+# Import urls override or default to no urls
+try:
+    from .urls_override import urlpatterns as urlpatterns_override
+except ImportError:
+    urlpatterns_override = []
 
 
-admin.autodiscover()
-admin.site.login_form = AdminAuthenticationForm
-
-
-urlpatterns = [
+# Add standard URL's
+urlpatterns = urlpatterns_override + [
     url(r'^', include('misago.urls', namespace='misago')),
 
     # django-simple-sso doesn't have namespaces, we can't use namespace here
@@ -47,9 +48,6 @@ urlpatterns = [
         ),
         name='django-i18n',
     ),
-
-    # Uncomment next line if you plan to use Django admin for 3rd party apps
-    #url(r'^django-admin/', admin.site.urls),
 ]
 
 
