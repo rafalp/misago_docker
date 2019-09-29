@@ -15,7 +15,7 @@ celery[redis]==4.3.0      # via misago
 certifi==2019.6.16        # via misago, requests, sentry-sdk
 chardet==3.0.4            # via misago, requests
 defusedxml==0.6.0         # via misago, python3-openid, social-auth-core
-django-anymail==6.1.0
+django-anymail==7.0.0
 django-debug-toolbar==1.11  # via misago
 django-htmlmin==0.11.0    # via misago
 django-js-asset==1.2.2    # via django-mptt, misago
@@ -32,7 +32,7 @@ importlib-metadata==0.18  # via misago, pluggy, pytest
 itsdangerous==1.1.0       # via django-simple-sso, misago, webservices
 kombu==4.6.3              # via celery, misago
 markdown==2.6.11          # via misago
-misago==0.22
+misago==0.23
 more-itertools==7.1.0     # via misago, pytest
 oauthlib==3.0.2           # via misago, requests-oauthlib, social-auth-core
 packaging==19.0           # via misago, pytest
@@ -53,7 +53,7 @@ redis==3.2.1              # via celery, django-redis, misago
 requests-oauthlib==1.2.0  # via misago, social-auth-core
 requests==2.22.0          # via django-anymail, misago, requests-oauthlib, responses, social-auth-core, webservices
 responses==0.10.6         # via misago
-sentry-sdk==0.10.1
+sentry-sdk==0.12.2
 six==1.12.0               # via bleach, django-anymail, faker, html5lib, misago, packaging, python-dateutil, python-multipart, responses, snapshottest, social-auth-app-django, social-auth-core
 snapshottest==0.5.0       # via misago
 social-auth-app-django==3.1.0  # via misago
