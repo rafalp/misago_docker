@@ -159,8 +159,6 @@ If you are familiar with Python/Django applications or Docker images involved an
 Overriding configuration
 ------------------------
 
-You can override default configuration by creating dedicated file:
-
 To override configuration in `docker-compose.yml`, create `docker-compose.override.yml` file next to it, and re-define selected parts in it. For example, to change default HTTP for NGINX proxy from 80 to 8080, you can include following configuration in your override:
 
 ```yml
