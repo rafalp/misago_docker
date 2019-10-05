@@ -20,13 +20,14 @@ RUN wget -q https://www.postgresql.org/media/keys/ACCC4CF8.asc -O - | apt-key ad
       gettext && \
     apt-get clean
 
-# Install requirements file
-ADD requirements.txt /
-RUN pip install --upgrade pip && pip install -r requirements.txt
-
 # Make current directory available as "Misago" within docker
 ADD . /misago
 WORKDIR /misago
+
+# Install requirements files
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt && \
+    [ -f requirements-plugins.txt ] pip install -r requirements-plugins.txt
 
 # Expose port 3031 from Docker
 EXPOSE 3031
