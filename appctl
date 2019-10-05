@@ -238,7 +238,7 @@ show_stats() {
 }
 
 # Flush the redis cache
-flush_cache() {
+flush_redis() {
     require_setup
     echo "You are about to flush all values from the Redis cache."
     echo "This will:"
@@ -426,7 +426,7 @@ if [[ $1 ]]; then
     elif [[ $1 = "stats" ]]; then
         show_stats
     elif [[ $1 = "flushredis" ]]; then
-        flush_cache
+        flush_redis
     elif [[ $1 = "forumindex" ]]; then
         change_forumindex
     elif [[ $1 = "email" ]]; then
