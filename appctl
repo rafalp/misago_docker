@@ -90,13 +90,14 @@ intro() {
     echo "    ${BOLD}backup${NORMAL}            backup and archive database and media."
     echo "    ${BOLD}restore BACKUP${NORMAL}    restore database and media from BACKUP archive."
     echo
-    echo "Shortcuts:"
+    echo "Utilities:"
     echo
     echo "    ${BOLD}collectstatic${NORMAL}     collect static assets."
     echo "    ${BOLD}manage.py${NORMAL}         runs \"python manage.py\" inside docker."
     echo "    ${BOLD}bash${NORMAL}              starts bash session inside running Misago container."
     echo "    ${BOLD}run${NORMAL}               runs \"docker-compose run --rm misago\"."
     echo "    ${BOLD}psql${NORMAL}              runs psql connected to database."
+    echo "    ${BOLD}flushredis${NORMAL}        flush the redis cache."
     echo
 }
 
@@ -234,6 +235,23 @@ rebuild_misago_container() {
 show_stats() {
     require_setup
     docker stats
+}
+
+# Flush the redis cache
+flush_redis() {
+    require_setup
+    echo "You are about to flush all values from the Redis cache."
+    echo "This will:"
+    echo "  - Remove all cached information"
+    echo "  - Close all user sessions (log all users out)"
+    echo
+
+    read -p "Flush Redis cache? [Y/n]: " should_flush_cache
+    if [ "$should_flush_cache" = "n" ]; then
+        echo "Cache flush canceled."
+        exit
+    fi
+    docker-compose exec redis redis-cli FLUSHALL
 }
 
 # Forum index configuration
@@ -407,6 +425,8 @@ if [[ $1 ]]; then
         rebuild_misago_container
     elif [[ $1 = "stats" ]]; then
         show_stats
+    elif [[ $1 = "flushredis" ]]; then
+        flush_redis
     elif [[ $1 = "forumindex" ]]; then
         change_forumindex
     elif [[ $1 = "email" ]]; then
