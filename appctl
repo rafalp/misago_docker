@@ -70,7 +70,6 @@ intro() {
     echo "    ${BOLD}restart${NORMAL}           stop and start all docker containers."
     echo "    ${BOLD}rebuild${NORMAL}           rebuild and restart Misago container."
     echo "    ${BOLD}stats${NORMAL}             see list and stats of running docker containers."
-    echo "    ${BOLD}flushredis${NORMAL}        flush the redis cache."
     echo
     echo "Change configuration:"
     echo
@@ -91,13 +90,14 @@ intro() {
     echo "    ${BOLD}backup${NORMAL}            backup and archive database and media."
     echo "    ${BOLD}restore BACKUP${NORMAL}    restore database and media from BACKUP archive."
     echo
-    echo "Shortcuts:"
+    echo "Utilities:"
     echo
     echo "    ${BOLD}collectstatic${NORMAL}     collect static assets."
     echo "    ${BOLD}manage.py${NORMAL}         runs \"python manage.py\" inside docker."
     echo "    ${BOLD}bash${NORMAL}              starts bash session inside running Misago container."
     echo "    ${BOLD}run${NORMAL}               runs \"docker-compose run --rm misago\"."
     echo "    ${BOLD}psql${NORMAL}              runs psql connected to database."
+    echo "    ${BOLD}flushredis${NORMAL}        flush the redis cache."
     echo
 }
 
