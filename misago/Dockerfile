@@ -25,9 +25,8 @@ ADD . /misago
 WORKDIR /misago
 
 # Install requirements files
-RUN pip install --upgrade pip && \
-    pip install -r requirements.txt && \
-    [ -f requirements-plugins.txt ] && pip install -r requirements-plugins.txt
+RUN pip install --upgrade pip && pip install -r requirements.txt
+RUN [ -f requirements-plugins.txt ] && pip install -r requirements-plugins.txt || true
 
 # Expose port 3031 from Docker
 EXPOSE 3031
