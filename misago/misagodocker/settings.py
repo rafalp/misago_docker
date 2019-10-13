@@ -11,6 +11,9 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
+
+from misago import load_plugin_list_if_exists
+
 from .utils import strtobool, strtolist
 
 
@@ -202,7 +205,11 @@ CSRF_COOKIE_SECURE = True
 
 CSRF_FAILURE_VIEW = 'misago.core.errorpages.csrf_failure'
 
-INSTALLED_APPS = [
+PLUGINS_LIST_PATH = os.path.join(BASE_DIR, "plugins.txt")
+
+INSTALLED_PLUGINS = load_plugin_list_if_exists(PLUGINS_LIST_PATH) or []
+
+INSTALLED_APPS = INSTALLED_PLUGINS + [
     # Misago overrides for Django core feature
     'misago',
     'misago.users',
@@ -245,6 +252,7 @@ INSTALLED_APPS = [
     "misago.faker",
     "misago.menus",
     "misago.sso",
+    "misago.plugins",
 ]
 
 INTERNAL_IPS = [
@@ -356,8 +364,9 @@ TEMPLATES = [
                 "misago.search.context_processors.search_providers",
                 "misago.themes.context_processors.theme",
                 "misago.legal.context_processors.legal_links",
-                "misago.users.context_processors.user_links",
                 "misago.menus.context_processors.menus",
+                "misago.users.context_processors.user_links",
+                "misago.core.context_processors.hooks",
 
                 # Data preloaders
                 "misago.conf.context_processors.preload_settings_json",

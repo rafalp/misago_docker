@@ -32,7 +32,7 @@ importlib-metadata==0.18  # via misago, pluggy, pytest
 itsdangerous==1.1.0       # via django-simple-sso, misago, webservices
 kombu==4.6.3              # via celery, misago
 markdown==2.6.11          # via misago
-misago==0.23
+misago==0.24.1
 more-itertools==7.1.0     # via misago, pytest
 oauthlib==3.0.2           # via misago, requests-oauthlib, social-auth-core
 packaging==19.0           # via misago, pytest
