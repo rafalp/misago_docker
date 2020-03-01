@@ -1,6 +1,7 @@
 import re
 
 from config import misago
+from timezonedb import VALID_TIMEZONES
 from utils import input_bool, print_setup_changed_message
 
 
@@ -13,9 +14,15 @@ def run_timezone_wizard(env_file):
 
     while not timezone:
         timezone = input(timezone_prompt).strip().replace("\\", "/")
+
         if not timezone:
             timezone = None
             print("You have to enter a timezone name.")
+            print()
+
+        if timezone not in VALID_TIMEZONES:
+            timezone = None
+            print("Entered timezone name is not valid.")
             print()
 
     env_file["MISAGO_TIME_ZONE"] = timezone
