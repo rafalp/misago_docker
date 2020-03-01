@@ -14,10 +14,12 @@ def run_timezone_wizard(env_file):
 
     while not timezone:
         timezone = input(timezone_prompt).strip().replace("\\", "/")
+
         if not timezone:
             timezone = None
             print("You have to enter a timezone name.")
             print()
+
         if timezone not in VALID_TIMEZONES:
             timezone = None
             print("Entered timezone name is not valid.")
