@@ -68,7 +68,8 @@ intro() {
     echo "    ${BOLD}start${NORMAL}             start all containers."
     echo "    ${BOLD}stop${NORMAL}              stop all containers."
     echo "    ${BOLD}restart${NORMAL}           stop and start all docker containers."
-    echo "    ${BOLD}rebuild${NORMAL}           rebuild and restart Misago container."
+    echo "    ${BOLD}rebuild${NORMAL}           rebuild and restart Misago and celery container containers."
+    echo "    ${BOLD}rebuild-all${NORMAL}       rebuild and restart all containers."
     echo "    ${BOLD}stats${NORMAL}             see list and stats of running docker containers."
     echo
     echo "Change configuration:"
@@ -223,11 +224,19 @@ restart_containers() {
     docker-compose up --detach
 }
 
-# Rebuild misago container
-rebuild_misago_container() {
+# Rebuild misago containers
+rebuild_misago_containers() {
     require_setup
     docker-compose stop misago misago-celery
     docker-compose build --force-rm misago misago-celery
+    docker-compose up --detach
+}
+
+# Rebuild all containers
+rebuild_all_containers() {
+    require_setup
+    docker-compose stop
+    docker-compose build --force-rm --no-cache
     docker-compose up --detach
 }
 
@@ -422,7 +431,9 @@ if [[ $1 ]]; then
     elif [[ $1 = "restart" ]]; then
         restart_containers
     elif [[ $1 = "rebuild" ]]; then
-        rebuild_misago_container
+        rebuild_misago_containers
+    elif [[ $1 = "rebuild-all" ]]; then
+        rebuild_all_containers
     elif [[ $1 = "stats" ]]; then
         show_stats
     elif [[ $1 = "flushredis" ]]; then
