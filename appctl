@@ -69,7 +69,7 @@ intro() {
     echo "    ${BOLD}stop${NORMAL}              stop all containers."
     echo "    ${BOLD}restart${NORMAL}           stop and start all docker containers."
     echo "    ${BOLD}rebuild${NORMAL}           rebuild and restart Misago and celery container containers."
-    echo "    ${BOLD}rebuild-all${NORMAL}       rebuild and restart all containers."
+    echo "    ${BOLD}rebuildall${NORMAL}        pull, rebuild and restart all containers."
     echo "    ${BOLD}stats${NORMAL}             see list and stats of running docker containers."
     echo
     echo "Change configuration:"
@@ -236,7 +236,7 @@ rebuild_misago_containers() {
 rebuild_all_containers() {
     require_setup
     docker-compose stop
-    docker-compose build --force-rm --no-cache
+    docker-compose build --force-rm --no-cache --pull
     docker-compose up --detach
 }
 
@@ -432,7 +432,7 @@ if [[ $1 ]]; then
         restart_containers
     elif [[ $1 = "rebuild" ]]; then
         rebuild_misago_containers
-    elif [[ $1 = "rebuild-all" ]]; then
+    elif [[ $1 = "rebuildall" ]]; then
         rebuild_all_containers
     elif [[ $1 = "stats" ]]; then
         show_stats
