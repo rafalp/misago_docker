@@ -17,6 +17,8 @@ To help you running your site, there is a special tool called `appctl` provided,
 Setup
 -----
 
+For complete step-by-step setup guide, please see [the documentation](https://misago.gitbook.io/docs/setup).
+
 To start your own Misago site, you will need:
 
 - server running Linux with Docker and 2GB of memory ([DigitalOcean droplets are safe bet](https://m.do.co/c/a8c85735320a))
