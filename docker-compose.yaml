@@ -23,7 +23,7 @@ services:
       - ./logs/nginx:/var/log/nginx:z
 
   nginx-lets-encrypt:
-    image: jrcs/letsencrypt-nginx-proxy-companion:2
+    image: jrcs/letsencrypt-nginx-proxy-companion:2.0
     restart: always
     networks:
       - misago
