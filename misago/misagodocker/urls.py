@@ -14,7 +14,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
 from django.conf import settings
-from django.conf.urls import include, url
+from django.urls import include, path
 from django.conf.urls.static import static
 from django.utils import timezone
 from django.views.decorators.cache import cache_page
@@ -31,22 +31,17 @@ except ImportError:
 
 # Add standard URL's
 urlpatterns = urlpatterns_override + [
-    url(r'^', include('misago.urls', namespace='misago')),
-
-    # django-simple-sso doesn't have namespaces, we can't use namespace here
-    url(r"^sso/", include("misago.sso.urls")),
+    path("", include("misago.urls", namespace="misago")),
 
     # Javascript translations
-    url(
-        r'^django-i18n.js$',
+    path(
+        "django-i18n.js",
         last_modified(lambda req, **kw: timezone.now())(
-            cache_page(86400 * 2, key_prefix='misagojsi18n')(
-                JavaScriptCatalog.as_view(
-                    packages=['misago'],
-                ),
-            ),
+            cache_page(86400 * 2, key_prefix="misagojsi18n")(
+                JavaScriptCatalog.as_view(packages=["misago"])
+            )
         ),
-        name='django-i18n',
+        name="django-i18n",
     ),
 ]
 
@@ -54,9 +49,8 @@ urlpatterns = urlpatterns_override + [
 # If debug mode is enabled, include debug toolbar
 if settings.DEBUG:
     import debug_toolbar
-    urlpatterns += [
-        url(r'^__debug__/', include(debug_toolbar.urls)),
-    ]
+
+    urlpatterns += [path("__debug__/", include(debug_toolbar.urls))]
 
 
 # Use static file server for static and media files (debug only)
