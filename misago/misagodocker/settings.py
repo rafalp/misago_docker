@@ -225,7 +225,7 @@ INSTALLED_APPS = INSTALLED_PLUGINS + [
     "django.contrib.staticfiles",
 
     # 3rd party apps used by Misago
-    "ariadne.contrib.django",
+    "ariadne_django",
     "celery",
     "debug_toolbar",
     "mptt",
@@ -247,11 +247,11 @@ INSTALLED_APPS = INSTALLED_PLUGINS + [
     "misago.threads",
     "misago.readtracker",
     "misago.search",
+    "misago.oauth2",
     "misago.socialauth",
     "misago.graphql",
     "misago.faker",
     "misago.menus",
-    "misago.sso",
     "misago.plugins",
 ]
 
