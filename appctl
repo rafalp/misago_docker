@@ -204,6 +204,7 @@ upgrade() {
     echo "Upgrade has been completed, restarting containers..."
     start_containers
     set_crontab
+    docker-compose exec redis redis-cli FLUSHALL
 }
 
 # Start docker containers
