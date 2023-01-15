@@ -334,7 +334,7 @@ SOCIAL_AUTH_PIPELINE = (
     'misago.socialauth.pipeline.require_activation',
 )
 
-SOCIAL_AUTH_POSTGRES_JSONFIELD = True
+SOCIAL_AUTH_JSONFIELD_ENABLED = True
 
 TEMPLATES = [
     {
