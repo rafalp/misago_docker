@@ -262,6 +262,8 @@ INTERNAL_IPS = [
 
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
+
 LOGIN_REDIRECT_URL = 'misago:index'
 
 LOGIN_URL = 'misago:login'
