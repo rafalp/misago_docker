@@ -66,7 +66,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": os.environ.get('REDIS_CACHE_URL', "redis://redis/1"),
+        "LOCATION": os.environ.get('CACHE_REDIS_URL', "redis://redis/1"),
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
@@ -432,7 +432,7 @@ REST_FRAMEWORK = {
 
 # Configure Celery to use Redis as message broker.
 
-CELERY_BROKER_URL = os.environ.get('REDIS_CELERY_BROKER_URL', "redis://redis/0")
+CELERY_BROKER_URL = os.environ.get('CELERY_BROKER_URL', "redis://redis/0")
 
 # Celery workers may leak the memory, eventually depriving the instance of resources.
 # This setting forces celery to stop worker, clean after it and create new one
