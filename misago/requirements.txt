@@ -151,7 +151,7 @@ kombu==5.2.4
     #   misago
 markdown==3.4.1
     # via misago
-misago==0.30.0
+misago==0.31.1
     # via -r requirements.in
 oauthlib==3.2.0
     # via
