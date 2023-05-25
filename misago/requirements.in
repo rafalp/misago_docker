@@ -1,4 +1,4 @@
-misago==0.35.0
+misago==0.36.0
 django-anymail
 django-redis
 sentry-sdk
