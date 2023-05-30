@@ -159,7 +159,7 @@ set_crontab() {
     rm -f cron_tmp
     touch cron_tmp
     echo "30 1 * * * cd $current_path && $docker_compose run --rm misago ./cron" >> cron_tmp
-    echo "0 1 * * * cd $current_path && $docker_compose run --rm misago ./.run backup " >> cron_tmp
+    echo "0 1 * * * cd $current_path && $docker_compose run --rm misago ./.run backup \"auto-\$(date +%Y%m%d%H%M%S)\"" >> cron_tmp
     echo "0 1 * * * find $current_path/backups/ -name auto-* -type f -mtime +10 -delete" >> cron_tmp
     echo "" >> cron_tmp
     crontab cron_tmp
