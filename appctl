@@ -60,45 +60,46 @@ intro() {
     echo
     echo "Setup and upgrade:"
     echo
-    echo "    ${BOLD}setup${NORMAL}             setup new Misago site."
-    echo "    ${BOLD}upgrade${NORMAL}           backup, rebuild, migrate and collect static."
+    echo "    ${BOLD}setup${NORMAL}             Setup new Misago site."
+    echo "    ${BOLD}upgrade${NORMAL}           Backup, rebuild, migrate and collect static."
     echo
     echo "Docker management:"
     echo
-    echo "    ${BOLD}start${NORMAL}             start all containers."
-    echo "    ${BOLD}stop${NORMAL}              stop all containers."
-    echo "    ${BOLD}restart${NORMAL}           stop and start all docker containers."
-    echo "    ${BOLD}rebuild${NORMAL}           rebuild and restart Misago and celery container containers."
-    echo "    ${BOLD}rebuildall${NORMAL}        pull, rebuild and restart all containers."
-    echo "    ${BOLD}stats${NORMAL}             see list and stats of running docker containers."
+    echo "    ${BOLD}start${NORMAL}             Start all containers."
+    echo "    ${BOLD}stop${NORMAL}              Stop all containers."
+    echo "    ${BOLD}restart${NORMAL}           Stop and start all docker containers."
+    echo "    ${BOLD}rebuild${NORMAL}           Rebuild and restart Misago and celery container containers."
+    echo "    ${BOLD}rebuildall${NORMAL}        Pull, rebuild and restart all containers."
+    echo "    ${BOLD}stats${NORMAL}             See list and stats of running docker containers."
     echo
     echo "Change configuration:"
     echo
-    echo "    ${BOLD}forumindex${NORMAL}        switch forum index between threads and categories."
-    echo "    ${BOLD}email${NORMAL}             change email setup."
-    echo "    ${BOLD}hostname${NORMAL}          change hostname setup."
-    echo "    ${BOLD}locale${NORMAL}            change locale setup."
-    echo "    ${BOLD}timezone${NORMAL}          change timezone setup."
-    echo "    ${BOLD}avatargallery${NORMAL}     load avatar gallery."
-    echo "    ${BOLD}sentry${NORMAL}            enable or disable Sentry (sentry.io) for logging."
-    echo "    ${BOLD}debug${NORMAL}             change debug mode."
-    echo "    ${BOLD}secret${NORMAL}            reset secret key."
+    echo "    ${BOLD}forumindex${NORMAL}        Switch forum index between threads and categories."
+    echo "    ${BOLD}email${NORMAL}             Change email setup."
+    echo "    ${BOLD}hostname${NORMAL}          Change hostname setup."
+    echo "    ${BOLD}locale${NORMAL}            Change locale setup."
+    echo "    ${BOLD}timezone${NORMAL}          Change timezone setup."
+    echo "    ${BOLD}avatargallery${NORMAL}     Load avatar gallery."
+    echo "    ${BOLD}sentry${NORMAL}            Enable or disable Sentry (sentry.io) for logging."
+    echo "    ${BOLD}debug${NORMAL}             Change debug mode."
+    echo "    ${BOLD}secret${NORMAL}            Reset secret key."
     echo
     echo "    Note: you need to rebuild Misago container for changes made with those utils to take effect."
     echo
     echo "Backup:"
     echo
-    echo "    ${BOLD}backup${NORMAL}            backup and archive database and media."
-    echo "    ${BOLD}restore BACKUP${NORMAL}    restore database and media from BACKUP archive."
+    echo "    ${BOLD}backup${NORMAL}            Backup and archive database and media."
+    echo "    ${BOLD}restore BACKUP${NORMAL}    Restore database and media from BACKUP archive."
     echo
     echo "Utilities:"
     echo
-    echo "    ${BOLD}collectstatic${NORMAL}     collect static assets."
-    echo "    ${BOLD}manage.py${NORMAL}         runs \"python manage.py\" inside docker."
-    echo "    ${BOLD}bash${NORMAL}              starts bash session inside running Misago container."
-    echo "    ${BOLD}run${NORMAL}               runs \"docker-compose run --rm misago\"."
-    echo "    ${BOLD}psql${NORMAL}              runs psql connected to database."
-    echo "    ${BOLD}flushredis${NORMAL}        flush the redis cache."
+    echo "    ${BOLD}collectstatic${NORMAL}     Collect static assets."
+    echo "    ${BOLD}manage.py${NORMAL}         Runs \"python manage.py\" inside docker."
+    echo "    ${BOLD}bash${NORMAL}              Starts bash session inside running Misago container."
+    echo "    ${BOLD}run${NORMAL}               Runs \"docker-compose run --rm misago\"."
+    echo "    ${BOLD}psql${NORMAL}              Runs psql connected to database."
+    echo "    ${BOLD}flushredis${NORMAL}        Flush the redis cache."
+    echo "    ${BOLD}resetcron${NORMAL}         Replace host's crontab with default one."
     echo
 }
 
