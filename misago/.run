@@ -54,10 +54,38 @@ run_psql() {
     psql --username $POSTGRES_USER --host $POSTGRES_HOST $POSTGRES_USER
 }
 
-# Backup database
-backup_db() {
+# Create new backup
+create_backup() {
+    if [[ ! $1 ]]; then
+        echo -e "Missing argument: ${RED}backup_name${NORMAL}"
+        echo
+        exit 1
+    fi
+    backup=$1
+    backup_tmp="/tmp/$backup"
+    backup_archive="$backup.tar.gz"
     wait_for_db
-    pg_dump -U $POSTGRES_USER -h $POSTGRES_HOST $POSTGRES_USER -Oxc > "/misago/backups/$1/database.sql"
+    echo "Initializing backup $backup"
+    mkdir $backup_tmp
+    echo "Preparing database..."
+    pg_dump -U $POSTGRES_USER -h $POSTGRES_HOST $POSTGRES_USER -Oxc > "$backup_tmp/database.sql"
+    echo "Preparing media files..."
+    cp -r /misago/media "$backup_tmp/media"
+    echo "Archiving..."
+    GZIP=-9
+    cd "/tmp/"
+    tar -zcf $backup_archive $backup
+    echo "Cleaning up..."
+    cd /misago/
+    mv "/tmp/$backup_archive" "/misago/backups/$backup_archive"
+    rm -rf $backup_tmp
+    echo "New backup: $backup.tar.gz"
+}
+
+# Dump database to backups for upgrade script
+prepare_v1_upgrade() {
+    wait_for_db
+    pg_dump -U $POSTGRES_USER -h $POSTGRES_HOST $POSTGRES_USER -Oxc > "/misago/backups/postgresql10.sql"
 }
 
 # Command dispatcher
@@ -68,8 +96,10 @@ if [[ $1 ]]; then
         wait_for_db
     elif [[ $1 = "psql" ]]; then
         run_psql
-    elif [[ $1 = "backup_db" ]]; then
-        backup_db $2
+    elif [[ $1 = "backup" ]]; then
+        create_backup $2
+    elif [[ $1 = "prepare_v1_upgrade" ]]; then
+        prepare_v1_upgrade
     else
         invalid_argument $1
     fi
