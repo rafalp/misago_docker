@@ -321,7 +321,6 @@ reset_secret_key() {
 # Create new backup
 create_new_backup() {
     require_setup
-    # create tmp backup dir
     backup_name="manual-$(date +%Y%m%d%H%M%S)"
     $docker_compose run --rm misago ./.run backup $backup_name
 }
