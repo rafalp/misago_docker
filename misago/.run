@@ -56,16 +56,21 @@ run_psql() {
 
 # Create new backup
 create_backup() {
+    backup_name=$1
+    if [[ !$backup ]]; then
+        echo -e "Missing argument: ${RED}backup_name${NORMAL}"
+        echo
+        exit 1
+    fi
     wait_for_db
-    backup=$1
-    backup_dir="/misago/backups/$backup"
-    backup_archive="/misago/backups/$backup.tar.gz"
+    backup_dir="/misago/backups/$backup_name"
+    backup_archive="/misago/backups/$backup_name.tar.gz"
     echo "Initializing backup $backup"
     mkdir $backup_dir
     echo "Backing up database..."
-    pg_dump -U $POSTGRES_USER -h $POSTGRES_HOST $POSTGRES_USER -Oxc > "/misago/backups/$backup/database.sql"
+    pg_dump -U $POSTGRES_USER -h $POSTGRES_HOST $POSTGRES_USER -Oxc > "$backup_dir/database.sql"
     echo "Backing up media..."
-    cp -r /misago/media "/misago/backups/$backup/media"
+    cp -r /misago/media "$backup_dir/media"
     echo "Archiving..."
     GZIP=-9
     tar -zcf $backup_archive $backup_dir
