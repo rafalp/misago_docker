@@ -54,10 +54,24 @@ run_psql() {
     psql --username $POSTGRES_USER --host $POSTGRES_HOST $POSTGRES_USER
 }
 
-# Backup database
-backup_db() {
+# Create new backup
+create_backup() {
     wait_for_db
-    pg_dump -U $POSTGRES_USER -h $POSTGRES_HOST $POSTGRES_USER -Oxc > "/misago/backups/$1/database.sql"
+    backup=$1
+    backup_dir="/misago/backups/$backup"
+    backup_archive="/misago/backups/$backup.tar.gz"
+    echo "Initializing backup $backup"
+    mkdir $backup_dir
+    echo "Backing up database..."
+    pg_dump -U $POSTGRES_USER -h $POSTGRES_HOST $POSTGRES_USER -Oxc > "/misago/backups/$backup/database.sql"
+    echo "Backing up media..."
+    cp -r /misago/media "/misago/backups/$backup/media"
+    echo "Archiving..."
+    GZIP=-9
+    tar -zcf $backup_archive $backup_dir
+    echo "Cleaning up..."
+    rm -rf $backup_dir
+    echo "New backup: $backup_archive"
 }
 
 # Dump database to backups for upgrade script
@@ -74,8 +88,8 @@ if [[ $1 ]]; then
         wait_for_db
     elif [[ $1 = "psql" ]]; then
         run_psql
-    elif [[ $1 = "backup_db" ]]; then
-        backup_db $2
+    elif [[ $1 = "backup" ]]; then
+        create_backup $2
     elif [[ $1 = "prepare_v1_upgrade" ]]; then
         prepare_v1_upgrade
     else
