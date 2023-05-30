@@ -336,7 +336,7 @@ create_new_backup() {
     cp -r ./misago/media "./backups/$backup_dir/media"
     cd ./backups/
     # archive backup dir
-    backup_archive="$backup_type-$(date +%Y%m%d%H%M%S).tar.gz"
+    backup_archive="$backup_dir.tar.gz"
     GZIP=-9
     tar -zcf $backup_archive "$backup_dir"
     # delete backup dir as its no longer required
@@ -472,6 +472,8 @@ if [[ $1 ]]; then
         docker_run $@
     elif [[ $1 = "psql" ]]; then
         run_psql
+    elif [[ $1 = "resetcron" ]]; then
+        set_crontab
     else
         invalid_argument $1
     fi

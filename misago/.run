@@ -60,6 +60,12 @@ backup_db() {
     pg_dump -U $POSTGRES_USER -h $POSTGRES_HOST $POSTGRES_USER -Oxc > "/misago/backups/$1/database.sql"
 }
 
+# Dump database to backups for upgrade script
+prepare_v1_upgrade() {
+    wait_for_db
+    pg_dump -U $POSTGRES_USER -h $POSTGRES_HOST $POSTGRES_USER -Oxc > "/misago/backups/postgresql10.sql"
+}
+
 # Command dispatcher
 if [[ $1 ]]; then
     if [[ $1 = "initialize_default_database" ]]; then
@@ -70,6 +76,8 @@ if [[ $1 ]]; then
         run_psql
     elif [[ $1 = "backup_db" ]]; then
         backup_db $2
+    elif [[ $1 = "prepare_v1_upgrade" ]]; then
+        prepare_v1_upgrade
     else
         invalid_argument $1
     fi
