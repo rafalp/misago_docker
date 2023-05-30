@@ -56,15 +56,15 @@ run_psql() {
 
 # Create new backup
 create_backup() {
-    backup_name=$1
-    if [[ !$backup ]]; then
+    if [[ ! $1 ]]; then
         echo -e "Missing argument: ${RED}backup_name${NORMAL}"
         echo
         exit 1
     fi
+    backup=$1
+    backup_dir="/tmp/misago-backup-$backup"
+    backup_archive="/misago/backups/$backup.tar.gz"
     wait_for_db
-    backup_dir="/misago/backups/$backup_name"
-    backup_archive="/misago/backups/$backup_name.tar.gz"
     echo "Initializing backup $backup"
     mkdir $backup_dir
     echo "Backing up database..."
@@ -73,10 +73,12 @@ create_backup() {
     cp -r /misago/media "$backup_dir/media"
     echo "Archiving..."
     GZIP=-9
-    tar -zcf $backup_archive $backup_dir
+    cd "$backup_dir/.."
+    tar -zcf $backup_archive $backup
     echo "Cleaning up..."
+    cd /misago/
     rm -rf $backup_dir
-    echo "New backup: $backup_archive"
+    echo "New backup: $backup.tar.gz"
 }
 
 # Dump database to backups for upgrade script
