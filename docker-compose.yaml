@@ -73,7 +73,6 @@ services:
       - VIRTUAL_PROTO=uwsgi
     env_file:
       - ./config/misago.env
-      - ./config/postgres.env
     depends_on:
       - nginx-lets-encrypt
       - postgres
@@ -101,7 +100,6 @@ services:
       - POSTGRES_PASSWORD="${MISAGO_POSTGRES_PASSWORD:-misagodbpassword}"
     env_file:
       - ./config/misago.env
-      - ./config/postgres.env
     depends_on:
       - postgres
       - redis
