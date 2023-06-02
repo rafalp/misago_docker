@@ -36,23 +36,26 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - ./config/vhost.d:/etc/nginx/vhost.d:z
 
-  postgres:
-    image: postgres:10
+  postgres-15:
+    image: postgres:15
     restart: unless-stopped
     networks:
       - misago
-    env_file:
-      - ./config/postgres.env
+    environment:
+      - POSTGRES_DB="${MISAGO_POSTGRES_DB:-misagodb}"
+      - POSTGRES_USER="${MISAGO_POSTGRES_USER:-misagodb}"
+      - POSTGRES_PASSWORD="${MISAGO_POSTGRES_PASSWORD:-misagodbpassword}"
+      - ENABLE_IPV6=true
     volumes:
-      - misago-database:/var/lib/postgresql/data
+      - misago-postgres-15:/var/lib/postgresql/data
 
   redis:
-    image: redis:5
+    image: redis:6
     restart: unless-stopped
     networks:
       - misago
     volumes:
-      - misago-redis:/data
+      - misago-redis-6:/data
 
   misago:
     build: misago
@@ -62,7 +65,10 @@ services:
         aliases:
           - misago
     environment:
-      - POSTGRES_HOST=postgres
+      - POSTGRES_HOST="${MISAGO_POSTGRES_HOST:-postgres-15}"
+      - POSTGRES_DB="${MISAGO_POSTGRES_DB:-misagodb}"
+      - POSTGRES_USER="${MISAGO_POSTGRES_USER:-misagodb}"
+      - POSTGRES_PASSWORD="${MISAGO_POSTGRES_PASSWORD:-misagodbpassword}"
       - SSL_POLICY=Mozilla-Modern
       - VIRTUAL_PROTO=uwsgi
     env_file:
@@ -80,7 +86,7 @@ services:
       - ./backups:/misago/backups:Z
       - ./logs:/misago/logs:z
 
-  misago-celery:
+  celery-worker:
     build: misago
     command: celery -A misagodocker worker --loglevel=info
     restart: unless-stopped
@@ -89,7 +95,10 @@ services:
         aliases:
           - misago
     environment:
-      - POSTGRES_HOST=postgres
+      - POSTGRES_HOST="${MISAGO_POSTGRES_HOST:-postgres-15}"
+      - POSTGRES_DB="${MISAGO_POSTGRES_DB:-misagodb}"
+      - POSTGRES_USER="${MISAGO_POSTGRES_USER:-misagodb}"
+      - POSTGRES_PASSWORD="${MISAGO_POSTGRES_PASSWORD:-misagodbpassword}"
     env_file:
       - ./config/misago.env
       - ./config/postgres.env
@@ -109,5 +118,5 @@ volumes:
   nginx-certs:
   nginx-html:
   lets-encrypt-acme:
-  misago-database:
-  misago-redis:
+  misago-postgres-15:
+  misago-redis-6:
