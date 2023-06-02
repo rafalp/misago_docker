@@ -7,13 +7,12 @@ RED='\033[0;31m'
 BOLD=$(tput bold)
 NORMAL=$(tput sgr0)
 
-# Define env paths
-# Those are paths to env files created by wizard
+# Define env path
+# This is a path to an env file created by wizard
 misago_env_path="./config/misago.env"
-env_paths=(
-    $misago_env_path
-    "./config/postgres.env"
-)
+
+# Find docker executable path
+docker=$(which docker)
 
 # Utility functions used by action commands
 error() {
@@ -21,41 +20,28 @@ error() {
 }
 
 require_setup() {
-    for env_path in "${env_paths[@]}"; do
-        if [ ! -e $env_path ]; then
-            error "You need to setup your site using \"./appctl setup\" before you will be able to use this option."
-            echo
-            exit 1
-        fi
-    done
+    if [ ! -e $misago_env_path ]; then
+        error "You need to setup your site using \"./appctl setup\" before you will be able to use this option."
+        echo
+        exit 1
+    fi
 }
 
-# Check if user has docker installed
-docker=$(which docker)
-
+# Check if user has docker and docker-compose
 if [ -z $docker ]; then
     error "You need to have Docker installed to use this tool."
     echo
     echo "Docker release for your system can be downloaded for free from this page:"
     echo "https://www.docker.com/get-started"
     echo
-    echo "If you are on Linux, you will also have to install Docker Compose after installing Docker:"
+    echo "If you are on Linux, you will also have to install Docker Compose plugin after installing Docker:"
     echo "https://docs.docker.com/compose/install/"
     echo
     exit 1
-fi
-
-# Find docker compose path
-if $docker compose version >/dev/null 2>&1; then
-    docker_compose="$docker compose"
-else
-    docker_compose=$(which docker-compose)
-fi
-
-if [ -z "$docker_compose" ]; then
-    error "You need to have Docker Compose installed to use this tool."
+elif ! $docker compose version >/dev/null 2>&1; then
+    error "You need to have Docker Compose plugin installed to use this tool."
     echo
-    echo "Guide for installing Docker Compose on your system can be found on this page:"
+    echo "Guide for installing Docker Compose plugin on your system can be found on this page:"
     echo "https://docs.docker.com/compose/install/"
     echo
     exit 1
@@ -171,8 +157,8 @@ set_crontab() {
     current_path=$(pwd)
     rm -f cron_tmp
     touch cron_tmp
-    echo "30 1 * * * cd $current_path && $docker_compose run --rm misago ./cron" >> cron_tmp
-    echo "0 1 * * * cd $current_path && $docker_compose run --rm misago ./.run backup \"auto-\$(date +%Y%m%d%H%M%S)\"" >> cron_tmp
+    echo "30 1 * * * cd $current_path && $docker compose run --rm misago ./cron" >> cron_tmp
+    echo "0 1 * * * cd $current_path && $docker compose run --rm misago ./.run backup \"auto-\$(date +%Y%m%d%H%M%S)\"" >> cron_tmp
     echo "0 1 * * * find $current_path/backups/ -name auto-* -type f -mtime +10 -delete" >> cron_tmp
     echo "" >> cron_tmp
     crontab cron_tmp
@@ -379,7 +365,7 @@ reset_secret_key() {
 create_new_backup() {
     require_setup
     backup_name="manual-$(date +%Y%m%d%H%M%S)"
-    $docker_compose run --rm misago ./.run backup $backup_name
+    $docker compose run --rm misago ./.run backup $backup_name
 }
 
 # Restore from backup
