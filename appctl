@@ -212,7 +212,7 @@ upgrade() {
 
 # Run major upgrade (v0 to v1)
 major_upgrade() {
-    
+    echo "Not available yet!"
 }
 
 # Start docker containers
