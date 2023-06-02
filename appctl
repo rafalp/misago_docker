@@ -63,6 +63,10 @@ intro() {
     echo "    ${BOLD}setup${NORMAL}             Setup new Misago site."
     echo "    ${BOLD}upgrade${NORMAL}           Backup, rebuild, migrate and collect static."
     echo
+    echo "Upgrade misago-docker to v1:"
+    echo
+    echo "    ${BOLD}majorupgrade${NORMAL}      Upgrades current misago-docker setup from v0 to v1."
+    echo
     echo "Docker management:"
     echo
     echo "    ${BOLD}start${NORMAL}             Start all containers."
@@ -99,7 +103,7 @@ intro() {
     echo "    ${BOLD}run${NORMAL}               Runs \"docker-compose run --rm misago\"."
     echo "    ${BOLD}psql${NORMAL}              Runs psql connected to database."
     echo "    ${BOLD}flushredis${NORMAL}        Flush the redis cache."
-    echo "    ${BOLD}resetcron${NORMAL}         Replace host's crontab with default one."
+    echo "    ${BOLD}resetcron${NORMAL}         Replace host's crontab with default one from \"setup\"."
     echo
 }
 
@@ -204,6 +208,11 @@ upgrade() {
     echo "Upgrade has been completed, restarting containers..."
     start_containers
     set_crontab
+}
+
+# Run major upgrade (v0 to v1)
+major_upgrade() {
+    
 }
 
 # Start docker containers
@@ -401,6 +410,8 @@ if [[ $1 ]]; then
         setup
     elif [[ $1 = "upgrade" ]]; then
         upgrade
+    elif [[ $1 = "majorupgrade" ]]; then
+        major_upgrade
     elif [[ $1 = "up" ]]; then
         start_containers
     elif [[ $1 = "start" ]]; then
