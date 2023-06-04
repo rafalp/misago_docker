@@ -1,9 +1,10 @@
 # 1.0 (2023-06-10)
 
-- Upgraded PostgreSQL service to 15.3.
+- Updated PostgreSQL service to 15.3.
 - Renamed PostgreSQL service from `postgres` to `postgres-15`.
-- Upgraded Redis service to 6.2.
+- Updated Redis service to 6.2.
 - Renamed Redis service from `redis` to `redis-6`.
+- Updated `nginx-lets-encrypt` service to 2.2.
 - Renamed `misago-celery` service to `celery-worker`.
 - Renamed `misago-database` volume to `misago-postgres-15`
 - Renamed `misago-redis` volume to `misago-redis-6`

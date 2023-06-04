@@ -82,10 +82,10 @@ create_backup() {
     echo "New backup: $backup.tar.gz"
 }
 
-# Dump database to backups for upgrade script
-prepare_v1_upgrade() {
+# Import database to backup during major upgrade
+complete_v1_upgrade() {
     wait_for_db
-    pg_dump -U $POSTGRES_USER -h $POSTGRES_HOST $POSTGRES_USER -Oxc > "/misago/backups/postgresql10.sql"
+    psql --username $POSTGRES_USER --host $POSTGRES_HOST $POSTGRES_USER < "/misago/backups/postgresql10.sql"
 }
 
 # Command dispatcher
@@ -98,8 +98,8 @@ if [[ $1 ]]; then
         run_psql
     elif [[ $1 = "backup" ]]; then
         create_backup $2
-    elif [[ $1 = "prepare_v1_upgrade" ]]; then
-        prepare_v1_upgrade
+    elif [[ $1 = "complete_v1_upgrade" ]]; then
+        complete_v1_upgrade
     else
         invalid_argument $1
     fi

@@ -27,18 +27,20 @@ require_setup() {
     fi
 }
 
-# Check if user has docker and docker-compose
+# Check if user has docker and docker compose
 if [ -z $docker ]; then
     error "You need to have Docker installed to use this tool."
     echo
     echo "Docker release for your system can be downloaded for free from this page:"
     echo "https://www.docker.com/get-started"
     echo
-    echo "If you are on Linux, you will also have to install Docker Compose plugin after installing Docker:"
+    echo "If you are on Linux, you will also have to install Docker Compose after installing Docker:"
     echo "https://docs.docker.com/compose/install/"
     echo
     exit 1
-elif ! $docker compose version >/dev/null 2>&1; then
+fi
+
+if ! $docker compose version >/dev/null 2>&1; then
     error "You need to have Docker Compose plugin installed to use this tool."
     echo
     echo "Guide for installing Docker Compose plugin on your system can be found on this page:"
@@ -56,10 +58,6 @@ intro() {
     echo
     echo "    ${BOLD}setup${NORMAL}             Setup new Misago site."
     echo "    ${BOLD}upgrade${NORMAL}           Backup, rebuild, migrate and collect static."
-    echo
-    echo "Upgrade misago-docker to v1:"
-    echo
-    echo "    ${BOLD}majorupgrade${NORMAL}      Upgrades current misago-docker setup from v0 to v1."
     echo
     echo "Docker management:"
     echo
@@ -97,7 +95,7 @@ intro() {
     echo "    ${BOLD}run${NORMAL}               Runs \"docker compose run --rm misago\"."
     echo "    ${BOLD}psql${NORMAL}              Runs psql connected to database."
     echo "    ${BOLD}flushredis${NORMAL}        Flush the redis cache."
-    echo "    ${BOLD}resetcron${NORMAL}         Replace host's crontab with default one from \"setup\"."
+    echo "    ${BOLD}resetcron${NORMAL}         Replace host's crontab with default one."
     echo
 }
 
@@ -131,10 +129,10 @@ setup() {
     done
     read -p "Initialize default database? [Y/n]: " initialize_default_database
     # Run docker build
-    $docker_compose build --no-cache --force-rm --pull
+    docker compose build --no-cache --force-rm --pull
     collectstatic
     if [ "$initialize_default_database" != "n" ]; then
-        $docker_compose run --rm misago ./.run initialize_default_database
+        docker compose run --rm misago ./.run initialize_default_database
     fi
     start_containers
     set_crontab
@@ -149,7 +147,7 @@ setup() {
 
 # Run collectstatic (uses misago-static volume) so site has loaded assets
 collectstatic() {
-    $docker_compose run --rm misago python manage.py collectstatic --no-input
+    docker compose run --rm misago python manage.py collectstatic --no-input
 }
 
 # Setup crontab to run `cron` script within Misago container using docker compose
@@ -174,12 +172,12 @@ upgrade() {
 
     echo "You are going to upgrade your Misago site to the new version."
     echo "All running docker containers will be stopped for the duration of the upgrade."
-    echo "Your site's data will be backed up in the \"backups\" directory."
+    echo "Your site's data will be backed up to the \"backups\" directory."
     echo "New version of misago-docker will be pulled from github.com"
     echo
     echo "In case of any issues, run this command to return to the current version:"
     echo
-    echo "git reset --hard $git_commit && $docker_compose build --no-cache --force-rm --pull"
+    echo "git reset --hard $git_commit && docker compose build --no-cache --force-rm --pull"
     echo
     echo "Note: remember to also restore your backup in case you are rolling back!"
     echo
@@ -193,95 +191,74 @@ upgrade() {
     echo "Creating backup..."
     create_new_backup "upgrade"
     echo "Stopping containers for upgrade..."
-    $docker_compose stop
+    docker compose stop
     git pull
-    $docker_compose build --no-cache --force-rm --pull
+    docker compose build --no-cache --force-rm --pull
     collectstatic
-    $docker_compose run --rm misago python manage.py migrate
-    $docker_compose run --rm misago python manage.py invalidateversionedcaches
+    docker compose run --rm misago python manage.py migrate
+    docker compose run --rm misago python manage.py invalidateversionedcaches
     echo "Upgrade has been completed, restarting containers..."
     start_containers
     set_crontab
 }
 
-# Run major upgrade (v0 to v1)
-major_upgrade() {
+# Run second step of major misago docker update
+complete_major_upgrade() {
     require_setup
-    
-    echo "You are going to upgrade your misago-docker setup to version 1."
-    echo "All running docker containers will be stopped for the duration of the upgrade."
-    echo "Your site's database will be backed up in the \"backups\" directory."
-    echo "New version of misago-docker will be pulled from github.com"
-    echo "Your site's database will then be imported to new database service running PostgreSQL 15."
-    echo
-    echo "In case of any issues, run this command to return to the current version:"
-    echo
-    echo "git checkout v0 && $docker_compose build --no-cache --force-rm --pull"
-
-    read -p "Start upgrade process? [Y/n]: " start_upgrade
-    if [ "$start_upgrade" = "n" ]; then
-        echo "Upgrade canceled."
-        exit
-    fi
-
-    docker=$(which docker)
-    if ! $docker compose version >/dev/null 2>&1; then
-        error "You need to have Docker Compose plugin installed to continue with upgrade."
-        echo
-        echo "Guide for installing Docker Compose plugin on your system can be found on this page:"
-        echo "https://docs.docker.com/compose/install/"
+    if [ ! -e ./backups/postgresql10.sql ]; then
+        error "Could not find 'postgresql10.sql' file created by misago-docker v0. Major update was not started or was started long time ago."
         echo
         exit 1
     fi
 
-    echo "Stopping running Misago contains..."
-    $docker_compose stop misago misago-celery
-
-    echo "Creating database migration from PostgreSQL 10 to 15..."
-    $docker_compose run --rm misago ./.run prepare_v1_upgrade
-
-    echo "Pulling misago-docker v1 from github.com..."
-    git remote set-branches origin '*'
-    git fetch -v --depth=1
-    git checkout v1
-
-    echo "Running completion script from v1..."
-    ./appctl completemajorupgrade
+    echo "Downing running containers..."
+    docker compose stop
+    docker compose down --remove-orphans
+    echo "Rebuilding new containers..."
+    docker compose build --force-rm --no-cache --pull
+    echo "Importing data from Misago Docker v0..."
+    docker compose run --rm misago ./.run complete_v1_upgrade
+    echo "Restarting containers..."
+    docker compose stop
+    docker compose up --detach
+    echo "Resetting crontab contents..."
+    set_crontab
+    echo "Finished!"
 }
 
 # Start docker containers
 start_containers() {
     require_setup
-    $docker_compose up --detach
+    docker compose up --detach
 }
 
 # Stop docker containers
 stop_containers() {
     require_setup
-    $docker_compose stop
+    docker compose stop
 }
 
 # Restart docker containers
 restart_containers() {
     require_setup
-    $docker_compose stop
-    $docker_compose up --detach
+    docker compose stop
+    docker compose up --detach
 }
 
 # Rebuild misago containers
 rebuild_misago_containers() {
     require_setup
-    $docker_compose stop misago misago-celery
-    $docker_compose build --force-rm misago misago-celery
-    $docker_compose up --detach
+    docker compose stop misago misago-celery
+    docker compose build --force-rm misago misago-celery
+    docker compose up --detach
 }
 
 # Rebuild all containers
 rebuild_all_containers() {
     require_setup
-    $docker_compose stop
-    $docker_compose build --force-rm --no-cache --pull
-    $docker_compose up --detach
+    docker compose stop
+    docker compose build --force-rm --no-cache --pull
+    docker compose up --detach
 }
 
 # Show stats for running docker containers
@@ -304,7 +281,7 @@ flush_redis() {
         echo "Cache flush canceled."
         exit
     fi
-    $docker_compose exec redis redis-cli FLUSHALL
+    docker compose exec redis redis-cli FLUSHALL
 }
 
 # Forum index configuration
@@ -340,7 +317,7 @@ change_timezone() {
 # Load avatar gallery
 load_avatargallery() {
     require_setup
-    $docker_compose run --rm misago python manage.py loadavatargallery
+    docker compose run --rm misago python manage.py loadavatargallery
 }
 
 # Sentry configuration
@@ -402,7 +379,7 @@ restore_from_backup() {
         error "Specified archive is missing media backup."
     fi
     # Restore from archive
-    $docker_compose run --rm misago ./.run psql < $database_sql
+    docker compose run --rm misago ./.run psql < $database_sql
     rm -rf ./misago/media/*
     mv "$media_dir"/* ./misago/media/
     # Cleanup...
@@ -419,23 +396,23 @@ run_collectstatic() {
 
 # Shortcut for starting bash session in running container
 run_bash() {
-    $docker_compose exec misago bash
+    docker compose exec misago bash
 }
 
 # Shortcut for docker compose run --rm misago python manage.py
 run_managepy() {
-    $docker_compose run --rm misago python manage.py "${@:2}"
+    docker compose run --rm misago python manage.py "${@:2}"
 }
 
 # Shortcut for docker compose run --rm misago...
 docker_run() {
-    $docker_compose run --rm misago "${@:2}"
+    docker compose run --rm misago "${@:2}"
 }
 
 # Shortcut for psql
 run_psql() {
     require_setup
-    $docker_compose run --rm misago ./.run psql
+    docker compose run --rm misago ./.run psql
 }
 
 # Command dispatcher
@@ -444,8 +421,8 @@ if [[ $1 ]]; then
         setup
     elif [[ $1 = "upgrade" ]]; then
         upgrade
-    elif [[ $1 = "majorupgrade" ]]; then
-        major_upgrade
+    elif [[ $1 = "completemajorupgrade" ]]; then
+        complete_major_upgrade
     elif [[ $1 = "up" ]]; then
         start_containers
     elif [[ $1 = "start" ]]; then
