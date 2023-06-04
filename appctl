@@ -180,7 +180,7 @@ upgrade() {
 
     echo "You are going to upgrade your Misago site to the new version."
     echo "All running docker containers will be stopped for the duration of the upgrade."
-    echo "Your site's data will be backed up to the \"backups\" directory."
+    echo "Your site's data will be backed up in the \"backups\" directory."
     echo "New version of misago-docker will be pulled from github.com"
     echo
     echo "In case of any issues, run this command to return to the current version:"
@@ -212,7 +212,45 @@ upgrade() {
 
 # Run major upgrade (v0 to v1)
 major_upgrade() {
-    echo "Not available yet!"
+    require_setup
+    
+    echo "You are going to upgrade your misago-docker setup to version 1."
+    echo "All running docker containers will be stopped for the duration of the upgrade."
+    echo "Your site's database will be backed up in the \"backups\" directory."
+    echo "New version of misago-docker will be pulled from github.com"
+    echo "Your site's database will then be imported to new database service running PostgreSQL 15."
+    echo
+    echo "In case of any issues, run this command to return to the current version:"
+    echo
+    echo "git checkout v0 && docker-compose build --no-cache --force-rm --pull"
+
+    read -p "Start upgrade process? [Y/n]: " start_upgrade
+    if [ "$start_upgrade" = "n" ]; then
+        echo "Upgrade canceled."
+        exit
+    fi
+
+    if ! $docker compose version >/dev/null 2>&1; then
+        error "You need to have Docker Compose plugin installed to continue with upgrade."
+        echo
+        echo "Guide for installing Docker Compose plugin on your system can be found on this page:"
+        echo "https://docs.docker.com/compose/install/"
+        echo
+        exit 1
+    fi
+
+    echo "Stopping running Misago contains..."
+    docker-compose stop misago misago-celery
+
+    echo "Creating database migration from PostgreSQL 10 to 15..."
+    docker-compose run --rm misago ./.run prepare_v1_upgrade
+
+    echo "Pulling misago-docker v1 from github.com..."
+    git pull
+    git checkout v1
+
+    echo "Running completion script from v1..."
+    ./appctl completemajorupdate
 }
 
 # Start docker containers
