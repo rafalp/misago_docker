@@ -1,9 +1,10 @@
-FROM python:3.11 as app-build
+FROM python:3.11
 
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE 1
 ENV PYTHONUNBUFFERED 1
 ENV IN_MISAGO_DOCKER 1
 
+# Install dependencies in one single command/layer
 RUN wget -q https://www.postgresql.org/media/keys/ACCC4CF8.asc -O - | apt-key add - && \
     sh -c 'echo "deb http://apt.postgresql.org/pub/repos/apt/ buster-pgdg main" >> /etc/apt/sources.list.d/pgdg.list' && \
     apt-get update && \
@@ -19,27 +20,13 @@ RUN wget -q https://www.postgresql.org/media/keys/ACCC4CF8.asc -O - | apt-key ad
       gettext && \
     apt-get clean
 
-ADD . /misago
-
-RUN pip install --upgrade pip && pip install -r requirements.txt
-
-# Build final (slim) image
-FROM python:3.11-slim
-
-ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE 1
-ENV PYTHONUNBUFFERED 1
-ENV IN_MISAGO_DOCKER 1
-
-# Copy build files from previous image
-COPY --from=app-build /usr/local/lib/python3.11/site-packages/ /usr/local/lib/python3.11/site-packages/
-COPY --from=app-build /usr/local/bin/ /usr/local/bin/
-
-# Update apt and install postgresql-client
-RUN apt-get update && apt-get install -y postgresql-client-15
-
-# Re-add misago
+# Make current directory available as "Misago" within docker
 ADD . /misago
 WORKDIR /misago
+
+# Install requirements files
+RUN pip install --upgrade pip && pip install -r requirements.txt
+RUN [ -f requirements-plugins.txt ] && pip install -r requirements-plugins.txt || true
 
 # Expose port 3031 from Docker
 EXPOSE 3031
