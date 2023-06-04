@@ -230,6 +230,7 @@ major_upgrade() {
         exit
     fi
 
+    docker=$(which docker)
     if ! $docker compose version >/dev/null 2>&1; then
         error "You need to have Docker Compose plugin installed to continue with upgrade."
         echo
