@@ -247,7 +247,7 @@ major_upgrade() {
     docker-compose run --rm misago ./.run prepare_v1_upgrade
 
     echo "Pulling misago-docker v1 from github.com..."
-    git pull
+    git pull origin v1
     git checkout v1
 
     echo "Running completion script from v1..."
