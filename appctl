@@ -213,7 +213,11 @@ complete_major_upgrade() {
 
     echo "Downing running containers..."
     docker compose stop
+<<<<<<< HEAD
     docker compose down --remove-orphans
+=======
+    docker compose down
+>>>>>>> ed216bb (Fix postgresql env vars in compose, stop containers before downing them)
     echo "Rebuilding new containers..."
     docker compose build --force-rm --no-cache --pull
     echo "Importing data from Misago Docker v0..."

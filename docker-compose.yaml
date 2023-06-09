@@ -42,9 +42,9 @@ services:
     networks:
       - misago
     environment:
-      - POSTGRES_DB="${MISAGO_POSTGRES_DB:-misagodb}"
-      - POSTGRES_USER="${MISAGO_POSTGRES_USER:-misagodb}"
-      - POSTGRES_PASSWORD="${MISAGO_POSTGRES_PASSWORD:-misagodbpassword}"
+      - POSTGRES_DB=${MISAGO_POSTGRES_DB:-misagodb}
+      - POSTGRES_USER=${MISAGO_POSTGRES_USER:-misagodb}
+      - POSTGRES_PASSWORD=${MISAGO_POSTGRES_PASSWORD:-misagodbpassword}
       - ENABLE_IPV6=true
     volumes:
       - misago-postgres-15:/var/lib/postgresql/data
@@ -65,10 +65,10 @@ services:
         aliases:
           - misago
     environment:
-      - POSTGRES_HOST="${MISAGO_POSTGRES_HOST:-postgres-15}"
-      - POSTGRES_DB="${MISAGO_POSTGRES_DB:-misagodb}"
-      - POSTGRES_USER="${MISAGO_POSTGRES_USER:-misagodb}"
-      - POSTGRES_PASSWORD="${MISAGO_POSTGRES_PASSWORD:-misagodbpassword}"
+      - POSTGRES_HOST=${MISAGO_POSTGRES_HOST:-postgres-15}
+      - POSTGRES_DB=${MISAGO_POSTGRES_DB:-misagodb}
+      - POSTGRES_USER=${MISAGO_POSTGRES_USER:-misagodb}
+      - POSTGRES_PASSWORD=${MISAGO_POSTGRES_PASSWORD:-misagodbpassword}
       - SSL_POLICY=Mozilla-Modern
       - VIRTUAL_PROTO=uwsgi
     env_file:
@@ -94,10 +94,10 @@ services:
         aliases:
           - misago
     environment:
-      - POSTGRES_HOST="${MISAGO_POSTGRES_HOST:-postgres-15}"
-      - POSTGRES_DB="${MISAGO_POSTGRES_DB:-misagodb}"
-      - POSTGRES_USER="${MISAGO_POSTGRES_USER:-misagodb}"
-      - POSTGRES_PASSWORD="${MISAGO_POSTGRES_PASSWORD:-misagodbpassword}"
+      - POSTGRES_HOST=${MISAGO_POSTGRES_HOST:-postgres-15}
+      - POSTGRES_DB=${MISAGO_POSTGRES_DB:-misagodb}
+      - POSTGRES_USER=${MISAGO_POSTGRES_USER:-misagodb}
+      - POSTGRES_PASSWORD=${MISAGO_POSTGRES_PASSWORD:-misagodbpassword}
     env_file:
       - ./config/misago.env
     depends_on:
