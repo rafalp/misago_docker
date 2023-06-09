@@ -7,7 +7,7 @@ This repository provides production-ready setup of Misago for people who:
 - Have a server with 2GB of RAM and Docker lying around
 - Know enough of Linux to ssh to VPS, move around, modify files, run programs and follow instructions from guides
 
-It provides Misago forum running on Python 3.7 behind Nginx reverse proxy with Https enabled via Let's Encrypt, PostgreSQL database and Redis for caching.
+It provides Misago forum running on Python 3.11 behind Nginx reverse proxy with HTTPS enabled via Let's Encrypt, PostgreSQL database and Redis for caching and messaging. Tasks queue powered by Celery is also included.
 
 To help you running your site, there is a special tool called `appctl` provided, that consists of shortcuts for useful actions, and exposes wizards for configuration management without the need for manually editing files.
 
@@ -40,10 +40,10 @@ This will create `misago_docker` directory that you can then `cd` to and continu
 
 Enter the misago_docker directory and run `./appctl setup` command. The wizard will let you set basic settings for your site: your domain name, timezone or first admin account details. After that it will:
 
-- install all requirements
-- build Docker containers
-- setup `crontab` that will run daily maintenance
-- create database and populate it with initial data
+- Install all the requirements.
+- Build Docker containers.
+- Setup `crontab` that will run daily maintenance.
+- Create database and populate it with initial data.
 
 When `setup` finishes, visit your domain in order to see your Misago forum running.
 
@@ -235,7 +235,7 @@ Default cron task will also try to delete log files older than 60 days.
 Need help?
 ----------
 
-If you have problems setting up your site using `misago_docker`, feel free to ask on [our forums](https://misago-project.org/) or [Discord Chat](https://discord.gg/fwvrZgB). Please don't use Github issues!
+If you have problems setting up your site using `misago_docker`, feel free to ask on [our forums](https://misago-project.org/c/docker/27/) or [Discord Chat](https://discord.gg/fwvrZgB). Please don't use Github issues!
 
 
 Contributing
