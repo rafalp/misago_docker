@@ -16,7 +16,7 @@ RUN wget -q https://www.postgresql.org/media/keys/ACCC4CF8.asc -O - | apt-key ad
       libopenjp2-7-dev \
       locales \
       cron \
-      postgresql-client-15 \
+      postgresql-client \
       gettext && \
     apt-get clean
 
