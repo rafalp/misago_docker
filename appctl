@@ -108,7 +108,7 @@ intro() {
     echo "    ${BOLD}collectstatic${NORMAL}     Collect static assets."
     echo "    ${BOLD}manage.py${NORMAL}         Runs \"python manage.py\" inside docker."
     echo "    ${BOLD}bash${NORMAL}              Starts bash session inside running Misago container."
-    echo "    ${BOLD}run${NORMAL}               Runs \"docker-compose run --rm misago\"."
+    echo "    ${BOLD}run${NORMAL}               Runs \"docker compose run --rm misago\"."
     echo "    ${BOLD}psql${NORMAL}              Runs psql connected to database."
     echo "    ${BOLD}flushredis${NORMAL}        Flush the redis cache."
     echo "    ${BOLD}resetcron${NORMAL}         Replace host's crontab with default one from \"setup\"."
@@ -145,10 +145,10 @@ setup() {
     done
     read -p "Initialize default database? [Y/n]: " initialize_default_database
     # Run docker build
-    docker-compose build --no-cache --force-rm --pull
+    $docker_compose build --no-cache --force-rm --pull
     collectstatic
     if [ "$initialize_default_database" != "n" ]; then
-        docker-compose run --rm misago ./.run initialize_default_database
+        $docker_compose run --rm misago ./.run initialize_default_database
     fi
     start_containers
     set_crontab
@@ -163,10 +163,10 @@ setup() {
 
 # Run collectstatic (uses misago-static volume) so site has loaded assets
 collectstatic() {
-    docker-compose run --rm misago python manage.py collectstatic --no-input
+    $docker_compose run --rm misago python manage.py collectstatic --no-input
 }
 
-# Setup crontab to run `cron` script within Misago container using docker-compose
+# Setup crontab to run `cron` script within Misago container using docker compose
 set_crontab() {
     current_path=$(pwd)
     rm -f cron_tmp
@@ -193,7 +193,7 @@ upgrade() {
     echo
     echo "In case of any issues, run this command to return to the current version:"
     echo
-    echo "git reset --hard $git_commit && docker-compose build --no-cache --force-rm --pull"
+    echo "git reset --hard $git_commit && $docker_compose build --no-cache --force-rm --pull"
     echo
     echo "Note: remember to also restore your backup in case you are rolling back!"
     echo
@@ -207,12 +207,12 @@ upgrade() {
     echo "Creating backup..."
     create_new_backup "upgrade"
     echo "Stopping containers for upgrade..."
-    docker-compose stop
+    $docker_compose stop
     git pull
-    docker-compose build --no-cache --force-rm --pull
+    $docker_compose build --no-cache --force-rm --pull
     collectstatic
-    docker-compose run --rm misago python manage.py migrate
-    docker-compose run --rm misago python manage.py invalidateversionedcaches
+    $docker_compose run --rm misago python manage.py migrate
+    $docker_compose run --rm misago python manage.py invalidateversionedcaches
     echo "Upgrade has been completed, restarting containers..."
     start_containers
     set_crontab
@@ -230,7 +230,7 @@ major_upgrade() {
     echo
     echo "In case of any issues, run this command to return to the current version:"
     echo
-    echo "git checkout v0 && docker-compose build --no-cache --force-rm --pull"
+    echo "git checkout v0 && $docker_compose build --no-cache --force-rm --pull"
 
     read -p "Start upgrade process? [Y/n]: " start_upgrade
     if [ "$start_upgrade" = "n" ]; then
@@ -249,10 +249,10 @@ major_upgrade() {
     fi
 
     echo "Stopping running Misago contains..."
-    docker-compose stop misago misago-celery
+    $docker_compose stop misago misago-celery
 
     echo "Creating database migration from PostgreSQL 10 to 15..."
-    docker-compose run --rm misago ./.run prepare_v1_upgrade
+    $docker_compose run --rm misago ./.run prepare_v1_upgrade
 
     echo "Pulling misago-docker v1 from github.com..."
     git remote set-branches origin '*'
@@ -266,36 +266,36 @@ major_upgrade() {
 # Start docker containers
 start_containers() {
     require_setup
-    docker-compose up --detach
+    $docker_compose up --detach
 }
 
 # Stop docker containers
 stop_containers() {
     require_setup
-    docker-compose stop
+    $docker_compose stop
 }
 
 # Restart docker containers
 restart_containers() {
     require_setup
-    docker-compose stop
-    docker-compose up --detach
+    $docker_compose stop
+    $docker_compose up --detach
 }
 
 # Rebuild misago containers
 rebuild_misago_containers() {
     require_setup
-    docker-compose stop misago misago-celery
-    docker-compose build --force-rm misago misago-celery
-    docker-compose up --detach
+    $docker_compose stop misago misago-celery
+    $docker_compose build --force-rm misago misago-celery
+    $docker_compose up --detach
 }
 
 # Rebuild all containers
 rebuild_all_containers() {
     require_setup
-    docker-compose stop
-    docker-compose build --force-rm --no-cache --pull
-    docker-compose up --detach
+    $docker_compose stop
+    $docker_compose build --force-rm --no-cache --pull
+    $docker_compose up --detach
 }
 
 # Show stats for running docker containers
@@ -318,7 +318,7 @@ flush_redis() {
         echo "Cache flush canceled."
         exit
     fi
-    docker-compose exec redis redis-cli FLUSHALL
+    $docker_compose exec redis redis-cli FLUSHALL
 }
 
 # Forum index configuration
@@ -354,7 +354,7 @@ change_timezone() {
 # Load avatar gallery
 load_avatargallery() {
     require_setup
-    docker-compose run --rm misago python manage.py loadavatargallery
+    $docker_compose run --rm misago python manage.py loadavatargallery
 }
 
 # Sentry configuration
@@ -416,7 +416,7 @@ restore_from_backup() {
         error "Specified archive is missing media backup."
     fi
     # Restore from archive
-    docker-compose run --rm misago ./.run psql < $database_sql
+    $docker_compose run --rm misago ./.run psql < $database_sql
     rm -rf ./misago/media/*
     mv "$media_dir"/* ./misago/media/
     # Cleanup...
@@ -433,23 +433,23 @@ run_collectstatic() {
 
 # Shortcut for starting bash session in running container
 run_bash() {
-    docker-compose exec misago bash
+    $docker_compose exec misago bash
 }
 
-# Shortcut for docker-compose run --rm misago python manage.py
+# Shortcut for docker compose run --rm misago python manage.py
 run_managepy() {
-    docker-compose run --rm misago python manage.py "${@:2}"
+    $docker_compose run --rm misago python manage.py "${@:2}"
 }
 
-# Shortcut for docker-compose run --rm misago...
+# Shortcut for docker compose run --rm misago...
 docker_run() {
-    docker-compose run --rm misago "${@:2}"
+    $docker_compose run --rm misago "${@:2}"
 }
 
 # Shortcut for psql
 run_psql() {
     require_setup
-    docker-compose run --rm misago ./.run psql
+    $docker_compose run --rm misago ./.run psql
 }
 
 # Command dispatcher
