@@ -260,7 +260,7 @@ major_upgrade() {
     git checkout v1
 
     echo "Running completion script from v1..."
-    ./appctl completemajorupdate
+    ./appctl completemajorupgrade
 }
 
 # Start docker containers
