@@ -248,7 +248,7 @@ major_upgrade() {
 
     echo "Pulling misago-docker v1 from github.com..."
     git pull origin v1
-    git checkout v1
+    git checkout -b v1
 
     echo "Running completion script from v1..."
     ./appctl completemajorupdate
