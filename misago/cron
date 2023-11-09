@@ -23,6 +23,7 @@ python manage.py deletemarkedusers
 python manage.py prunecategories
 python manage.py buildactivepostersranking
 python manage.py clearattachments
+python manage.py clearnotifications
 python manage.py clearreadtracker
 python manage.py clearsessions
 python manage.py clearsocial
