@@ -14,7 +14,7 @@ RUN apt-get update && \
       libopenjp2-7-dev \
       locales \
       cron \
-      postgresql-client \
+      postgresql-client-15 \
       gettext && \
     apt-get clean
 
