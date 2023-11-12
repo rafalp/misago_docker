@@ -281,7 +281,7 @@ flush_redis() {
         echo "Cache flush canceled."
         exit
     fi
-    docker compose exec redis redis-cli FLUSHALL
+    docker compose exec redis-6 redis-cli FLUSHALL
 }
 
 # Forum index configuration
