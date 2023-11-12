@@ -7,7 +7,7 @@ This repository provides a production-ready setup of Misago for people who:
 - Have a server with 1GB of RAM and Docker available.
 - Have basic knowledge of Linux to SSH to a VPS, navigate the file system, modify files, run programs, and follow instructions from guides.
 
-It sets up Misago forum running on Python 3.11 behind an NGINX reverse proxy with HTTPS enabled using Let's Encrypt. It uses PostgreSQL for the database and Redis for caching and messaging. Celery is included for task queue functionality.
+It sets up Misago forum running on Python 3.12 behind an NGINX reverse proxy with HTTPS enabled using Let's Encrypt. It uses PostgreSQL for the database and Redis for caching and messaging. Celery is included for task queue functionality.
 
 To help you with running your site, the repository includes a tool called `appctl` that provides shortcuts for common actions and wizards for configuration management, eliminating the need for manual file editing.
 
