@@ -66,11 +66,8 @@ DEFAULT_AUTO_FIELD = "django.db.models.AutoField"
 
 CACHES = {
     "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
+        "BACKEND": "django.core.cache.backends.redis.RedisCache",
         "LOCATION": os.environ.get('CACHE_REDIS_URL', "redis://redis-6/1"),
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        }
     }
 }
 
@@ -108,8 +105,6 @@ LANGUAGE_CODE = os.environ.get('MISAGO_LANGUAGE_CODE', 'en-us')
 TIME_ZONE = os.environ.get('MISAGO_TIME_ZONE', 'UTC')
 
 USE_I18N = True
-
-USE_L10N = True
 
 USE_TZ = True
 
@@ -334,7 +329,6 @@ DEBUG_TOOLBAR_PANELS = [
     'debug_toolbar.panels.templates.TemplatesPanel',
     'debug_toolbar.panels.cache.CachePanel',
     'debug_toolbar.panels.signals.SignalsPanel',
-    'debug_toolbar.panels.logging.LoggingPanel',
 ]
 
 
