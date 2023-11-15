@@ -1,5 +1,4 @@
-misago==0.37.0
+misago==0.38.0.rc3
 django-anymail
-django-redis
 sentry-sdk
 uwsgi

@@ -5,7 +5,7 @@ from utils import get_random_string, input_bool, print_setup_changed_message
 
 
 def get_random_secret_key():
-    chars = "abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)"
+    chars = "abcdefghijklmnopqrstuvwxyz0123456789!@#%^&*(-_+)"
     return get_random_string(50, chars)
 
 
