@@ -248,8 +248,8 @@ restart_containers() {
 # Rebuild misago containers
 rebuild_misago_containers() {
     require_setup
-    docker compose stop misago misago-celery
-    docker compose build --force-rm misago misago-celery
+    docker compose stop misago celery-worker
+    docker compose build --force-rm misago celery-worker
     docker compose up --detach
 }
 
