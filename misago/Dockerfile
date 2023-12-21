@@ -3,6 +3,7 @@ FROM python:3.12
 ENV APT_KEY_DONT_WARN_ON_DANGEROUS_USAGE 1
 ENV PYTHONUNBUFFERED 1
 ENV IN_MISAGO_DOCKER 1
+ENV MISAGO_PLUGINS "/misago/plugins"
 
 # Install dependencies in one single command/layer
 RUN apt-get update && \
@@ -23,8 +24,11 @@ ADD . /misago
 WORKDIR /misago
 
 # Install requirements files
-RUN pip install --upgrade pip && pip install -r requirements.txt
-RUN [ -f requirements-plugins.txt ] && pip install -r requirements-plugins.txt || true
+RUN pip install --upgrade pip && \
+    pip install -r requirements.txt
+
+# Bootstrap plugins
+RUN ./.run bootstrap_plugins
 
 # Expose port 3031 from Docker
 EXPOSE 3031

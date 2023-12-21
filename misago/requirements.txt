@@ -136,7 +136,7 @@ kombu==5.3.3
     #   misago
 markdown==3.5.1
     # via misago
-misago==0.38.1
+misago==0.39.0.b1
     # via -r requirements.in
 mypy-extensions==1.0.0
     # via
