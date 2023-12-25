@@ -37,6 +37,47 @@ invalid_argument() {
     exit 1
 }
 
+# Bootstrap plugins at the build time
+bootstrap_plugins() {
+    if [ -d $MISAGO_PLUGINS ]; then
+        echo "Bootstrapping plugins..."
+
+        glob_pattern="$MISAGO_PLUGINS/*/*/misago_plugin.py"
+        for plugin in $glob_pattern; do
+            plugin_dir=$(dirname $(dirname "$plugin"))
+            plugin_name=$(basename $plugin_dir)
+            plugin_pyproject="$plugin_dir/pyproject.toml"
+            plugin_requirements="$plugin_dir/requirements.txt"
+            plugin_requirements_dev="$plugin_dir/requirements-dev.txt"
+
+            if [ -f $plugin_pyproject ]; then
+                echo "Installing: $plugin_pyproject"
+                pip install -e "$plugin_dir[dev]"
+            elif [ -f $plugin_requirements ]; then
+                echo "Installing: $plugin_requirements"
+                pip install -r $plugin_requirements
+                if [ -f $plugin_requirements_dev ]; then
+                    echo "Installing: $plugin_requirements_dev"
+                    pip install -r $plugin_requirements_dev
+                fi
+            elif [ -f $plugin_requirements_dev ]; then
+                echo "Installing: $plugin_requirements_dev"
+                pip install -r $plugin_requirements_dev
+            else
+                echo "Skipping plugin bootstrap for: $plugin_name"
+            fi
+        done
+
+        pip_install="$MISAGO_PLUGINS/pip-install.txt"
+        if [ -f $pip_install ]; then
+            echo "Installing: $pip_install"
+            pip install -r $pip_install
+        fi
+    else
+        echo "Skipping plugin bootstrap because plugins directory doesn't exist."
+    fi
+}
+
 # Initialize default database
 initialize_default_database() {
     wait_for_db
@@ -90,7 +131,9 @@ complete_v1_upgrade() {
 
 # Command dispatcher
 if [[ $1 ]]; then
-    if [[ $1 = "initialize_default_database" ]]; then
+    if [[ $1 = "bootstrap_plugins" ]]; then
+        bootstrap_plugins
+    elif [[ $1 = "initialize_default_database" ]]; then
         initialize_default_database
     elif [[ $1 = "wait_for_db" ]]; then
         wait_for_db

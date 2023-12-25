@@ -21,12 +21,13 @@ from django.views.decorators.cache import cache_page
 from django.views.decorators.http import last_modified
 from django.views.i18n import JavaScriptCatalog
 from misago import __released__, __version__
+from misago.plugins.urlpatterns import discover_plugins_urlpatterns
 
 # Import urls override or default to no urls
 try:
-    from .urls_override import urlpatterns as urlpatterns_override
+    from .urls_override import urlpatterns as override_urlpatterns
 except ImportError:
-    urlpatterns_override = []
+    override_urlpatterns = []
 
 
 # Cache key for django-i18n.js view that invalidates cache when
@@ -39,8 +40,12 @@ misago_i18n_cache_key = (
 )
 
 
+# Discover plugins urlpatterns
+plugins_urlpatterns = discover_plugins_urlpatterns(settings.INSTALLED_PLUGINS)
+
+
 # Add standard URL's
-urlpatterns = urlpatterns_override + [
+urlpatterns = override_urlpatterns + plugins_urlpatterns + [
     path("", include("misago.urls", namespace="misago")),
 
     # Javascript translations
