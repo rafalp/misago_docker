@@ -1,3 +1,7 @@
+# 1.0.2 (2024-12-30)
+
+- Fix syntax error in crontab.
+
 # 1.0.1 (2024-07-28)
 
 - Disabled logging of write errors in UWSGI.
