@@ -1,4 +1,4 @@
-misago==0.39.2
+misago==0.39.3
 django-anymail
 sentry-sdk
 uwsgi
